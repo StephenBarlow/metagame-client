@@ -9,8 +9,10 @@ import CreateAccountButton from './components/CreateAccountButton';
 
 function App() {
 
+  const serverURL = process.env.REACT_APP_SERVER_URL || 'http://localhost:4000';
+
   const client = new ApolloClient({
-    uri: 'http://localhost:4000',
+    uri: serverURL,
     cache: new InMemoryCache()
   });
 
