@@ -5,7 +5,6 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import FantasyLeagueList from './components/FantasyLeagueList';
 import PickGrid from './components/PickGrid';
 import AccountPanel from './components/AccountPanel';
-import CreateAccountButton from './components/CreateAccountButton';
 
 function App() {
 

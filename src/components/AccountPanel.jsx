@@ -2,7 +2,7 @@ import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import LogoutButton from './LogoutButton';
 import LoginButton from './LoginButton';
-import CreateAccountButton from './CreateAccountButton';
+import SignupButton from './SignupButton';
 
 const GET_ME = gql`
   query GetMe {
@@ -29,7 +29,7 @@ function AccountPanel() {
       :
       <>
         <LoginButton/>
-        <CreateAccountButton/>
+        <SignupButton/>
       </>
     }
     </div>
