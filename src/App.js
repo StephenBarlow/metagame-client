@@ -19,11 +19,12 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <header className="App-header">
-          <CreateAccountButton/>
+        <header className="global-header">
           <AccountPanel/>
-          <PickGrid/>
         </header>
+        <div className="content">
+          <PickGrid/>
+        </div>
       </div>
     </ApolloProvider>
   );

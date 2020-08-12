@@ -1,5 +1,8 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import LogoutButton from './LogoutButton';
+import LoginButton from './LoginButton';
+import CreateAccountButton from './CreateAccountButton';
 
 const GET_ME = gql`
   query GetMe {
@@ -17,13 +20,20 @@ function AccountPanel() {
   if (error) return `Error! ${error.message}`;
 
   return (
-    <div>
+    <div className="account-panel">
     {data?.me.email ? 
-      <span>{ data.me.email }</span>
+      <>
+        <span>You are { data.me.email }</span>
+        <LogoutButton/>
+      </>
       :
-      <span>You are signed out.</span>
+      <>
+        <LoginButton/>
+        <CreateAccountButton/>
+      </>
     }
     </div>
+    
   )
 }
 
