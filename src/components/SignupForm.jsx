@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
+import LoginButton from './LoginButton';
+import UserContext from './ActiveUserContext';
 
 const SIGN_UP = gql`
 mutation CreateUser($request: CreateUserRequest!) {
@@ -16,21 +18,40 @@ mutation CreateUser($request: CreateUserRequest!) {
 }
 `;
 
-function formSubmit(event, signup, email) {
+const formSubmit = function(event, signup, email) {
   event.preventDefault();
   signup({ variables: { "request": {
     email: email
   } }});
-}
+};
 
 function SignupForm() {
 
   const [email, setEmail] = useState('');
-  const [signup, { loading, error, data }] = useMutation(SIGN_UP);
+  const [message, setMessage] = useState(null);
+  const activeUser = useContext(UserContext);
+
+  const signIn = function({ createUser }) {
+    if (createUser?.user) {
+      activeUser(createUser.user.email);
+      localStorage.setItem('activeUser',createUser.user.email);
+    }
+
+    if (createUser?.errors?.length > 0) {
+      setMessage(createUser.errors[0].message);
+    }
+  };
+
+  const [signup, { loading, error, data }] = useMutation(
+    SIGN_UP,
+    {
+      onCompleted: signIn
+    }
+  );
 
   return (
     <>
-      <h3>Create account</h3>
+      <h3>Register</h3>
       <form onSubmit={(event) => formSubmit(event, signup, email) }>
         <label>
           Email:
@@ -40,9 +61,8 @@ function SignupForm() {
       </form>
       <p className="form-status">
         { loading && <>Loading...</> }
-        { error && <>Error logging in</> }
-        { data?.errors && <> { data.errors[0].message } </> }
-        { data?.user && <> { data.user.email } </> }
+        { error && <>Server error while creating account</> }
+        { message && <> { message } </> }
       </p>
     </>
   );

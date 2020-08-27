@@ -1,8 +1,9 @@
 import React from 'react';
+import { useParams } from "react-router-dom";
 import { gql, useQuery } from '@apollo/client';
 
 const GET_PICK_GRID = gql`
-  query GetPickGrid {
+  query GetPickGrid($leagueID: ID!) {
     sportsTeams {
       id
       shortName
@@ -25,13 +26,13 @@ const GET_PICK_GRID = gql`
     league(leagueID: $leagueID) {
       users {
         id
-        displayName
+        displayName(leagueID: $leagueID)
       }
       picks {
         user {
           id
         }
-        teams {
+        team {
           id
         }
         week
@@ -42,11 +43,20 @@ const GET_PICK_GRID = gql`
 
 function PickGrid() {
 
-  const { loading, error, data } = useQuery(GET_PICK_GRID);
+  const { id } = useParams();
+  const { loading, error, data } = useQuery(
+    GET_PICK_GRID,
+    {
+      variables: {
+        leagueID: id
+      }
+    }
+  );
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
 
+  // Sort teams alphabetically
   let teams = data.sportsTeams.slice().sort(function(a, b) {
     if (a.shortName > b.shortName) {
       return 1;
@@ -59,6 +69,9 @@ function PickGrid() {
     <th data-team-id="{ team.id }">{ team.shortName }</th>
   );
 
+  let players = data.league.users;
+  const playerNames = players.map((player) => <tr><td>{ player.displayName }</td></tr>)
+
   return (
     <table>
       <thead>
@@ -70,7 +83,7 @@ function PickGrid() {
         </tr>
       </thead>
       <tbody>
-
+        { playerNames }
       </tbody>
     </table>
   );

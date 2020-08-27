@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { gql, useLazyQuery } from '@apollo/client';
+import UserContext from './ActiveUserContext';
 
 const LOG_IN = gql`
   query LogIn($email: String!) {
     user(email: $email) {
+      id
       email
     }
   }
@@ -14,10 +16,33 @@ function formSubmit(event, login, email) {
   login({ variables: { "email": email }});
 }
 
+function storeActiveUser({ user }){
+  if (!user) {
+    return;
+  } else {
+    
+  }
+}
+
 function LoginForm() {
 
+  // Keeping track of the address entered in the form
   const [email, setEmail] = useState('');
-  const [login, { loading, error, data }] = useLazyQuery(LOG_IN);
+  const activeUser = useContext(UserContext);
+
+  const signIn = function({ user }) {
+    if (user) {
+      activeUser(user.email);
+      localStorage.setItem('activeUser', user.email);
+    }
+  };
+  
+  const [login, { loading, error, data }] = useLazyQuery(
+    LOG_IN,
+    {
+      onCompleted: signIn
+    }
+  );
 
   return (
     <>
@@ -31,8 +56,8 @@ function LoginForm() {
       </form>
       <p className="form-status">
         { loading && <>Loading...</> }
-        { error && <>Error logging in</> }
-        { data && <>Success!</>}
+        { error && <>Server error logging in</> }
+        { data?.user?.email && <>Success!</>}
       </p>
     </>
   );

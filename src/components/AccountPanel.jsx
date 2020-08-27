@@ -6,9 +6,7 @@ import SignupButton from './SignupButton';
 
 const GET_ME = gql`
   query GetMe {
-    me @client {
-      email
-    }
+    me @client
   }
 `;
 
@@ -21,9 +19,9 @@ function AccountPanel() {
 
   return (
     <div className="account-panel">
-    {data?.me.email ? 
+    {data?.me ? 
       <>
-        <span>You are { data.me.email }</span>
+        <span>Playing as <strong>{ data.me }</strong></span>
         <LogoutButton/>
       </>
       :

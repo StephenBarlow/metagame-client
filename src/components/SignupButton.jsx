@@ -17,7 +17,7 @@ class SignupButton extends Component {
   render() {
     return(
       <>
-        <a onClick={this.showModal}> Create account </a>
+        <a onClick={this.showModal}> Register </a>
         <Modal show={this.state.show} handleClose={this.hideModal}>
           <SignupForm/>
         </Modal>

@@ -24,6 +24,10 @@ td, th {
   min-width:40px;
 }
 
+.content {
+  padding-left: 20px;
+  padding-right: 20px;
+}
 
 
 .modal {
@@ -57,7 +61,7 @@ form label {
   align-items: center;
 }
 
-.account-panel a {
+.account-panel a, .account-panel span {
   margin-right: 20px;
 }
 
@@ -75,6 +79,22 @@ form input:not(:first-of-type) {
   margin-left: 10px;
 }
 
-.content {
+.logo {
+  display: flex;
+  height: inherit;
+  margin: 0;
+  margin-left: 10px;
+  float: left;
+  align-items: center;
+}
 
+.logo a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.modal form input[type=text] {
+  height: 30px;
+  width: 200px;
+  font-size: 18px;
 }
