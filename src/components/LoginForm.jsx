@@ -16,14 +16,6 @@ function formSubmit(event, login, email) {
   login({ variables: { "email": email }});
 }
 
-function storeActiveUser({ user }){
-  if (!user) {
-    return;
-  } else {
-    
-  }
-}
-
 function LoginForm() {
 
   // Keeping track of the address entered in the form
@@ -32,8 +24,8 @@ function LoginForm() {
 
   const signIn = function({ user }) {
     if (user) {
-      activeUser(user.email);
-      localStorage.setItem('activeUser', user.email);
+      activeUser(user);
+      localStorage.setItem('activeUser', JSON.stringify(user));
     }
   };
   
@@ -46,7 +38,7 @@ function LoginForm() {
 
   return (
     <>
-      <h3>Sign in</h3>
+      <h3>Please sign in with your email</h3>
       <form onSubmit={(event) => formSubmit(event, login, email) }>
         <label>
           Email:
@@ -57,6 +49,7 @@ function LoginForm() {
       <p className="form-status">
         { loading && <>Loading...</> }
         { error && <>Server error logging in</> }
+        { data && !data.user && <>User not found!</>}
         { data?.user?.email && <>Success!</>}
       </p>
     </>

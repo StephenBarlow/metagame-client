@@ -1,29 +1,10 @@
 import React from 'react';
-import { useParams } from "react-router-dom";
 import { gql, useQuery } from '@apollo/client';
 
 const GET_PICK_GRID = gql`
   query GetPickGrid($leagueID: ID!) {
-    sportsTeams {
-      id
-      shortName
-    }
-
-    sportsGames {
-      startsAt
-      awayTeam {
-        id
-      }
-      homeTeam {
-        id
-      }
-      result {
-        awayTeamScore
-        homeTeamScore
-      }
-    }
-
     league(leagueID: $leagueID) {
+      currentWeek
       users {
         id
         displayName(leagueID: $leagueID)
@@ -41,14 +22,13 @@ const GET_PICK_GRID = gql`
   }
 `;
 
-function PickGrid() {
+function PickGrid(props) {
 
-  const { id } = useParams();
   const { loading, error, data } = useQuery(
     GET_PICK_GRID,
     {
       variables: {
-        leagueID: id
+        leagueID: props.leagueID
       }
     }
   );
@@ -57,7 +37,7 @@ function PickGrid() {
   if (error) return `Error! ${error.message}`;
 
   // Sort teams alphabetically
-  let teams = data.sportsTeams.slice().sort(function(a, b) {
+  let teams = props.teams.slice().sort(function(a, b) {
     if (a.shortName > b.shortName) {
       return 1;
     } else {
@@ -66,24 +46,45 @@ function PickGrid() {
   });
 
   const teamHeaders = teams.map((team) => 
-    <th data-team-id="{ team.id }">{ team.shortName }</th>
+    <th data-team-id={team.id} key={team.id}>{team.shortName}</th>
   );
 
   let players = data.league.users;
-  const playerNames = players.map((player) => <tr><td>{ player.displayName }</td></tr>)
+
+  const playerRows = data.league.users.map((player) => <tr key={player.id}>
+    <td className="player-name">{player.displayName}</td>
+    <td className="player-total">0</td>
+    <td className="player-last">0</td>
+    {
+      teams.map((team) => <td className="player-team" key={team.id}>
+        
+      </td>)
+    }
+    <td className="player-byes">2</td>
+  </tr>);
+
+  const playerNames = players.map((player) => <tr key={player.id}><td>{ player.displayName }</td></tr>)
+
+  let playerPicks = teams.map((team) => 
+    <td>Blah</td>
+  );
+
+
 
   return (
-    <table>
+    <table className="pick-grid">
       <thead>
         <tr>
           <th>Competitor</th>
-          <th>Score</th>
+          <th>Total</th>
+          <th>Last</th>
           { teamHeaders }
-          <th data-team-id="bye">BYE</th>
+          <th data-team-id="bye" className="player-byes">BYES</th>
         </tr>
       </thead>
       <tbody>
-        { playerNames }
+        
+        { playerRows }
       </tbody>
     </table>
   );

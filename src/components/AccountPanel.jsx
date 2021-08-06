@@ -1,33 +1,23 @@
-import React from 'react';
-import { gql, useQuery } from '@apollo/client';
+import React, { useContext } from 'react';
 import LogoutButton from './LogoutButton';
 import LoginButton from './LoginButton';
 import SignupButton from './SignupButton';
-
-const GET_ME = gql`
-  query GetMe {
-    me @client
-  }
-`;
+import UserContext from './ActiveUserContext';
 
 function AccountPanel() {
 
-  const { loading, error, data } = useQuery(GET_ME);
-  
-  if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
+  const activeUser = useContext(UserContext);
 
   return (
     <div className="account-panel">
-    {data?.me ? 
+    {activeUser() ? 
       <>
-        <span>Playing as <strong>{ data.me }</strong></span>
+        <span>Playing as <strong>{ activeUser().email }</strong></span>
         <LogoutButton/>
       </>
       :
       <>
         <LoginButton/>
-        <SignupButton/>
       </>
     }
     </div>
