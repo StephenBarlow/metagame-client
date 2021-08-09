@@ -8,6 +8,10 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
   submitPick(request: $request) {
     pick {
       id
+      week
+      league {
+        id
+      }
       user {
         id
       }
