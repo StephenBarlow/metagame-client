@@ -45,7 +45,12 @@ function PickSubmitForm(props) {
 
   const [submitPicks, {loading, error, data}] = useMutation (
     SUBMIT_PICKS,
-    {}
+    {
+      refetchQueries: [
+        'GetLeagueDetails',
+        'GetCurrentPick'
+      ]
+    }
   );
 
   let teams = props.teams.slice().sort(function(a, b) {

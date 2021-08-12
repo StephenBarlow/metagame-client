@@ -3,6 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
 import PickSubmitForm from './PickSubmitForm'
+import CurrentPick from './CurrentPick'
 import { useParams } from 'react-router-dom';
 
 const GET_SPORTS_TEAMS = gql`
@@ -22,11 +23,13 @@ const GET_LEAGUE_DETAILS = gql`
       name
       currentWeek
       picks {
+        id
         user {
           id
         }
         team {
           id
+          name
         }
         week
       }
@@ -61,6 +64,7 @@ function LeagueDetails() {
       <h3>The Grid</h3>
       <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
       <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} />
+      <CurrentPick league={leagueData.league} />
     </>
   );
 }
