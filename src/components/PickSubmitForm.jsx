@@ -48,7 +48,8 @@ function PickSubmitForm(props) {
     {
       refetchQueries: [
         'GetLeagueDetails',
-        'GetCurrentPick'
+        'GetCurrentPick',
+        'GetPickGrid'
       ]
     }
   );

@@ -5,7 +5,6 @@ function CurrentPick(props) {
 
   const activeUser = useContext(UserContext);
   const currentPicks = props.league.picks.filter(item => (item.user.id === activeUser().id && item.week === props.league.currentWeek));
-  console.log(currentPicks);
 
   return (
     <>
