@@ -3,7 +3,8 @@ import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
 import PickSubmitForm from './PickSubmitForm'
-import CurrentPick from './CurrentPick'
+import CurrentPick from './CurrentPick';
+import CurrentWeekPicks from './CurrentWeekPicks'
 import { useParams } from 'react-router-dom';
 
 const GET_SPORTS_TEAMS = gql`
@@ -17,11 +18,12 @@ const GET_SPORTS_TEAMS = gql`
 `;
 
 const GET_LEAGUE_DETAILS = gql`
-  query GetLeagueDetails($leagueID: ID) {
+  query GetLeagueDetails($leagueID: ID!) {
     league(leagueID: $leagueID) {
       id
       name
       currentWeek
+      revealedWeek
       picks {
         id
         user {
@@ -30,8 +32,13 @@ const GET_LEAGUE_DETAILS = gql`
         team {
           id
           name
+          shortName
         }
         week
+      }
+      users {
+        id
+        displayName(leagueID: $leagueID)
       }
     }
   }
@@ -61,6 +68,10 @@ function LeagueDetails() {
   return (
     <>
       <h2>{leagueData.league.name}</h2>
+
+      { leagueData.league.currentWeek === leagueData.league.revealedWeek && 
+        <CurrentWeekPicks league={leagueData.league}/>
+      }
       <h3>The Grid</h3>
       <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
       <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} />

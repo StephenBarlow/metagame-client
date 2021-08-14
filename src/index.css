@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #404050;
+  color: #eee;
 }
 
 code {
@@ -14,16 +16,30 @@ code {
 
 
 /* My stuff */
+a:visited {
+  color: #eee;
+}
+
 table {
   border-collapse: collapse;
 }
 
 td, th {
-  font-size: 16px;
+  font-size: 18px;
   border: 1px solid black;
   min-width:40px;
 }
 
+.team-picker {
+  margin-right: 10px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.pick-submit {
+  height: 40px;
+  font-size: 18px;
+}
 
 
 .team-bye {
@@ -114,13 +130,23 @@ form input:not(:first-of-type) {
   font-size: 18px;
 }
 
-.double-win {
+.outcome-double-win {
   background-color: #016306;
   color: white;
 }
 
-.double-loss {
+.outcome-double-loss {
   background-color: #66ca6b;
+  color: black;
+}
+
+.outcome-unknown {
+  background-color: #fffc57;
+  color: black;
+}
+
+.outcome-split {
+  background-color: #eb1717;
   color: black;
 }
 
@@ -141,6 +167,7 @@ form input:not(:first-of-type) {
 
 .team-buf {
   background-color: #00338D;
+  -webkit-text-stroke: 0.5px #aaa;
   color: #C60C30;
 }
 
@@ -186,6 +213,7 @@ form input:not(:first-of-type) {
 
 .team-hou {
   background-color: #03202F;
+  -webkit-text-stroke: 0.5px white;
   color: #A71930;
 }
 
@@ -221,7 +249,7 @@ form input:not(:first-of-type) {
 
 .team-mia {
   background-color: #008E97;
-  color: #FC4C02;
+  color:  white;
 }
 
 .team-min {

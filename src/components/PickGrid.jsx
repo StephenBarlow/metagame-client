@@ -7,6 +7,7 @@ const GET_PICK_GRID = gql`
   query GetPickGrid($leagueID: ID!) {
     league(leagueID: $leagueID) {
       currentWeek
+      revealedWeek
       users {
         id
         displayName(leagueID: $leagueID)
@@ -18,6 +19,7 @@ const GET_PICK_GRID = gql`
         }
         team {
           id
+          shortName
         }
         week
       }
@@ -159,6 +161,14 @@ function PickGrid(props) {
     return pickedTeamScore - otherTeamScore;
   }
 
+  const calculatePlayerScore = function(playerID) {
+    let totalScore = 0;
+    for (const [key, value] of Object.entries(pickResults[playerID])) {
+      totalScore += value.value;
+    }
+    return totalScore;
+  };
+
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
 
@@ -174,29 +184,28 @@ function PickGrid(props) {
   });
 
   const teamHeaders = teams.map((team) => 
-    <th data-team-id={team.id} key={team.id} className={'team-' + team.shortName.toLowerCase()}>{team.shortName}</th>
+    <th data-team-id={team.id} key={team.id} className={'team-' + team.shortName.toLowerCase()} title={team.name}>{team.shortName}</th>
   );
 
   const getOutcomeClass = function(result) {
     if (!result) {
       return '';
     } else if (result.outcome === 'DOUBLE_WIN') {
-      return 'double-win';
+      return 'outcome-double-win';
     } else if (result.outcome === 'DOUBLE_LOSS') {
-      return 'double-loss';
+      return 'outcome-double-loss';
     } else if (result.outcome === 'UNKNOWN') {
-      return 'unknown-outcome';
+      return 'outcome-unknown';
+    } else if (result.outcome === 'SPLIT') {
+      return 'outcome-split';
     }
   }
 
-  let players = data.league.users;
-
   const playerRows = data.league.users.map((player) => <tr key={player.id}>
     <td className="player-name">{player.displayName}</td>
-    <td className="player-total">0</td>
-    <td className="player-last">0</td>
+    <td className="player-total">{calculatePlayerScore(player.id)}</td>
     {
-      teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])}>
+      teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])} title={'Week ' + pickResults[player.id][team.id]?.week}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}
@@ -207,21 +216,12 @@ function PickGrid(props) {
     <td className="player-byes">2</td>
   </tr>);
 
-  const playerNames = players.map((player) => <tr key={player.id}><td>{ player.displayName }</td></tr>)
-
-  let playerPicks = teams.map((team) => 
-    <td>Blah</td>
-  );
-
-
-
   return (
     <table className="pick-grid">
       <thead>
         <tr>
           <th>Competitor</th>
           <th>Total</th>
-          <th>Last</th>
           { teamHeaders }
           <th data-team-id="bye" className="player-byes">BYES</th>
         </tr>

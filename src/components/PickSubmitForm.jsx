@@ -72,14 +72,16 @@ function PickSubmitForm(props) {
           className="team-picker" name="first-team-picker" id="first-team-picker"
           onChange={event => setFirstTeam(event.target.value)}
         >
+          <option value="" key="blank"></option>
           {teams}
         </select>
         <select 
           className="team-picker" name="second-team-picker" id="second-team-picker"
           onChange={event => setSecondTeam(event.target.value)}>
+          <option value="" key="blank"></option>
           {teams}
         </select>
-        <input type="submit" />
+        <input className="pick-submit" type="submit" />
       </form>
       <p className="form-status">
         { loading && <>Loading...</> }
