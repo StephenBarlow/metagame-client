@@ -174,8 +174,20 @@ function PickGrid(props) {
   });
 
   const teamHeaders = teams.map((team) => 
-    <th data-team-id={team.id} key={team.id}>{team.shortName}</th>
+    <th data-team-id={team.id} key={team.id} className={'team-' + team.shortName.toLowerCase()}>{team.shortName}</th>
   );
+
+  const getOutcomeClass = function(result) {
+    if (!result) {
+      return '';
+    } else if (result.outcome === 'DOUBLE_WIN') {
+      return 'double-win';
+    } else if (result.outcome === 'DOUBLE_LOSS') {
+      return 'double-loss';
+    } else if (result.outcome === 'UNKNOWN') {
+      return 'unknown-outcome';
+    }
+  }
 
   let players = data.league.users;
 
@@ -184,7 +196,7 @@ function PickGrid(props) {
     <td className="player-total">0</td>
     <td className="player-last">0</td>
     {
-      teams.map((team) => <td className="player-team" key={team.id}>
+      teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}

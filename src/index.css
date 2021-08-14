@@ -24,6 +24,12 @@ td, th {
   min-width:40px;
 }
 
+
+
+.team-bye {
+  
+}
+
 .content {
   padding-left: 20px;
   padding-right: 20px;
@@ -106,4 +112,174 @@ form input:not(:first-of-type) {
   height: 30px;
   width: 200px;
   font-size: 18px;
+}
+
+.double-win {
+  background-color: #016306;
+  color: white;
+}
+
+.double-loss {
+  background-color: #66ca6b;
+  color: black;
+}
+
+.team-ari {
+  background-color: #97233F;
+  color: #FFB612;
+}
+
+.team-atl {
+  background-color: #A71930;
+  color: white;
+}
+
+.team-bal {
+  background-color: #241773;
+  color: white; 
+}
+
+.team-buf {
+  background-color: #00338D;
+  color: #C60C30;
+}
+
+.team-car {
+  background-color: #0085CA;
+  color: black;
+}
+
+.team-chi {
+  background-color: #0B162A;
+  color: #C83803;
+}
+
+.team-cin {
+  background-color: #FB4F14;
+  color: black;
+}
+
+.team-cle {
+  background-color: #311D00;
+  color: #FF3C00;
+}
+
+.team-dal {
+  background-color: #869397;
+  color: #041E42;
+}
+
+.team-den {
+  background-color: #FB4F14;
+  color: #002244;
+}
+
+.team-det {
+  background-color: #0076B6;
+  color: white;
+}
+
+.team-gb {
+  background-color: #203731;
+  color: #FFB612;
+}
+
+.team-hou {
+  background-color: #03202F;
+  color: #A71930;
+}
+
+.team-ind {
+  background-color: #002C5F;
+  color: white;
+}
+
+.team-jax {
+  background-color: #006778;
+  color: #D7A22A;
+}
+
+.team-kc {
+  background-color: #E31837;
+  color: #FFB81C;
+}
+
+.team-lac {
+  background-color: #0080C6;
+  color: #FFC20E;
+}
+
+.team-lar {
+  background-color: #003594;
+  color: #FFA300;
+}
+
+.team-lv {
+  background-color: black;
+  color: #A5ACAF;
+}
+
+.team-mia {
+  background-color: #008E97;
+  color: #FC4C02;
+}
+
+.team-min {
+  background-color: #4F2683;
+  color: #FFC62F;
+}
+
+.team-ne {
+  background-color: #002244;
+  color: #B0B7BC;
+}
+
+.team-no {
+  background-color: #D3BC8D;
+  color: #101820;
+}
+
+.team-nyg {
+  background-color: #0B2265;
+  color: white;
+}
+
+.team-nyj {
+  background-color: #125740;
+  color: white;
+}
+
+.team-phi {
+  background-color: #004C54;
+  color: #ACC0C6;
+}
+
+.team-pit {
+  background-color: #FFB612;
+  color: #101820;
+}
+
+.team-sea {
+  background-color: #002244;
+  color: #69BE28;
+}
+
+.team-sf {
+  background-color: #B3995D;
+  color: #AA0000;
+}
+
+.team-tb {
+  background-color: #D50A0A;
+  color: #FF7900;
+}
+
+.team-ten {
+  background-color: #4B92DB;
+  color: #0C2340; 
+}
+
+.team-was {
+  background-color: #773141;
+  color: #FFB612;
 }
