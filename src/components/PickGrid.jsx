@@ -217,20 +217,21 @@ function PickGrid(props) {
   </tr>);
 
   return (
-    <table className="pick-grid">
-      <thead>
-        <tr>
-          <th>Competitor</th>
-          <th>Total</th>
-          { teamHeaders }
-          <th data-team-id="bye" className="player-byes">BYES</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-        { playerRows }
-      </tbody>
-    </table>
+    <div class="grid-wrapper">
+      <table className="pick-grid">
+        <thead>
+          <tr>
+            <th>Competitor</th>
+            <th>Total</th>
+            { teamHeaders }
+            <th data-team-id="bye" className="player-byes">BYES</th>
+          </tr>
+        </thead>
+        <tbody>
+          { playerRows }
+        </tbody>
+      </table>
+    </div>
   );
 }
 

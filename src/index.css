@@ -51,12 +51,17 @@ td, th {
   padding-right: 20px;
 }
 
-.pick-grid td {
-  text-align: center;
+.grid-wrapper {
+  overflow-x: scroll;
 }
 
-.player-byes {
-  background: gray;
+.pick-grid td, th {
+  text-align: center;
+  background-color: #333;
+}
+
+.pick-grid .player-byes {
+  background-color: #222;
   color: white;
 }
 
