@@ -68,6 +68,7 @@ function PickGrid(props) {
         // If the player has picked that team...
         const teamPick = data.league.picks.find(pick => (pick.team.id === team.id && pick.user.id === player.id));
 
+        // Calculate the result of that pick
         if (teamPick) {
           results[player.id][team.id] = calculatePickResult(player.id, teamPick);
         }
@@ -98,6 +99,7 @@ function PickGrid(props) {
       };
     }
 
+    // Get each game's margin of victory/loss
     const firstGameMargin = calculateGameMargin(firstPickGame, firstPick.team.id);
 
     const secondGameMargin = calculateGameMargin(secondPickGame, secondPick.team.id);
@@ -113,7 +115,7 @@ function PickGrid(props) {
       }
     } else if (firstGameMargin <= 0 && secondGameMargin <= 0) {
 
-      // Double loss, points depend on "larger" margin of LOSS
+      // Double loss, points depend on "larger" margin of loss
       let firstGameScore;
 
       if (firstGameMargin < secondGameMargin) {
@@ -201,11 +203,12 @@ function PickGrid(props) {
     }
   }
 
+  // Generate the grid row for each competitor
   const playerRows = data.league.users.map((player) => <tr key={player.id}>
     <td className="player-name">{player.displayName}</td>
     <td className="player-total">{calculatePlayerScore(player.id)}</td>
     {
-      teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])} title={'Week ' + pickResults[player.id][team.id]?.week}>
+      teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])} title={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : ''}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}
@@ -213,11 +216,11 @@ function PickGrid(props) {
         }
       </td>)
     }
-    <td className="player-byes">2</td>
+    <td className="player-byes">••</td>
   </tr>);
 
   return (
-    <div class="grid-wrapper">
+    <div className="grid-wrapper">
       <table className="pick-grid">
         <thead>
           <tr>

@@ -29,14 +29,15 @@ function CurrentPick(props) {
 
   return (
     <>
-      <h3>Current picks for week {props.league.currentWeek}</h3>
-      <ul>
+      <h3>Your picks for week {props.league.currentWeek}</h3>
+      <div>
       {
-        data.currentPick.map((pick) => <li key={pick.id}>
-          {pick.team.name}
-        </li>)
+        data.currentPick.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
+          {pick.team.shortName}
+        </span>)
       }
-      </ul>
+      </div>
+      <p>You can replace these picks until the start of the early Sunday games.</p>
     </>
   );
 }
