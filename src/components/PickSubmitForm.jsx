@@ -31,10 +31,10 @@ function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');
   const [secondTeam, setSecondTeam] = useState('');
+  const [message, setMessage] = useState('\xa0');
 
   const formSubmit = function(event, submitPicks, teams) {
     event.preventDefault();
-    console.log(teams);
     submitPicks({ variables: { "request": {
       userID: activeUser().id,
       leagueID: props.league.id,
@@ -50,7 +50,15 @@ function PickSubmitForm(props) {
         'GetLeagueDetails',
         'GetCurrentPick',
         'GetPickGrid'
-      ]
+      ],
+      onCompleted: ({submitPick}) => {
+        if (submitPick.pick) {
+          setMessage('Picks submitted successfully!');
+        }
+        if (submitPick.errors) {
+          setMessage(`Error: ${submitPick.errors[0].message}`);
+        }
+      }
     }
   );
 
@@ -83,12 +91,10 @@ function PickSubmitForm(props) {
           <option value="-1" key="bye">BYE</option>
           {teams} 
         </select>
-        <input className="pick-submit" type="submit" />
+        <input className="pick-submit" type="submit" value="Submit" />
       </form>
       <p className="form-status">
-        { loading && <>Loading...</> }
-        { error && <>Server error while submitting picks.</> }
-        { data && <>Picks submitted successfully!</>}
+        { message }
       </p>
     </>
   )

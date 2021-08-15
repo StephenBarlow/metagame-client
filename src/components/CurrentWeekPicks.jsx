@@ -1,9 +1,7 @@
-import React, { useState, useContext } from 'react';
-import UserContext from './ActiveUserContext';
+import React from 'react';
 
 function CurrentWeekPicks(props) {
 
-  const activeUser = useContext(UserContext);
   const currentPicks = props.league.picks.filter(item => (item.week === props.league.currentWeek));
 
   const picksForPlayer = function(playerID) {

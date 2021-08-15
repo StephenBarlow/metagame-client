@@ -41,6 +41,10 @@ td, th {
   font-size: 18px;
 }
 
+.form-status {
+  color: #ffca58;
+}
+
 .current-pick {
   font-weight: bold;
   padding: 5px;
