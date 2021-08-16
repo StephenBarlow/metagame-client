@@ -64,6 +64,12 @@ function PickSubmitForm(props) {
     }
   );
 
+  // Checks if the active user has already
+  // picked a particular team
+  const alreadyPicked = function(teamID) {
+    return !!props.league.picks.find(pick => pick.user.id === activeUser().id && pick.team.id === teamID);
+  }
+
   let teams = props.teams.slice().sort(function(a, b) {
     if (a.name > b.name) {
       return 1;
@@ -72,12 +78,7 @@ function PickSubmitForm(props) {
     }
   });
 
-  const pastPicks = props.league.picks;
-  teams = teams.filter(team => {
-    return !(pastPicks.find(pick => pick.user.id === activeUser().id && pick.team.id === team.id))
-  });
-
-  teams = teams.map((team) => <option value={team.id} key={team.id}>{team.name}</option>)
+  teams = teams.map((team) => <option value={team.id} key={team.id} disabled={alreadyPicked(team.id)}>{team.name}</option>)
 
   return (
     <>

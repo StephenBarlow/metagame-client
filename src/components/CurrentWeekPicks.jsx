@@ -5,7 +5,7 @@ function CurrentWeekPicks(props) {
   const currentPicks = props.league.picks.filter(item => (item.week === props.league.currentWeek));
 
   const picksForPlayer = function(playerID) {
-    return currentPicks.filter(pick => (pick.user.id === playerID)).map((pick) => <td className={'team-' + pick.team.shortName.toLowerCase()}>{pick.team.shortName}</td>)
+    return currentPicks.filter(pick => (pick.user.id === playerID)).map((pick) => <td key={pick.team.shortName.toLowerCase()} className={'team-' + pick.team.shortName.toLowerCase()}>{pick.team.shortName}</td>)
   }
 
   const playerRows = props.league.users.map((player) => <tr key={player.id}>
