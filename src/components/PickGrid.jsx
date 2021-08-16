@@ -182,13 +182,16 @@ function PickGrid(props) {
   const calculatePlayerScore = function(playerID) {
     let totalScore = 0;
     for (const [key, value] of Object.entries(pickResults[playerID])) {
-      totalScore += value.value;
+      if (Number.isInteger(value.value)) {
+        totalScore += value.value;
+      }
     }
     return totalScore;
   };
 
-  if (loading) return 'Loading...';
+  if (loading || gamesLoading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
+  if (gamesError) return `Error! ${gamesError.message}`;
 
   const pickResults = getPickResults();
 
@@ -236,21 +239,24 @@ function PickGrid(props) {
   </tr>);
 
   return (
-    <div className="grid-wrapper">
-      <table className="pick-grid">
-        <thead>
-          <tr>
-            <th>Competitor</th>
-            <th>Total</th>
-            { teamHeaders }
-            <th data-team-id="bye" className="player-byes">BYES</th>
-          </tr>
-        </thead>
-        <tbody>
-          { playerRows }
-        </tbody>
-      </table>
-    </div>
+    <>
+      <h3>Standings</h3>
+      <div className="grid-wrapper">
+        <table className="pick-grid">
+          <thead>
+            <tr>
+              <th>Competitor</th>
+              <th>Total</th>
+              { teamHeaders }
+              <th data-team-id="bye" className="player-byes">BYES</th>
+            </tr>
+          </thead>
+          <tbody>
+            { playerRows }
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 

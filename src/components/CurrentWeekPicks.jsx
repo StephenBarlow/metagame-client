@@ -15,19 +15,23 @@ function CurrentWeekPicks(props) {
 
   return (
     <>
-      <h3>All picks for week {props.league.currentWeek}</h3>
-      <table className="pick-grid">
-      <thead>
-        <tr>
-          <th>Competitor</th>
-          <th>Team 1</th>
-          <th>Team 2</th>
-        </tr>
-      </thead>
-      <tbody>
-        {playerRows}
-      </tbody>
-    </table>
+      { props.league.currentWeek === props.league.revealedWeek &&
+      <>
+        <h3>All picks for week {props.league.currentWeek}</h3>
+        <table className="pick-grid">
+          <thead>
+            <tr>
+              <th>Competitor</th>
+              <th>Team 1</th>
+              <th>Team 2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {playerRows}
+          </tbody>
+        </table>
+      </>
+      }
     </>
   );
 }

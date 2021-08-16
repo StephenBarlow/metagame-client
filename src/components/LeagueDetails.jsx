@@ -69,12 +69,12 @@ function LeagueDetails() {
     <>
       <h2>{leagueData.league.name}</h2>
 
-      { leagueData.league.currentWeek === leagueData.league.revealedWeek && 
-        <CurrentWeekPicks league={leagueData.league}/>
-      }
+      <CurrentWeekPicks league={leagueData.league}/>
+
       <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} />
+
       <CurrentPick league={leagueData.league} />
-      <h3>The Grid</h3>
+
       <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
     </>
   );

@@ -70,11 +70,19 @@ function PickSubmitForm(props) {
     }
   });
 
+  const pastPicks = props.league.picks;
+  teams = teams.filter(team => {
+    return !(pastPicks.find(pick => pick.user.id === activeUser().id && pick.team.id === team.id))
+  });
+
   teams = teams.map((team) => <option value={team.id} key={team.id}>{team.name}</option>)
 
   return (
     <>
       <h3>Submit picks for week {props.league.currentWeek}</h3>
+      <p>
+        <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank">Odds</a>
+      </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
         <select 
           className="team-picker" name="first-team-picker" id="first-team-picker"

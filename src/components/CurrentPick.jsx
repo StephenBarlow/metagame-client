@@ -26,6 +26,9 @@ function CurrentPick(props) {
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
+  if (!data.currentPick.length) {
+    return (<p className="warning">You have not yet submitted picks for week {props.league.currentWeek}.</p>)
+  }
 
   return (
     <>
@@ -37,7 +40,7 @@ function CurrentPick(props) {
         </span>)
       }
       </div>
-      <p>You can replace these picks until the start of the early Sunday games.</p>
+      <p>You can change these picks until the start of the early Sunday games.</p>
     </>
   );
 }
