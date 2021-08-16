@@ -6,6 +6,7 @@ import { gql, useQuery } from '@apollo/client';
 const GET_PICK_GRID = gql`
   query GetPickGrid($leagueID: ID!) {
     league(leagueID: $leagueID) {
+      season
       currentWeek
       revealedWeek
       users {
@@ -24,7 +25,12 @@ const GET_PICK_GRID = gql`
         week
       }
     }
-    sportsGames {
+  }
+`;
+
+const GET_SPORTS_GAMES = gql`
+  query GetSportsGames($season: String) {
+    sportsGames(season: $season) {
       id
       awayTeam {
         id
@@ -52,6 +58,16 @@ function PickGrid(props) {
       variables: {
         leagueID: props.leagueID
       }
+    }
+  );
+
+  const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
+    GET_SPORTS_GAMES,
+    {
+      variables: {
+        season: data?.league.season
+      },
+      skip: !data
     }
   );
 
@@ -86,9 +102,9 @@ function PickGrid(props) {
     const secondPick = data.league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
 
     // Get the result of both picked games
-    const firstPickGame = data.sportsGames.find(game => (game.week === firstPick.week && (game.awayTeam.id === firstPick.team.id || game.homeTeam.id === firstPick.team.id)));
+    const firstPickGame = gamesData.sportsGames.find(game => (game.week === firstPick.week && (game.awayTeam.id === firstPick.team.id || game.homeTeam.id === firstPick.team.id)));
 
-    const secondPickGame = data.sportsGames.find(game => (game.week === secondPick.week && (game.awayTeam.id === secondPick.team.id || game.homeTeam.id === secondPick.team.id)));
+    const secondPickGame = gamesData.sportsGames.find(game => (game.week === secondPick.week && (game.awayTeam.id === secondPick.team.id || game.homeTeam.id === secondPick.team.id)));
 
     // Result unknown if either game is incomplete
     if (!(firstPickGame.result.complete && secondPickGame.result.complete )) {
