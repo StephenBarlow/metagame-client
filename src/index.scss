@@ -24,14 +24,19 @@ h3 {
   margin-top: 50px;
 }
 
-table {
+.pick-grid {
   border-collapse: collapse;
-}
 
-td, th {
-  font-size: 18px;
-  border: 1px solid black;
-  min-width:40px;
+  td, th {
+    font-size: 18px;
+    border: 1px solid black;
+    min-width:40px;
+    text-align: center;
+
+    &.default-cell {
+      background-color: #333;
+    }
+  }
 }
 
 .team-picker {
@@ -57,11 +62,6 @@ td, th {
   border-radius: 3px;
 }
 
-
-.team-bye {
-  
-}
-
 .content {
   padding-left: 20px;
   padding-right: 20px;
@@ -69,11 +69,6 @@ td, th {
 
 .grid-wrapper {
   overflow-x: scroll;
-}
-
-.pick-grid td, th {
-  text-align: center;
-  background-color: #333;
 }
 
 .pick-grid .player-byes {
@@ -113,8 +108,10 @@ form label {
   align-items: center;
 }
 
-.account-panel a, .account-panel span {
-  margin-right: 20px;
+.account-panel {
+  a, span {
+    margin-right: 20px;
+  }
 }
 
 .global-header {
@@ -138,11 +135,11 @@ form input:not(:first-of-type) {
   margin-left: 10px;
   float: left;
   align-items: center;
-}
 
-.logo a {
-  text-decoration: none;
-  color: inherit;
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 
 .modal form input[type=text] {
@@ -171,164 +168,164 @@ td.outcome-split {
   color: black;
 }
 
-td.team-ari, th.team-ari {
+.team-ari {
   background-color: #97233F;
   color: #FFB612;
 }
 
-td.team-atl, th.team-atl {
+.team-atl {
   background-color: #A71930;
   color: white;
 }
 
-td.team-bal, th.team-bal {
+.team-bal {
   background-color: #241773;
   color: white; 
 }
 
-td.team-buf, th.team-buf {
+.team-buf {
   background-color: #00338D;
   -webkit-text-stroke: 0.5px #aaa;
   color: #C60C30;
 }
 
-td.team-car, th.team-car {
+.team-car {
   background-color: #0085CA;
   color: black;
 }
 
-td.team-chi, th.team-chi {
+.team-chi {
   background-color: #0B162A;
   color: #C83803;
 }
 
-td.team-cin, th.team-cin {
+.team-cin {
   background-color: #FB4F14;
   color: black;
 }
 
-td.team-cle, th.team-cle {
+.team-cle {
   background-color: #311D00;
   color: #FF3C00;
 }
 
-td.team-dal, th.team-dal {
+.team-dal, th.team-dal {
   background-color: #869397;
   color: #041E42;
 }
 
-td.team-den, th.team-den {
+.team-den {
   background-color: #FB4F14;
   color: #002244;
 }
 
-td.team-det, th.team-det {
+.team-det {
   background-color: #0076B6;
   color: white;
 }
 
-td.team-gb, th.team-gb {
+.team-gb {
   background-color: #203731;
   color: #FFB612;
 }
 
-td.team-hou, th.team-hou {
+.team-hou {
   background-color: #03202F;
   -webkit-text-stroke: 0.5px white;
   color: #A71930;
 }
 
-td.team-ind, th.team-ind {
+.team-ind {
   background-color: #002C5F;
   color: white;
 }
 
-td.team-jax, th.team-jax {
+.team-jax {
   background-color: #006778;
   color: #D7A22A;
 }
 
-td.team-kc, th.team-kc {
+.team-kc {
   background-color: #E31837;
   color: #FFB81C;
 }
 
-td.team-lac, th.team-lac {
+.team-lac {
   background-color: #0080C6;
   color: #FFC20E;
 }
 
-td.team-lar, th.team-lar {
+.team-lar {
   background-color: #003594;
   color: #FFA300;
 }
 
-td.team-lv, th.team-lv {
+.team-lv {
   background-color: black;
   color: #A5ACAF;
 }
 
-td.team-mia, th.team-mia {
+.team-mia {
   background-color: #008E97;
   color:  white;
 }
 
-td.team-min, th.team-min {
+.team-min {
   background-color: #4F2683;
   color: #FFC62F;
 }
 
-td.team-ne, th.team-ne {
+.team-ne {
   background-color: #002244;
   color: #B0B7BC;
 }
 
-td.team-no, th.team-no {
+.team-no {
   background-color: #D3BC8D;
   color: #101820;
 }
 
-td.team-nyg, th.team-nyg{
+.team-nyg {
   background-color: #0B2265;
   color: white;
 }
 
-td.team-nyj, th.team-nyj {
+.team-nyj {
   background-color: #125740;
   color: white;
 }
 
-td.team-phi, th.team-phi {
+.team-phi {
   background-color: #004C54;
   color: #ACC0C6;
 }
 
-td.team-pit, th.team-pit {
+.team-pit {
   background-color: #FFB612;
   color: #101820;
 }
 
-td.team-sea, th.team-sea {
+.team-sea {
   background-color: #002244;
   color: #69BE28;
 }
 
-td.team-sf, th.team-sf {
+.team-sf {
   background-color: #B3995D;
   color: #AA0000;
 }
 
-td.team-tb, th.team-tb {
+.team-tb {
   background-color: #D50A0A;
   color: #FF7900;
 }
 
-td.team-ten, th.team-ten {
+.team-ten {
   background-color: #4B92DB;
   color: #0C2340; 
 }
 
-td.team-was, th.team-was {
+.team-was {
   background-color: #773141;
   color: #FFB612;
 }

@@ -9,7 +9,7 @@ function CurrentWeekPicks(props) {
   }
 
   const playerRows = props.league.users.map((player) => <tr key={player.id}>
-    <td className="player-name">{player.displayName}</td>
+    <td className="player-name default-cell">{player.displayName}</td>
     {picksForPlayer(player.id)}
   </tr>)
 
@@ -21,9 +21,9 @@ function CurrentWeekPicks(props) {
         <table className="pick-grid">
           <thead>
             <tr>
-              <th>Competitor</th>
-              <th>Team 1</th>
-              <th>Team 2</th>
+              <th className="default-cell">Competitor</th>
+              <th className="default-cell">Team 1</th>
+              <th className="default-cell">Team 2</th>
             </tr>
           </thead>
           <tbody>

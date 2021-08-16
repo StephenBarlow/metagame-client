@@ -27,6 +27,8 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 }
 `;
 
+const FIRST_DEADLINE = new Date('2021-09-12T13:00:00-05:00');
+
 function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');

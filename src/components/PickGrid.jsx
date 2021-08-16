@@ -210,7 +210,7 @@ function PickGrid(props) {
 
   const getOutcomeClass = function(result) {
     if (!result) {
-      return '';
+      return 'default-cell';
     } else if (result.outcome === 'DOUBLE_WIN') {
       return 'outcome-double-win';
     } else if (result.outcome === 'DOUBLE_LOSS') {
@@ -224,8 +224,8 @@ function PickGrid(props) {
 
   // Generate the grid row for each competitor
   const playerRows = data.league.users.map((player) => <tr key={player.id}>
-    <td className="player-name">{player.displayName}</td>
-    <td className="player-total">{calculatePlayerScore(player.id)}</td>
+    <td className="player-name default-cell">{player.displayName}</td>
+    <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     {
       teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])} title={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : ''}>
         {pickResults[player.id][team.id] &&
@@ -245,8 +245,8 @@ function PickGrid(props) {
         <table className="pick-grid">
           <thead>
             <tr>
-              <th>Competitor</th>
-              <th>Total</th>
+              <th className="default-cell">Competitor</th>
+              <th className="default-cell">Total</th>
               { teamHeaders }
               <th data-team-id="bye" className="player-byes">BYES</th>
             </tr>
