@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #404050;
+  background-color: #252535;
   color: #eee;
 }
 
@@ -32,10 +32,15 @@ h3 {
     border: 1px solid black;
     min-width:40px;
     text-align: center;
+    padding:1px;
 
     &.default-cell {
       background-color: #333;
     }
+  }
+
+  .player-name {
+    text-align: inherit;
   }
 }
 
@@ -185,7 +190,6 @@ td.outcome-split {
 
 .team-buf {
   background-color: #00338D;
-  -webkit-text-stroke: 0.5px #aaa;
   color: #C60C30;
 }
 
@@ -231,7 +235,6 @@ td.outcome-split {
 
 .team-hou {
   background-color: #03202F;
-  -webkit-text-stroke: 0.5px white;
   color: #A71930;
 }
 

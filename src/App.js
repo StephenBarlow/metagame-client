@@ -17,6 +17,7 @@ import PickGrid from './components/PickGrid';
 import AccountPanel from './components/AccountPanel';
 import LeagueDetails from './components/LeagueDetails';
 import { UserProvider } from './components/ActiveUserContext';
+import {Helmet} from "react-helmet";
 
 function App() {
 
@@ -47,6 +48,10 @@ function App() {
     <ApolloProvider client={client}>
       <UserProvider value={activeUser}>
         <div className="App">
+          <Helmet>
+            <meta charSet="utf-8" />
+            <title>NFL Pick 2</title>
+          </Helmet>
           <Router>
             <header className="global-header">
               <Logo/>
@@ -57,7 +62,7 @@ function App() {
                 <Route path="/leagues/:id">
                   { loggedIn
                     ? <LeagueDetails />
-                    : <p>You must be signed in to view a league's details.</p>
+                    : <p>You must be signed in to view a league's details. <a href="/">Return to home</a></p>
                   }
                 </Route>
                 <Route exact path="/">
