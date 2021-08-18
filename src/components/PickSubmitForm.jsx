@@ -27,8 +27,6 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 }
 `;
 
-const FIRST_DEADLINE = new Date('2021-09-12T13:00:00-05:00');
-
 function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');
@@ -80,8 +78,20 @@ function PickSubmitForm(props) {
 
   teams = teams.map((team) => <option value={team.id} key={team.id} disabled={alreadyPicked(team.id)}>{team.name}</option>)
 
+  // Don't show the form if picks have been revealed
+  // and this player has already picked
+  const userHasPicked = props.league.picks.find(pick => (pick.user.id === activeUser().id && pick.week === props.league.currentWeek));
+  if (userHasPicked && props.league.currentWeek === props.league.revealedWeek) {
+    return (null);
+  }
+
   return (
     <>
+      { props.userMustPick &&
+        <p className="warning">
+          The week's games have started and you haven't submitted a pick! You must pick before league details are shown.
+        </p>
+      }
       <h3>Submit picks for week {props.league.currentWeek}</h3>
       <p>
         <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank">Odds</a>

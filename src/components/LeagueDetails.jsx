@@ -1,4 +1,6 @@
-import React, { useContext } from 'react';
+// Shows all of the details of the current league.
+
+import React, { useContext, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
@@ -65,17 +67,26 @@ function LeagueDetails() {
     teams = teamsData.sportsTeams.map((team) => <li key={team.id}>{team.name}</li>);
   }
 
+  // User must pick if the current week's picks
+  // have been revealed and this user
+  // hasn't made a pick yet.
+  const userMustPick = !(leagueData.league.picks.find(pick => (pick.user.id === activeUser().id && pick.week === leagueData.league.currentWeek))) && leagueData.league.currentWeek === leagueData.league.revealedWeek;
+
   return (
     <>
       <h2>{leagueData.league.name}</h2>
 
-      <CurrentWeekPicks league={leagueData.league}/>
+      { !userMustPick &&
+        <CurrentWeekPicks league={leagueData.league}/>
+      }
 
-      <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} />
+      <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} />
 
       <CurrentPick league={leagueData.league} />
 
-      <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
+      { !userMustPick &&
+        <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
+      }
     </>
   );
 }

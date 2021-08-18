@@ -1,3 +1,6 @@
+// Table that shows all picks for the current
+// week after they're revealed.
+
 import React from 'react';
 
 function CurrentWeekPicks(props) {

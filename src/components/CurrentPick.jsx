@@ -1,3 +1,6 @@
+// Shows a user's pick for the current week if the
+// full pick set has not yet been revealed.
+
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
@@ -28,6 +31,12 @@ function CurrentPick(props) {
   if (error) return `Error! ${error.message}`;
   if (!data.currentPick.length) {
     return (<p className="warning">You have not yet submitted picks for week {props.league.currentWeek}.</p>)
+  }
+
+  // Don't bother showing this if the table of
+  // everyone's picks is being displayed.
+  if (props.league.currentWeek === props.league.revealedWeek) {
+    return (null);
   }
 
   return (
