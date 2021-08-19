@@ -24,6 +24,10 @@ h3 {
   margin-top: 50px;
 }
 
+.league-list {
+  font-size: 20px;
+}
+
 .pick-grid {
   border-collapse: collapse;
 
@@ -73,7 +77,7 @@ h3 {
 }
 
 .grid-wrapper {
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .pick-grid .player-byes {

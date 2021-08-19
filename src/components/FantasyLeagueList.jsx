@@ -29,12 +29,12 @@ function FantasyLeagueList() {
   }
 
   return (
-    <>
+    <div className="league-list">
       <h2>Your leagues</h2>
       <ul>
       { leagues }
       </ul>
-    </>
+    </div>
   );
 }
 
