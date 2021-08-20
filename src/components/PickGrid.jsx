@@ -223,7 +223,19 @@ function PickGrid(props) {
   }
 
   // Generate the grid row for each competitor
-  const playerRows = data.league.users.map((player) => <tr key={player.id}>
+  const sortedUsers = data.league.users.slice().sort((firstPlayer, secondPlayer) => {
+    const firstScore = calculatePlayerScore(firstPlayer.id);
+    const secondScore = calculatePlayerScore(secondPlayer.id);
+
+    if (firstScore > secondScore) {
+      return -1;
+    } else if ( secondScore > firstScore) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+  const playerRows = sortedUsers.map((player) => <tr key={player.id}>
     <td className="player-name default-cell">{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     {

@@ -26,6 +26,7 @@ function App() {
   const loggedIn = useReactiveVar(activeUser);
 
   const client = new ApolloClient({
+    connectToDevTools: true,
     uri: serverURL,
     cache: new InMemoryCache({
       typePolicies: {
