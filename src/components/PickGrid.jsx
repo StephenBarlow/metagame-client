@@ -1,6 +1,7 @@
 // The big-ass table showing the entire pick history for a league.
 
-import React from 'react';
+import React, { useContext } from 'react';
+import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 
 const GET_PICK_GRID = gql`
@@ -51,7 +52,7 @@ const GET_SPORTS_GAMES = gql`
 `;
 
 function PickGrid(props) {
-
+  const activeUser = useContext(UserContext);
   const { loading, error, data } = useQuery(
     GET_PICK_GRID,
     {
@@ -195,6 +196,10 @@ function PickGrid(props) {
     return totalScore;
   };
 
+  const isActiveUser = function(playerID) {
+    return (playerID === activeUser().id) ? 'is-active-user' : '';
+  }
+
   if (loading || gamesLoading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
   if (gamesError) return `Error! ${gamesError.message}`;
@@ -243,7 +248,7 @@ function PickGrid(props) {
     }
   });
   const playerRows = sortedUsers.map((player) => <tr key={player.id}>
-    <td className="player-name default-cell">{player.displayName}</td>
+    <td className={"player-name default-cell " + isActiveUser(player.id)} >{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">{calculatePlayerLast(player.id)}</td>
     {

@@ -1,9 +1,11 @@
 // Table that shows all picks for the current
 // week after they're revealed.
 
-import React from 'react';
+import React, { useContext } from 'react';
+import UserContext from './ActiveUserContext';
 
 function CurrentWeekPicks(props) {
+  const activeUser = useContext(UserContext);
 
   const currentPicks = props.league.picks.filter(item => (item.week === props.league.currentWeek));
 
@@ -11,8 +13,12 @@ function CurrentWeekPicks(props) {
     return currentPicks.filter(pick => (pick.user.id === playerID)).map((pick) => <td key={pick.team.shortName.toLowerCase()} className={'team-' + pick.team.shortName.toLowerCase()}>{pick.team.shortName}</td>)
   }
 
+  const isActiveUser = function(playerID) {
+    return (playerID === activeUser().id) ? 'is-active-user' : '';
+  }
+
   const playerRows = props.league.users.map((player) => <tr key={player.id}>
-    <td className="player-name default-cell">{player.displayName}</td>
+    <td className={ "player-name default-cell " + isActiveUser(player.id)}>{player.displayName}</td>
     {picksForPlayer(player.id)}
   </tr>)
 

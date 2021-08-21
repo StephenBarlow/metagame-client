@@ -17,6 +17,7 @@ code {
 
 /* My stuff */
 $phone: 500px;
+$highlight: #ffca58;
 
 .active-user {
   @media screen and (max-width: $phone) {
@@ -54,6 +55,10 @@ h3 {
     &.current-week {
       border: 2px dashed yellow;
     }
+
+    &.is-active-user {
+      color: $highlight;
+    }
   }
 
   .player-name {
@@ -73,7 +78,7 @@ h3 {
 }
 
 .form-status, .warning {
-  color: #ffca58;
+  color: $highlight;
 }
 
 .current-pick {
