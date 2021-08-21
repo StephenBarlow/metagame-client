@@ -215,16 +215,17 @@ function PickGrid(props) {
   );
 
   const getOutcomeClass = function(result) {
+    let baseClass = (result?.week === data.league.currentWeek) ? 'current-week ' : '';
     if (!result) {
       return 'default-cell';
     } else if (result.outcome === 'DOUBLE_WIN') {
-      return 'outcome-double-win';
+      return baseClass + 'outcome-double-win';
     } else if (result.outcome === 'DOUBLE_LOSS') {
-      return 'outcome-double-loss';
+      return baseClass + 'outcome-double-loss';
     } else if (result.outcome === 'UNKNOWN') {
-      return 'outcome-unknown';
+      return baseClass + 'outcome-unknown';
     } else if (result.outcome === 'SPLIT') {
-      return 'outcome-split';
+      return baseClass + 'outcome-split';
     }
   }
 

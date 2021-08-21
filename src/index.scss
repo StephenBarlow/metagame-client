@@ -42,6 +42,10 @@ h3 {
     &.default-cell {
       background-color: #333;
     }
+
+    &.current-week {
+      border: 2px dashed yellow;
+    }
   }
 
   .player-name {
@@ -164,13 +168,14 @@ td.outcome-double-win {
 }
 
 td.outcome-double-loss {
-  background-color: #66ca6b;
+  background-color: #00d81d;
   color: black;
 }
 
 td.outcome-unknown {
-  background-color: #fffc57;
-  color: black;
+  background-color: black;
+  color: white;
+  font-weight: bold;
 }
 
 td.outcome-split {
