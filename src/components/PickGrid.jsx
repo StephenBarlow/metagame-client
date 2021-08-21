@@ -97,6 +97,10 @@ function PickGrid(props) {
   // These next few functions are like the only Pick-2-specific logic
   const calculatePickResult = function(playerID, firstPick) {
 
+    let pickResult = {
+      week: firstPick.week
+    };
+
     // Find the other pick by the same
     // player from the same week
     const secondPick = data.league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
@@ -108,11 +112,9 @@ function PickGrid(props) {
 
     // Result unknown if either game is incomplete
     if (!(firstPickGame.result.complete && secondPickGame.result.complete )) {
-      return {
-        value: '?',
-        week: firstPick.week,
-        outcome: 'UNKNOWN'
-      };
+      pickResult.value = '?';
+      pickResult.outcome = 'UNKNOWN';
+      return pickResult;
     }
 
     // Get each game's margin of victory/loss
@@ -124,14 +126,13 @@ function PickGrid(props) {
 
       // Double win, always points equal
       // to margin of victory
-      return {
-        value: firstGameMargin,
-        week: firstPick.week,
-        outcome: 'DOUBLE_WIN'
-      }
+      pickResult.value = firstGameMargin;
+      pickResult.outcome = 'DOUBLE_WIN';
+      return pickResult;
     } else if (firstGameMargin <= 0 && secondGameMargin <= 0) {
 
       // Double loss, points depend on "larger" margin of loss
+      pickResult.outcome = 'DOUBLE_LOSS';
       let firstGameScore;
 
       if (firstGameMargin < secondGameMargin) {
@@ -149,20 +150,15 @@ function PickGrid(props) {
         firstGameScore = 0;
       }
 
-      return {
-        value: firstGameScore,
-        week: firstPick.week,
-        outcome: 'DOUBLE_LOSS'
-      }
+      pickResult.value = firstGameScore;
+
+      return pickResult;
     } else {
       // Split, no points
-      return {
-        value: 0,
-        week: firstPick.week,
-        outcome: 'SPLIT'
-      }
+      pickResult.value = 0;
+      pickResult.outcome = 'SPLIT';
+      return pickResult;
     }
-
   };
 
   const calculateGameMargin = function(game, teamID) {
@@ -183,6 +179,16 @@ function PickGrid(props) {
     let totalScore = 0;
     for (const [key, value] of Object.entries(pickResults[playerID])) {
       if (Number.isInteger(value.value)) {
+        totalScore += value.value;
+      }
+    }
+    return totalScore;
+  };
+
+  const calculatePlayerLast = function(playerID) {
+    let totalScore = 0;
+    for (const [key, value] of Object.entries(pickResults[playerID])) {
+      if (Number.isInteger(value.value) && value.week === data.league.currentWeek - 1) {
         totalScore += value.value;
       }
     }
@@ -238,6 +244,7 @@ function PickGrid(props) {
   const playerRows = sortedUsers.map((player) => <tr key={player.id}>
     <td className="player-name default-cell">{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
+    <td className="player-last default-cell">{calculatePlayerLast(player.id)}</td>
     {
       teams.map((team) => <td className="player-team" key={team.id} className={getOutcomeClass(pickResults[player.id][team.id])} title={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : ''}>
         {pickResults[player.id][team.id] &&
@@ -259,6 +266,7 @@ function PickGrid(props) {
             <tr>
               <th className="default-cell">Competitor</th>
               <th className="default-cell">Total</th>
+              <th className="default-cell">Last</th>
               { teamHeaders }
               <th data-team-id="bye" className="player-byes">BYES</th>
             </tr>
