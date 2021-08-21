@@ -16,6 +16,14 @@ code {
 
 
 /* My stuff */
+$phone: 500px;
+
+.active-user {
+  @media screen and (max-width: $phone) {
+    display: none;
+  }
+}
+
 a, a:visited {
   color: #eee;
 }

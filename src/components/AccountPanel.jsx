@@ -12,7 +12,7 @@ function AccountPanel() {
     <div className="account-panel">
     {activeUser() ? 
       <>
-        <span><strong>{ activeUser().email }</strong></span>
+        <span className="active-user"><strong>{ activeUser().email }</strong></span>
         <LogoutButton/>
       </>
       :
