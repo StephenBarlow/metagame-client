@@ -7,58 +7,96 @@ import UserContext from './ActiveUserContext';
 function CurrentWeekPicks(props) {
   const activeUser = useContext(UserContext);
 
-  const currentPicks = props.league.picks.filter(item => (item.week === props.league.currentWeek));
+  // Get picks from this week only
+  const currentPicks = props.league.picks.filter(pick => (pick.week === props.league.currentWeek));
 
-  // Try to organize the table of this week's picks by team a bit
-  /*let mostPickedTeams = [];
-  let addedPlayers = [];
-  let previousAddedPlayersLength = -1;
-  let playersRemaining = true;
-  while(playersRemaining) {
-    if (addedPlayers.length === previousAddedPlayersLength) break;
-    previousAddedPlayersLength = addedPlayers.length;
-    playersRemaining = false;
-    let pickFrequencies = {};
-    for (const pick of currentPicks) {
-      if(addedPlayers.includes(pick.user.id)) continue;
-      playersRemaining = true;
-      if(pickFrequencies.hasOwnProperty(pick.team.shortName)) {
-        pickFrequencies[pick.team.shortName].push(pick.user.id);
+  // Make a convenient array mapping users and their picks
+  let playerPicks = [];
+  for(const player of props.league.users) {
+    const currentPlayerPicks = currentPicks.filter(pick => (pick.user.id === player.id));
+    let pickArray = currentPlayerPicks.map(pick => pick.team.shortName).sort();
+    playerPicks.push({
+      player: player,
+      picks: pickArray
+    });
+  }
+
+  // Get the frequency of each picked team
+  let pickFrequencies = {};
+  for (const playerPick of playerPicks) {
+    for (const shortName of playerPick.picks) {
+      if (pickFrequencies.hasOwnProperty(shortName)) {
+        pickFrequencies[shortName] += 1;
       } else {
-        pickFrequencies[pick.team.shortName] = [pick.user.id];
+        pickFrequencies[shortName] = 1;
       }
     }
-
-    let mostPickedTeam;
-    for (const pickedTeam of Object.entries(pickFrequencies)) {
-      if (!mostPickedTeam || pickedTeam[1].length > mostPickedTeam[1].length) {
-        mostPickedTeam = pickedTeam;
-      }
-    }
-    mostPickedTeams.push(mostPickedTeam);
-    addedPlayers.concat(mostPickedTeam[1]);
   }
 
-  const organizedPicks = mostPickedTeams.map((entry) => {
-    return entry[1].map((playerID) => {
-      return picksForPlayer(playerID);
-    })
+  for (const playerPick of playerPicks) {
+    if (playerPick.picks.length) {
+
+      // Put the more frequent of the two picks in the left column.
+      // If same frequency, alphabetically first goes on the left.
+      if (pickFrequencies[playerPick.picks[1]] > pickFrequencies[playerPick.picks[0]] || (pickFrequencies[playerPick.picks[1]] === pickFrequencies[playerPick.picks[0]] && playerPick.picks[1] > playerPick.picks[0])) {
+        playerPick.picks.reverse();
+      }
+    }
+  }
+
+  playerPicks.sort((playerOne, playerTwo) => {
+
+    // If somebody hasn't made picks yet, shove 'em to the bottom
+    if (!playerOne.picks.length) {
+      return 1;
+    } else if (!playerTwo.picks.length) {
+      return -1;
+    }
+
+    // Put the most frequent team picks on top for left column
+    if (pickFrequencies[playerOne.picks[0]] > pickFrequencies[playerTwo.picks[0]]) {
+      return -1;
+    } else if (pickFrequencies[playerOne.picks[0]] < pickFrequencies[playerTwo.picks[0]]) {
+      return 1;
+    }
+
+    // Flip the sort for right-hand column so the right-column
+    // most-frequent might join up with the left-column second-most-frequent
+    if (pickFrequencies[playerOne.picks[1]] < pickFrequencies[playerTwo.picks[1]]) {
+      return -1;
+    } else if (pickFrequencies[playerOne.picks[1]] > pickFrequencies[playerTwo.picks[1]]) {
+      return 1;
+    }
+
+    // Fall back to alphabetical sorting
+    if (playerOne.picks[0] < playerTwo.picks[0]) {
+      return -1;
+    } else if (playerTwo.picks[0] < playerOne.picks[0]) {
+      return 1;
+    }
+
+    if (playerOne.picks[1] < playerTwo.picks[1]) {
+      return -1;
+    } else if (playerTwo.picks[1] < playerOne.picks[1]) {
+      return 1;
+    }
+
+    return 0;
   })
-
-  console.log(organizedPicks);*/
-
-  const picksForPlayer = function(playerID) {
-    return currentPicks.filter(pick => (pick.user.id === playerID)).map((pick) => <td key={pick.team.shortName.toLowerCase()} className={'team-' + pick.team.shortName.toLowerCase()}>{pick.team.shortName}</td>)
-  }
 
   const isActiveUser = function(playerID) {
     return (playerID === activeUser().id) ? 'is-active-user' : '';
   }
 
-  const playerRows = props.league.users.map((player) => <tr key={player.id}>
-    <td className={ "player-name default-cell " + isActiveUser(player.id)}>{player.displayName}</td>
-    {picksForPlayer(player.id)}
-  </tr>)
+  const playerRows = playerPicks.map((playerPick) => <tr key={playerPick.player.id}>
+    <td className={ "player-name default-cell " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
+    { playerPick.picks.length > 0 &&
+      <>
+      <td key={playerPick.picks[0].toLowerCase()} className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
+      <td key={playerPick.picks[1].toLowerCase()} className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
+      </>
+    }
+</tr>);
 
   return (
     <>
