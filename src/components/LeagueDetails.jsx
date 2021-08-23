@@ -1,6 +1,6 @@
 // Shows all of the details of the current league.
 
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';

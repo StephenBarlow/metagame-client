@@ -9,6 +9,44 @@ function CurrentWeekPicks(props) {
 
   const currentPicks = props.league.picks.filter(item => (item.week === props.league.currentWeek));
 
+  // Try to organize the table of this week's picks by team a bit
+  /*let mostPickedTeams = [];
+  let addedPlayers = [];
+  let previousAddedPlayersLength = -1;
+  let playersRemaining = true;
+  while(playersRemaining) {
+    if (addedPlayers.length === previousAddedPlayersLength) break;
+    previousAddedPlayersLength = addedPlayers.length;
+    playersRemaining = false;
+    let pickFrequencies = {};
+    for (const pick of currentPicks) {
+      if(addedPlayers.includes(pick.user.id)) continue;
+      playersRemaining = true;
+      if(pickFrequencies.hasOwnProperty(pick.team.shortName)) {
+        pickFrequencies[pick.team.shortName].push(pick.user.id);
+      } else {
+        pickFrequencies[pick.team.shortName] = [pick.user.id];
+      }
+    }
+
+    let mostPickedTeam;
+    for (const pickedTeam of Object.entries(pickFrequencies)) {
+      if (!mostPickedTeam || pickedTeam[1].length > mostPickedTeam[1].length) {
+        mostPickedTeam = pickedTeam;
+      }
+    }
+    mostPickedTeams.push(mostPickedTeam);
+    addedPlayers.concat(mostPickedTeam[1]);
+  }
+
+  const organizedPicks = mostPickedTeams.map((entry) => {
+    return entry[1].map((playerID) => {
+      return picksForPlayer(playerID);
+    })
+  })
+
+  console.log(organizedPicks);*/
+
   const picksForPlayer = function(playerID) {
     return currentPicks.filter(pick => (pick.user.id === playerID)).map((pick) => <td key={pick.team.shortName.toLowerCase()} className={'team-' + pick.team.shortName.toLowerCase()}>{pick.team.shortName}</td>)
   }
