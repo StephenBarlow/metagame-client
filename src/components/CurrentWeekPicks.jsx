@@ -60,6 +60,13 @@ function CurrentWeekPicks(props) {
       return 1;
     }
 
+    // Fall back to alphabetical sorting
+    if (playerOne.picks[0] < playerTwo.picks[0]) {
+      return -1;
+    } else if (playerTwo.picks[0] < playerOne.picks[0]) {
+      return 1;
+    }
+
     // Flip the sort for right-hand column so the right-column
     // most-frequent might join up with the left-column second-most-frequent
     if (pickFrequencies[playerOne.picks[1]] < pickFrequencies[playerTwo.picks[1]]) {
@@ -68,13 +75,7 @@ function CurrentWeekPicks(props) {
       return 1;
     }
 
-    // Fall back to alphabetical sorting
-    if (playerOne.picks[0] < playerTwo.picks[0]) {
-      return -1;
-    } else if (playerTwo.picks[0] < playerOne.picks[0]) {
-      return 1;
-    }
-
+    // Fall back to alphabetical sorting again
     if (playerOne.picks[1] < playerTwo.picks[1]) {
       return -1;
     } else if (playerTwo.picks[1] < playerOne.picks[1]) {
@@ -94,6 +95,12 @@ function CurrentWeekPicks(props) {
       <>
       <td key={playerPick.picks[0].toLowerCase()} className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
       <td key={playerPick.picks[1].toLowerCase()} className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
+      </>
+    }
+    { playerPick.picks.length === 0 &&
+      <>
+      <td className="outcome-unknown">?</td>
+      <td className="outcome-unknown">?</td>
       </>
     }
 </tr>);
