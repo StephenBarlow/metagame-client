@@ -38,7 +38,7 @@ function CurrentWeekPicks(props) {
 
       // Put the more frequent of the two picks in the left column.
       // If same frequency, alphabetically first goes on the left.
-      if (pickFrequencies[playerPick.picks[1]] > pickFrequencies[playerPick.picks[0]] || (pickFrequencies[playerPick.picks[1]] === pickFrequencies[playerPick.picks[0]] && playerPick.picks[1] > playerPick.picks[0])) {
+      if (pickFrequencies[playerPick.picks[1]] > pickFrequencies[playerPick.picks[0]] || (pickFrequencies[playerPick.picks[1]] === pickFrequencies[playerPick.picks[0]] && playerPick.picks[1] < playerPick.picks[0])) {
         playerPick.picks.reverse();
       }
     }
@@ -110,7 +110,7 @@ function CurrentWeekPicks(props) {
       { props.league.currentWeek === props.league.revealedWeek &&
       <>
         <h3>All picks for week {props.league.currentWeek}</h3>
-        <table className="pick-grid">
+        <table className="pick-grid week-picks">
           <thead>
             <tr>
               <th className="default-cell">Competitor</th>

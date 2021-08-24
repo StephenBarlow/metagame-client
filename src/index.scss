@@ -66,6 +66,15 @@ h3 {
   }
 }
 
+table.week-picks {
+  td.player-name {
+    font-weight: normal;
+  }
+  td {
+    font-weight: bold;
+  }
+}
+
 .team-picker {
   margin-right: 10px;
   height: 40px;
@@ -174,6 +183,8 @@ form input:not(:first-of-type) {
   width: 200px;
   font-size: 18px;
 }
+
+
 
 td.outcome-double-win {
   background-color: #016306;

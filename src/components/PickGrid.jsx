@@ -265,7 +265,7 @@ function PickGrid(props) {
 
   return (
     <>
-      <h3>Standings</h3>
+      <h3>THE GRID</h3>
       <div className="grid-wrapper">
         <table className="pick-grid">
           <thead>
