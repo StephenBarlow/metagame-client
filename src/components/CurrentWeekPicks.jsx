@@ -53,6 +53,13 @@ function CurrentWeekPicks(props) {
       return -1;
     }
 
+    // If somebody picked BYE, shove 'em to the almost-botom
+    if (playerOne.picks.[0] === 'BYE') {
+      return 1;
+    } else if (playerTwo.picks[0] === 'BYE') {
+      return -1;
+    }
+
     // Put the most frequent team picks on top for left column
     if (pickFrequencies[playerOne.picks[0]] > pickFrequencies[playerTwo.picks[0]]) {
       return -1;
@@ -93,8 +100,8 @@ function CurrentWeekPicks(props) {
     <td className={ "player-name default-cell " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
-      <td key={playerPick.picks[0].toLowerCase()} className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
-      <td key={playerPick.picks[1].toLowerCase()} className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
+      <td className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
+      <td className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
       </>
     }
     { playerPick.picks.length === 0 &&

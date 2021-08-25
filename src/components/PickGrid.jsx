@@ -234,6 +234,26 @@ function PickGrid(props) {
     }
   }
 
+  const getByeCell = function(playerID) {
+    const byePicks = data.league.picks.filter(pick => (pick.user.id === playerID && pick.team.id === 'bye'));
+    const byeThisWeek = byePicks.find(pick => pick.week === data.league.currentWeek);
+    const byesRemaining = 2 - (byePicks.length / 2);
+
+    if (byesRemaining >= 0) {
+      return (
+        <td className={'player-byes ' + (byeThisWeek ? 'current-week' : '') }>
+          {
+            [...Array(byesRemaining)].map(_ => '● ')
+          }
+        </td>
+      )
+    } else {
+      return (
+        <td className={'player-byes ' + (byeThisWeek ? 'current-week' : '') }>!!!</td>
+      )
+    }
+  }
+
   // Generate the grid row for each competitor
   const sortedUsers = data.league.users.slice().sort((firstPlayer, secondPlayer) => {
     const firstScore = calculatePlayerScore(firstPlayer.id);
@@ -260,7 +280,9 @@ function PickGrid(props) {
         }
       </td>)
     }
-    <td className="player-byes">••</td>
+    {
+      getByeCell(player.id)
+    }
   </tr>);
 
   return (
