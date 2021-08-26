@@ -44,7 +44,7 @@ function LoginForm() {
           Email:
         </label>
         <input type="text" id="login-email" placeholder="donovan@chunkysoup.com" onChange={event => setEmail(event.target.value)} />
-        <input type="submit" />
+        <input id="login-submit" type="submit" />
       </form>
       <p className="form-status">
         { loading && <>Loading...</> }

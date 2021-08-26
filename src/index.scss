@@ -19,6 +19,17 @@ code {
 $phone: 500px;
 $highlight: #ffca58;
 
+#login-email {
+  width:230px;
+  height: 30px;
+  font-size: 18px;
+}
+
+#login-submit {
+  height: 35px;
+  font-size: 18px;
+}
+
 .active-user {
   @media screen and (max-width: $phone) {
     display: none;
@@ -73,6 +84,10 @@ table.week-picks {
   td {
     font-weight: bold;
   }
+}
+
+.resources a {
+  margin-right: 10px;
 }
 
 .team-picker {
