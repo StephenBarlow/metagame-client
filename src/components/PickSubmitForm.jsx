@@ -43,6 +43,26 @@ function PickSubmitForm(props) {
     } }});
   };
 
+  const canSubmit = function() {
+
+    // Can't pick the same team in both dropdowns except BYE
+    if (firstTeam === secondTeam && firstTeam !== '-1') {
+      return false;
+    }
+
+    // Gotta pick something in both dropdowns
+    if (firstTeam === '' || secondTeam === '') {
+      return false;
+    }
+
+    // Gotta pick BYE in both dropdowns if you pick it at all
+    if ((firstTeam === '-1' && secondTeam !== '-1') || (firstTeam !== '-1' && secondTeam === '-1')) {
+      return false;
+    }
+
+    return true;
+  }
+
   const [submitPicks, {loading, error, data}] = useMutation (
     SUBMIT_PICKS,
     {
@@ -112,7 +132,7 @@ function PickSubmitForm(props) {
           <option value="-1" key="bye">BYE</option>
           {teams} 
         </select>
-        <input className="pick-submit" type="submit" value="Submit" />
+        <input className="pick-submit" type="submit" value="Submit" disabled={!canSubmit()} />
       </form>
       <p className="form-status">
         { message }
