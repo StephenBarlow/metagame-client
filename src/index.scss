@@ -51,10 +51,18 @@ h3 {
 .pick-grid {
   border-collapse: separate;
   margin-bottom: 20px;
+  background-color: #282828;
+
+  td {
+    border: 1px solid black;
+  }
+
+  th {
+    border: 1px solid black;
+  }
 
   td, th {
     font-size: 18px;
-    border: 1px solid black;
     min-width:40px;
     text-align: center;
     padding:1px;
