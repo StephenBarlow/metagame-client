@@ -268,7 +268,7 @@ function PickGrid(props) {
     }
   });
   const playerRows = sortedUsers.map((player) => <tr key={player.id}>
-    <td className={"player-name default-cell " + isActiveUser(player.id)} >{player.displayName}</td>
+    <td className={"player-name default-cell sticky " + isActiveUser(player.id)} >{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">{calculatePlayerLast(player.id)}</td>
     {
@@ -292,7 +292,7 @@ function PickGrid(props) {
         <table className="pick-grid">
           <thead>
             <tr>
-              <th className="default-cell">Competitor</th>
+              <th className="default-cell sticky">Competitor</th>
               <th className="default-cell">Total</th>
               <th className="default-cell">Last</th>
               { teamHeaders }

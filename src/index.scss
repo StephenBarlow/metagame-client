@@ -63,6 +63,13 @@ h3 {
       background-color: #333;
     }
 
+    &.sticky {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background-color: #222;
+    }
+
     &.current-week {
       border: 2px dashed yellow;
     }
