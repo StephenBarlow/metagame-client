@@ -3,6 +3,7 @@
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
+import ReactTooltip from 'react-tooltip';
 
 const GET_PICK_GRID = gql`
   query GetPickGrid($leagueID: ID!) {
@@ -272,7 +273,7 @@ function PickGrid(props) {
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">{calculatePlayerLast(player.id)}</td>
     {
-      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} title={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : ''}>
+      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tip={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : null}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}
@@ -287,6 +288,7 @@ function PickGrid(props) {
 
   return (
     <>
+      <ReactTooltip effect="solid" backgroundColor="#000000"/>
       <h3>THE GRID</h3>
       <div className="grid-wrapper">
         <table className="pick-grid">
