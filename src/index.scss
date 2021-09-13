@@ -77,7 +77,6 @@ h3 {
       position: sticky;
       left: 0;
       z-index: 2;
-      background-color: #222;
     }
 
     &.current-week {
@@ -87,10 +86,21 @@ h3 {
     &.is-active-user {
       color: $highlight;
     }
+
+    &.player-name {
+      text-align: inherit;
+      background-color: #222;
+    }
   }
 
-  .player-name {
-    text-align: inherit;
+  td {
+    &.player-name {
+      font-weight: normal;
+    }
+  }
+
+  .player-last {
+    font-weight: normal;
   }
 }
 

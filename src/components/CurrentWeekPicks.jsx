@@ -97,7 +97,7 @@ function CurrentWeekPicks(props) {
   }
 
   const playerRows = playerPicks.map((playerPick) => <tr key={playerPick.player.id}>
-    <td className={ "player-name default-cell " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
+    <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
       <td className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
@@ -120,7 +120,7 @@ function CurrentWeekPicks(props) {
         <table className="pick-grid week-picks">
           <thead>
             <tr>
-              <th className="default-cell">Competitor</th>
+              <th className="player-name">Competitor</th>
               <th className="default-cell">Team 1</th>
               <th className="default-cell">Team 2</th>
             </tr>
