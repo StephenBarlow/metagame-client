@@ -24,6 +24,7 @@ const GET_LEAGUE_DETAILS = gql`
     league(leagueID: $leagueID) {
       id
       name
+      season
       currentWeek
       revealedWeek
       picks {
@@ -85,7 +86,7 @@ function LeagueDetails() {
       <CurrentPick league={leagueData.league} />
 
       { !userMustPick &&
-        <PickGrid leagueID={leagueID} teams={teamsData.sportsTeams} />
+        <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
       }
     </>
   );

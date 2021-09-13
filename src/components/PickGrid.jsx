@@ -5,31 +5,6 @@ import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 import ReactTooltip from 'react-tooltip';
 
-const GET_PICK_GRID = gql`
-  query GetPickGrid($leagueID: ID!) {
-    league(leagueID: $leagueID) {
-      season
-      currentWeek
-      revealedWeek
-      users {
-        id
-        displayName(leagueID: $leagueID)
-      }
-      picks {
-        id
-        user {
-          id
-        }
-        team {
-          id
-          shortName
-        }
-        week
-      }
-    }
-  }
-`;
-
 const GET_SPORTS_GAMES = gql`
   query GetSportsGames($season: String) {
     sportsGames(season: $season) {
@@ -54,22 +29,15 @@ const GET_SPORTS_GAMES = gql`
 
 function PickGrid(props) {
   const activeUser = useContext(UserContext);
-  const { loading, error, data } = useQuery(
-    GET_PICK_GRID,
-    {
-      variables: {
-        leagueID: props.leagueID
-      }
-    }
-  );
+  const league = props.league;
 
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
       variables: {
-        season: data?.league.season
+        season: league.season
       },
-      skip: !data
+      skip: !league
     }
   );
 
@@ -77,14 +45,14 @@ function PickGrid(props) {
     let results = {};
 
     // For each player...
-    for (const player of data.league.users) {
+    for (const player of league.users) {
       results[player.id] = {};
 
       // For each team...
       for (const team of props.teams) {
 
         // If the player has picked that team...
-        const teamPick = data.league.picks.find(pick => (pick.team.id === team.id && pick.user.id === player.id));
+        const teamPick = league.picks.find(pick => (pick.team.id === team.id && pick.user.id === player.id));
 
         // Calculate the result of that pick
         if (teamPick) {
@@ -105,7 +73,7 @@ function PickGrid(props) {
 
     // Find the other pick by the same
     // player from the same week
-    const secondPick = data.league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
+    const secondPick = league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
 
     // Get the result of both picked games
     const firstPickGame = gamesData.sportsGames.find(game => (game.week === firstPick.week && (game.awayTeam.id === firstPick.team.id || game.homeTeam.id === firstPick.team.id)));
@@ -190,7 +158,7 @@ function PickGrid(props) {
   const calculatePlayerLast = function(playerID) {
     let totalScore = 0;
     for (const [key, value] of Object.entries(pickResults[playerID])) {
-      if (Number.isInteger(value.value) && value.week === data.league.currentWeek - 1) {
+      if (Number.isInteger(value.value) && value.week === league.currentWeek - 1) {
         totalScore += value.value;
       }
     }
@@ -201,8 +169,7 @@ function PickGrid(props) {
     return (playerID === activeUser().id) ? 'is-active-user' : '';
   }
 
-  if (loading || gamesLoading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
+  if (gamesLoading) return 'Loading...';
   if (gamesError) return `Error! ${gamesError.message}`;
 
   const pickResults = getPickResults();
@@ -221,7 +188,7 @@ function PickGrid(props) {
   );
 
   const getOutcomeClass = function(result) {
-    let baseClass = (result?.week === data.league.currentWeek) ? 'current-week ' : '';
+    let baseClass = (result?.week === league.currentWeek) ? 'current-week ' : '';
     if (!result) {
       return 'default-cell';
     } else if (result.outcome === 'DOUBLE_WIN') {
@@ -236,8 +203,8 @@ function PickGrid(props) {
   }
 
   const getByeCell = function(playerID) {
-    const byePicks = data.league.picks.filter(pick => (pick.user.id === playerID && pick.team.id === 'bye'));
-    const byeThisWeek = byePicks.find(pick => pick.week === data.league.currentWeek);
+    const byePicks = league.picks.filter(pick => (pick.user.id === playerID && pick.team.id === 'bye'));
+    const byeThisWeek = byePicks.find(pick => pick.week === league.currentWeek);
     const byesRemaining = 2 - (byePicks.length / 2);
 
     if (byesRemaining >= 0) {
@@ -256,7 +223,7 @@ function PickGrid(props) {
   }
 
   // Generate the grid row for each competitor
-  const sortedUsers = data.league.users.slice().sort((firstPlayer, secondPlayer) => {
+  const sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
     const firstScore = calculatePlayerScore(firstPlayer.id);
     const secondScore = calculatePlayerScore(secondPlayer.id);
 
