@@ -4,6 +4,7 @@ import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 import ReactTooltip from 'react-tooltip';
+import ScrollContainer from 'react-indiana-drag-scroll';
 
 const GET_SPORTS_GAMES = gql`
   query GetSportsGames($season: String) {
@@ -257,22 +258,23 @@ function PickGrid(props) {
     <>
       <ReactTooltip effect="solid" backgroundColor="#000000"/>
       <h3>THE GRID</h3>
-      <div className="grid-wrapper">
-        <table className="pick-grid">
-          <thead>
-            <tr>
-              <th className="default-cell player-name sticky">Competitor</th>
-              <th className="default-cell">Total</th>
-              <th className="default-cell">Last</th>
-              { teamHeaders }
-              <th data-team-id="bye" className="player-byes">BYES</th>
-            </tr>
-          </thead>
-          <tbody>
-            { playerRows }
-          </tbody>
-        </table>
-      </div>
+      <ScrollContainer vertical="false" className="grid-wrapper" hideScrollbars="false">
+
+          <table className="pick-grid">
+            <thead>
+              <tr>
+                <th className="default-cell player-name sticky">Competitor</th>
+                <th className="default-cell">Total</th>
+                <th className="default-cell">Last</th>
+                { teamHeaders }
+                <th data-team-id="bye" className="player-byes">BYES</th>
+              </tr>
+            </thead>
+            <tbody>
+              { playerRows }
+            </tbody>
+          </table>
+      </ScrollContainer>
     </>
   );
 }
