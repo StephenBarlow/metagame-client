@@ -32,6 +32,14 @@ function PickSubmitForm(props) {
   const [firstTeam, setFirstTeam] = useState('');
   const [secondTeam, setSecondTeam] = useState('');
   const [message, setMessage] = useState('\xa0');
+  const [hidePicked, setHidePicked] = useState(props.config?.hidePicked);
+
+  const updateHidePicked = function(hp) {
+    setHidePicked(hp);
+    let userConfig = (props.config ? { ...props.config } : {});
+    userConfig.hidePicked = hp;
+    localStorage.setItem('userConfig', JSON.stringify(userConfig));
+  }
 
   const formSubmit = function(event, submitPicks, teams) {
     event.preventDefault();
@@ -96,6 +104,10 @@ function PickSubmitForm(props) {
     }
   });
 
+  if (hidePicked) {
+    teams = teams.filter((team) => !alreadyPicked(team.id));
+  }
+
   teams = teams.map((team) => <option value={team.id} key={team.id} disabled={alreadyPicked(team.id)}>{team.name}</option>)
 
   // Don't show the form if picks have been revealed
@@ -119,7 +131,7 @@ function PickSubmitForm(props) {
         <a href="https://docs.google.com/document/d/1Ui9Nwc9xW597GhBqPj6KhbDCau997BFU6OVWYOcVVMc/edit?usp=sharing" target="_blank">Rules</a>
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
-        <select 
+        <select
           className="team-picker" name="first-team-picker" id="first-team-picker"
           onChange={event => setFirstTeam(event.target.value)}
         >
@@ -127,15 +139,19 @@ function PickSubmitForm(props) {
           <option value="-1" key="bye">BYE</option>
           {teams}
         </select>
-        <select 
+        <select
           className="team-picker" name="second-team-picker" id="second-team-picker"
           onChange={event => setSecondTeam(event.target.value)}>
           <option value="" key="blank"></option>
           <option value="-1" key="bye">BYE</option>
-          {teams} 
+          {teams}
         </select>
         <input className="pick-submit" type="submit" value="Submit" disabled={!canSubmit()} />
       </form>
+      <input
+        type="checkbox" id="hide-picked" value="HidePicked"
+        checked={hidePicked} onChange={event => updateHidePicked(event.target.checked)}
+        /><label htmlFor="hide-picked">Hide teams I've picked</label>
       <p className="form-status">
         { message }
       </p>

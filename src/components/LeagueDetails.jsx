@@ -58,6 +58,8 @@ function LeagueDetails() {
     }
   });
 
+  const userConfig = JSON.parse(localStorage.getItem('userConfig'));
+
   if (teamsLoading || leagueLoading) return 'Loading...';
   if (teamsError) return `Error! ${teamsError.message}`;
   if (leagueError) return `Error! ${leagueError.message}`;
@@ -81,7 +83,7 @@ function LeagueDetails() {
         <CurrentWeekPicks league={leagueData.league}/>
       }
 
-      <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} />
+      <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} config={userConfig} />
 
       <CurrentPick league={leagueData.league} />
 
