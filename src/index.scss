@@ -239,6 +239,8 @@ form input:not(:first-of-type) {
   width: 600px;
   border: 1px solid black;
   margin-bottom: 20px;
+  max-width: 100%;
+  overflow: auto;
 
   text {
     fill: #ddd;
