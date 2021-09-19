@@ -294,7 +294,6 @@ function PickGrid(props) {
           <BarSeries
             animated
             rawData={allScores}
-            strokeWidth={0}
           />
           <DensitySeries
             showArea={false}

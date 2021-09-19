@@ -254,6 +254,8 @@ form input:not(:first-of-type) {
   rect {
     fill: cyan;
     opacity: 1;
+    stroke: black;
+    stroke-width: 1;
   }
 
   path {
