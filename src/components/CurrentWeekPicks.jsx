@@ -54,7 +54,7 @@ function CurrentWeekPicks(props) {
     }
 
     // If somebody picked BYE, shove 'em to the almost-botom
-    if (playerOne.picks.[0] === 'BYE') {
+    if (playerOne.picks[0] === 'BYE') {
       return 1;
     } else if (playerTwo.picks[0] === 'BYE') {
       return -1;
@@ -90,7 +90,16 @@ function CurrentWeekPicks(props) {
     }
 
     return 0;
-  })
+  });
+
+  if (playerPicks.length > 1) {
+    for (let i = 1; i < playerPicks.length; i++){
+      if (playerPicks[i].picks[0] === playerPicks[i-1].picks[1]){
+        playerPicks[i].picks.reverse();
+      }
+    }
+  }
+
 
   const isActiveUser = function(playerID) {
     return (playerID === activeUser().id) ? 'is-active-user' : '';
