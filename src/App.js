@@ -43,7 +43,7 @@ function App() {
     }),
   });
 
-  
+
 
   return (
     <ApolloProvider client={client}>

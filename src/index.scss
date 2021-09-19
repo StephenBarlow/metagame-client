@@ -234,6 +234,30 @@ form input:not(:first-of-type) {
   font-size: 18px;
 }
 
+.histogram {
+  background: #222;
+  width: 600px;
+  border: 1px solid black;
+  margin-bottom: 20px;
+
+  text {
+    fill: #ddd;
+    font-size:14px;
+  }
+
+  line {
+    stroke: #ddd;
+  }
+
+  rect {
+    fill: cyan;
+    opacity: 1;
+  }
+
+  path {
+    stroke: magenta;
+  }
+}
 
 
 td.outcome-double-win {
