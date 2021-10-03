@@ -158,10 +158,15 @@ function PickGrid(props) {
   };
 
   const calculatePlayerLast = function(playerID) {
+    const weekToCheck = (league.currentWeek === league.revealedWeek ? league.currentWeek : league.currentWeek - 1);
+
     let totalScore = 0;
     for (const [key, value] of Object.entries(pickResults[playerID])) {
-      if (Number.isInteger(value.value) && value.week === league.currentWeek - 1) {
+      if (value.week === weekToCheck && Number.isInteger(value.value)) {
         totalScore += value.value;
+      } else if (value.week === weekToCheck && value.value === '?') {
+        totalScore = '?';
+        break;
       }
     }
     return totalScore;
@@ -242,7 +247,7 @@ function PickGrid(props) {
   const playerRows = sortedUsers.map((player) => <tr key={player.id}>
     <td className={"player-name sticky " + isActiveUser(player.id)} >{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
-    <td className="player-last default-cell">{calculatePlayerLast(player.id)}</td>
+    <td className="player-last default-cell">+{calculatePlayerLast(player.id)}</td>
     {
       teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tip={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : null}>
         {pickResults[player.id][team.id] &&
@@ -268,7 +273,7 @@ function PickGrid(props) {
               <tr>
                 <th className="default-cell player-name sticky">Competitor</th>
                 <th className="default-cell">Total</th>
-                <th className="default-cell">Last</th>
+                <th className="default-cell">Wk&nbsp;{(league.currentWeek === league.revealedWeek ? league.currentWeek : league.currentWeek - 1)}</th>
                 { teamHeaders }
                 <th data-team-id="bye" className="player-byes">BYES</th>
               </tr>
