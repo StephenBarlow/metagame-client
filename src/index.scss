@@ -18,6 +18,7 @@ code {
 /* My stuff */
 $phone: 500px;
 $highlight: #ffca58;
+$rowHighlight: #686868;
 $pickedColor: #181818;
 
 #login-email {
@@ -57,6 +58,11 @@ h3 {
   td {
     border: 1px solid black;
     font-weight: bold;
+  }
+
+  tbody tr:hover td {
+    border-top: 1px solid $rowHighlight;
+    border-bottom: 1px solid $rowHighlight;
   }
 
   th {
