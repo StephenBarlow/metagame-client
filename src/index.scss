@@ -61,8 +61,8 @@ h3 {
   }
 
   tbody tr:hover td {
-    border-top: 1px solid $rowHighlight;
-    border-bottom: 1px solid $rowHighlight;
+    border-top-color: $rowHighlight;
+    border-bottom-color: $rowHighlight;
   }
 
   th {
