@@ -249,6 +249,13 @@ function PickGrid(props) {
         secondScore = calculatePlayerLast(secondPlayer.id);
       }
 
+      if (firstScore === '?') {
+        firstScore = 0;
+      }
+      if (secondScore === '?') {
+        secondScore = 0;
+      }
+
       if (firstScore > secondScore) {
         return -1;
       } else if ( secondScore > firstScore) {
