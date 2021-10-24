@@ -1,6 +1,6 @@
 // The big-ass table showing the entire pick history for a league.
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 import ReactTooltip from 'react-tooltip';
@@ -31,6 +31,7 @@ const GET_SPORTS_GAMES = gql`
 
 function PickGrid(props) {
   const activeUser = useContext(UserContext);
+  const [sortMethod, setSortMethod] = useState('total');
   const league = props.league;
 
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
@@ -232,18 +233,32 @@ function PickGrid(props) {
   const allScores = league.users.map((user) => calculatePlayerScore(user.id));
 
   // Generate the grid row for each competitor
-  const sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
-    const firstScore = calculatePlayerScore(firstPlayer.id);
-    const secondScore = calculatePlayerScore(secondPlayer.id);
+  let sortedUsers;
 
-    if (firstScore > secondScore) {
-      return -1;
-    } else if ( secondScore > firstScore) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
+  if (sortMethod === 'me') {
+    sortedUsers = [ league.users.slice().find(user => (isActiveUser(user.id))) ];
+  } else {
+    sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
+      let firstScore, secondScore;
+
+      if (sortMethod === 'total') {
+        firstScore = calculatePlayerScore(firstPlayer.id);
+        secondScore = calculatePlayerScore(secondPlayer.id);
+      } else if (sortMethod === 'last') {
+        firstScore = calculatePlayerLast(firstPlayer.id);
+        secondScore = calculatePlayerLast(secondPlayer.id);
+      }
+
+      if (firstScore > secondScore) {
+        return -1;
+      } else if ( secondScore > firstScore) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+
   const playerRows = sortedUsers.map((player) => <tr key={player.id}>
     <td className={"player-name sticky " + isActiveUser(player.id)} >{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
@@ -266,6 +281,15 @@ function PickGrid(props) {
     <>
       <ReactTooltip effect="solid" backgroundColor="#000000"/>
       <h3>THE GRID</h3>
+      <label>Sort by: </label>
+      <select
+          className="sort-picker" name="sort-picker" id="sort-picker"
+          onChange={event => setSortMethod(event.target.value)}
+        >
+          <option value="total" key="total">Total score</option>
+          <option value="last" key="last">Week {league.revealedWeek} score</option>
+          <option value="me" key="me">Just me</option>
+        </select>
       <ScrollContainer vertical="false" className="grid-wrapper" hideScrollbars="false">
 
           <table className="pick-grid">
