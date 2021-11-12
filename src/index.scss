@@ -21,6 +21,10 @@ $highlight: #ffca58;
 $rowHighlight: #686868;
 $pickedColor: #181818;
 
+.hidden {
+  display: none;
+}
+
 #login-email {
   width:230px;
   height: 30px;

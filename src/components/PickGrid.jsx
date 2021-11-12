@@ -195,6 +195,10 @@ function PickGrid(props) {
     <th data-team-id={team.id} key={team.id} className={'team-' + team.shortName.toLowerCase()} title={team.name}>{team.shortName}</th>
   );
 
+  const hidePlayer = function(player) {
+    return (sortMethod === 'me' && !isActiveUser(player.id));
+  }
+
   const getOutcomeClass = function(result) {
     let baseClass = (result?.week === league.currentWeek) ? 'current-week ' : '';
     if (!result) {
@@ -233,40 +237,34 @@ function PickGrid(props) {
   const allScores = league.users.map((user) => calculatePlayerScore(user.id));
 
   // Generate the grid row for each competitor
-  let sortedUsers;
+  const sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
+    let firstScore, secondScore;
 
-  if (sortMethod === 'me') {
-    sortedUsers = [ league.users.slice().find(user => (isActiveUser(user.id))) ];
-  } else {
-    sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
-      let firstScore, secondScore;
+    if (sortMethod === 'total') {
+      firstScore = calculatePlayerScore(firstPlayer.id);
+      secondScore = calculatePlayerScore(secondPlayer.id);
+    } else if (sortMethod === 'last') {
+      firstScore = calculatePlayerLast(firstPlayer.id);
+      secondScore = calculatePlayerLast(secondPlayer.id);
+    }
 
-      if (sortMethod === 'total') {
-        firstScore = calculatePlayerScore(firstPlayer.id);
-        secondScore = calculatePlayerScore(secondPlayer.id);
-      } else if (sortMethod === 'last') {
-        firstScore = calculatePlayerLast(firstPlayer.id);
-        secondScore = calculatePlayerLast(secondPlayer.id);
-      }
+    if (firstScore === '?') {
+      firstScore = 0;
+    }
+    if (secondScore === '?') {
+      secondScore = 0;
+    }
 
-      if (firstScore === '?') {
-        firstScore = 0;
-      }
-      if (secondScore === '?') {
-        secondScore = 0;
-      }
+    if (firstScore > secondScore) {
+      return -1;
+    } else if ( secondScore > firstScore) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
 
-      if (firstScore > secondScore) {
-        return -1;
-      } else if ( secondScore > firstScore) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-  }
-
-  const playerRows = sortedUsers.map((player) => <tr key={player.id}>
+  const playerRows = sortedUsers.map((player) => <tr key={player.id} className={(hidePlayer(player) ? 'hidden' : '')}>
     <td className={"player-name sticky " + isActiveUser(player.id)} >{player.displayName}</td>
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">+{calculatePlayerLast(player.id)}</td>
