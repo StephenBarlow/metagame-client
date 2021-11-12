@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import LoginButton from './LoginButton';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`
@@ -71,7 +70,7 @@ function PickSubmitForm(props) {
     return true;
   }
 
-  const [submitPicks, {loading, error, data}] = useMutation (
+  const [submitPicks] = useMutation (
     SUBMIT_PICKS,
     {
       refetchQueries: [

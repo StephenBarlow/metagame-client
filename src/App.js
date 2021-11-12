@@ -3,8 +3,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
-  useParams
 } from "react-router-dom";
 
 import './App.css';
@@ -13,7 +11,6 @@ import { ApolloClient, InMemoryCache, ApolloProvider, makeVar, useReactiveVar } 
 import Home from './components/Home';
 import Logo from './components/Logo';
 import FantasyLeagueList from './components/FantasyLeagueList';
-import PickGrid from './components/PickGrid';
 import AccountPanel from './components/AccountPanel';
 import LeagueDetails from './components/LeagueDetails';
 import { UserProvider } from './components/ActiveUserContext';

@@ -64,12 +64,6 @@ function LeagueDetails() {
   if (teamsError) return `Error! ${teamsError.message}`;
   if (leagueError) return `Error! ${leagueError.message}`;
 
-  let teams = []
-
-  if (teamsData.sportsTeams) {
-    teams = teamsData.sportsTeams.map((team) => <li key={team.id}>{team.name}</li>);
-  }
-
   // User must pick if the current week's picks
   // have been revealed and this user
   // hasn't made a pick yet.
