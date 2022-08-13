@@ -21,6 +21,7 @@ const GET_SPORTS_TEAMS = gql`
 
 const GET_LEAGUE_DETAILS = gql`
   query GetLeagueDetails($leagueID: ID!) {
+    currentSeason
     league(leagueID: $leagueID) {
       id
       name
@@ -77,9 +78,11 @@ function LeagueDetails() {
         <CurrentWeekPicks league={leagueData.league}/>
       }
 
-      <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} config={userConfig} />
+      { (leagueData.currentSeason === leagueData.league.season) &&
+        <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} config={userConfig} />
+      }
 
-      <CurrentPick league={leagueData.league} />
+      <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} />
 
       { !userMustPick &&
         <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />

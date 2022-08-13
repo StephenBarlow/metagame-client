@@ -24,9 +24,13 @@ function CurrentPick(props) {
     variables: {
       leagueID: props.league.id,
       userID: activeUser().id
-    }
+    },
+    skip: props.currentSeason !== props.league.season
   });
 
+  if (props.currentSeason !== props.league.season) {
+    return (<p className="warning">This league has concluded.</p>)
+  }
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
   if (!data.currentPick.length) {
