@@ -8,7 +8,9 @@ const GET_FANTASY_LEAGUES = gql`
     leagues(userID: $userID) {
       id
       name
+      season
     }
+    currentSeason
   }
 `;
 
@@ -30,7 +32,7 @@ function FantasyLeagueList() {
   let leagues = []
 
   if (data.leagues) {
-    leagues = data.leagues.map((league) => <li><a href={"/leagues/" + league.id}>{league.name}</a></li>);
+    leagues = data.leagues.map((league) => <li><a href={"/leagues/" + league.id}>{league.name}</a> {(league.season !== data.currentSeason && '(concluded)')}</li>);
   }
 
   return (
