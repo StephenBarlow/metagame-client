@@ -5,19 +5,6 @@ import UserContext from './ActiveUserContext';
 const SUBMIT_PICKS = gql`
 mutation SubmitPicks($request: SubmitPickRequest!) {
   submitPick(request: $request) {
-    pick {
-      id
-      week
-      league {
-        id
-      }
-      user {
-        id
-      }
-      team {
-        id
-      }
-    }
     errors {
       code
       message
