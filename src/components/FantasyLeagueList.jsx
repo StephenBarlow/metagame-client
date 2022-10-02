@@ -29,17 +29,28 @@ function FantasyLeagueList() {
     return <Redirect to={'/leagues/' + data.leagues[0].id} />
   }
 
-  let leagues = []
+  let currentLeagues = [];
+  let pastLeagues = [];
 
   if (data.leagues) {
-    leagues = data.leagues.map((league) => <li><a href={"/leagues/" + league.id}>{league.name}</a> {(league.season !== data.currentSeason && '(concluded)')}</li>);
+
+    const cLeagues = data.leagues.filter((league) => league.season === data.currentSeason);
+    const pLeagues = data.leagues.filter((league) => league.season !== data.currentSeason);
+
+    currentLeagues = cLeagues.map((league) => <li><a href={"/leagues/" + league.id}>{league.name}</a></li>);
+    pastLeagues = pLeagues.map((league) => <li><a href={"/leagues/" + league.id}>{league.name}</a></li>);
   }
 
   return (
     <div className="league-list">
-      <h2>Your leagues</h2>
+      <h2>Current leagues</h2>
       <ul>
-      { leagues }
+      { currentLeagues }
+      </ul>
+
+      <h2>Past leagues</h2>
+      <ul>
+        { pastLeagues }
       </ul>
     </div>
   );
