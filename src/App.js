@@ -60,7 +60,7 @@ function App() {
                 <Route path="/leagues/:id">
                   { loggedIn
                     ? <LeagueDetails />
-                    : <p>You must be signed in to view a league's details. <a href="/">Return to home</a></p>
+                    : <p>You must sign in to view a league's details. <a href="/">Return to home</a></p>
                   }
                 </Route>
                 <Route exact path="/">
