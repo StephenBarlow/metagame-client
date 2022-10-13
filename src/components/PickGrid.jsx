@@ -326,8 +326,8 @@ function PickGrid(props) {
           <BarSeries
             rawData={allScores}
           />
-          <XAxis/>
-          <YAxis/>
+          <XAxis label="Score"/>
+          <YAxis label="Number of players"/>
         </Histogram>
       </div>
     </>
