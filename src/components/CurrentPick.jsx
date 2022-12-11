@@ -53,7 +53,7 @@ function CurrentPick(props) {
         </span>)
       }
       </div>
-      <p>You can change these picks until the start of the early Sunday games.</p>
+      <p>You can change these teams until one of their games starts or the pick list is revealed, whichever comes first.</p>
     </>
   );
 }
