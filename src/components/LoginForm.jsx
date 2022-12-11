@@ -50,7 +50,7 @@ function LoginForm() {
         { loading && <>Loading...</> }
         { error && <>Server error logging in</> }
         { data && !data.user && <>User not found!</>}
-        { data?.user?.email && <>Success!</>}
+        { data?.user?.email && <>Success! Click the top-left logo to return to home.</>}
       </p>
     </>
   );
