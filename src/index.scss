@@ -98,8 +98,10 @@ h3 {
     }
 
     &.player-name {
+      padding-left:5px;
       text-align: inherit;
       background-color: #222;
+      min-width:130px;
     }
   }
 

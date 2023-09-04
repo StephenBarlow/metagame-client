@@ -286,7 +286,7 @@ function PickGrid(props) {
     <>
       <ReactTooltip effect="solid" backgroundColor="#000000"/>
       <h3>THE GRID</h3>
-      <label>Sort by: </label>
+      <label style={{paddingLeft: '4px'}}>Sort by: </label>
       <select
           className="sort-picker" name="sort-picker" id="sort-picker"
           onChange={event => setSortMethod(event.target.value)}

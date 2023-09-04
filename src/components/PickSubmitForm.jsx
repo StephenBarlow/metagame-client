@@ -110,7 +110,7 @@ function PickSubmitForm(props) {
           The week's games have started and you haven't submitted a pick! You must pick before league details are shown.
         </p>
       }
-      <h3>Submit picks for week {props.league.currentWeek}</h3>
+      <h3>Submit your picks for week {props.league.currentWeek}</h3>
       <p className="resources">
         <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank">Odds</a>
 
