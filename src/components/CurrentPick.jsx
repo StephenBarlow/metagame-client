@@ -53,7 +53,7 @@ function CurrentPick(props) {
         </span>)
       }
       </div>
-      <p>You can change these teams until one of their games starts or the pick list is revealed, whichever comes first.</p>
+      <p style={{maxWidth: '400px', fontSize: '14px'}}>You can change these teams until one of their games starts or the pick list is revealed (whichever happens first).</p>
     </>
   );
 }

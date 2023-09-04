@@ -26,6 +26,7 @@ function LoginForm() {
     if (user) {
       activeUser(user);
       localStorage.setItem('activeUser', JSON.stringify(user));
+      window.location.reload(false);
     }
   };
   

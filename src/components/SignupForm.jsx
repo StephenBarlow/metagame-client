@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import LoginButton from './LoginButton';
 import UserContext from './ActiveUserContext';
 
 const SIGN_UP = gql`
