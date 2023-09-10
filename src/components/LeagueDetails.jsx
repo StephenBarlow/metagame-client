@@ -83,6 +83,10 @@ function LeagueDetails() {
       }
 
       <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} />
+
+      { !userMustPick &&
+        <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
+      }
     </>
   );
 }
