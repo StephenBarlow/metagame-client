@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import UserContext from './ActiveUserContext';
-import { Redirect } from "react-router-dom";
+import { redirect } from "react-router-dom";
 
 const GET_FANTASY_LEAGUES = gql`
   query GetFantasyLeagues ($userID: String!) {
@@ -25,8 +25,8 @@ function FantasyLeagueList() {
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
 
-  if (data.leagues && data.leagues.length === 1) {
-    return <Redirect to={'/leagues/' + data.leagues[0].id} />
+  if (data.leagues?.length === 1) {
+    return redirect('/leagues/' + data.leagues[0].id);
   }
 
   let currentLeagues = [];

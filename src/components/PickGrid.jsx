@@ -5,7 +5,6 @@ import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 import ReactTooltip from 'react-tooltip';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import { Histogram, BarSeries, XAxis, YAxis } from '@data-ui/histogram';
 
 const GET_SPORTS_GAMES = gql`
   query GetSportsGames($season: String) {
@@ -312,24 +311,6 @@ function PickGrid(props) {
             </tbody>
           </table>
       </ScrollContainer>
-      <h3>THE GRAPH</h3>
-      <div className="histogram">
-        <Histogram
-          ariaLabel="Histogram of Pick 2 scores"
-          height={400}
-          width={600}
-          orientation="vertical"
-          cumulative={false}
-          normalized={false}
-          binType="numeric"
-        >
-          <BarSeries
-            rawData={allScores}
-          />
-          <XAxis label="Score"/>
-          <YAxis label="Number of players"/>
-        </Histogram>
-      </div>
     </>
   );
 }

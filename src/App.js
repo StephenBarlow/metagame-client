@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Routes
 } from "react-router-dom";
 import {Helmet} from "react-helmet";
 import './App.css';
@@ -55,7 +56,7 @@ function App() {
               <AccountPanel/>
             </header>
             <div className="content">
-              <Switch>
+              <Routes>
                 <Route path="/leagues/:id">
                   { loggedIn
                     ? <LeagueDetails />
@@ -68,7 +69,7 @@ function App() {
                     : <Home/>
                   }
                 </Route>
-              </Switch>
+              </Routes>
             </div>
           </Router>
         </div>
