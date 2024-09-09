@@ -121,6 +121,10 @@ h3 {
   }
 }
 
+.__react_component_tooltip::before {
+  display:none;
+}
+
 table.week-picks {
   td.player-name {
     font-weight: normal;

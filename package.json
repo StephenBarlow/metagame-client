@@ -16,7 +16,7 @@
     "react-router-dom": "^5.3.4",
     "react-scripts": "3.4.1",
     "react-test-renderer": "^16.14.0",
-    "react-tooltip": "^4.2.21",
+    "react-tooltip": "^4.5.1",
     "sass": "^1.54.4"
   },
   "scripts": {
