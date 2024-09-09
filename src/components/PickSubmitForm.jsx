@@ -112,9 +112,9 @@ function PickSubmitForm(props) {
       }
       <h3>Submit your picks for week {props.league.currentWeek}</h3>
       <p className="resources">
-        <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank">Odds</a>
+        <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank" rel="noopener noreferrer">Odds</a>
 
-        <a href="https://docs.google.com/document/d/1Ui9Nwc9xW597GhBqPj6KhbDCau997BFU6OVWYOcVVMc/edit?usp=sharing" target="_blank">Rules</a>
+        <a href="https://docs.google.com/document/d/1Ui9Nwc9xW597GhBqPj6KhbDCau997BFU6OVWYOcVVMc/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Rules</a>
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
         <select

@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import LogoutButton from './LogoutButton';
 import LoginButton from './LoginButton';
-import SignupButton from './SignupButton';
 import UserContext from './ActiveUserContext';
 
 function AccountPanel() {

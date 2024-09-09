@@ -67,6 +67,10 @@ h3 {
   tbody tr:hover td {
     border-top-color: $rowHighlight;
     border-bottom-color: $rowHighlight;
+
+    &.current-week {
+      border-color: yellow;
+    }
   }
 
   th {
