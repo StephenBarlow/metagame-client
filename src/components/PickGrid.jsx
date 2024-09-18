@@ -2,32 +2,11 @@
 
 import React, { useContext, useState } from 'react';
 import UserContext from './ActiveUserContext';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import ReactTooltip from 'react-tooltip';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { Histogram, BarSeries, XAxis, YAxis } from '@data-ui/histogram';
-
-const GET_SPORTS_GAMES = gql`
-  query GetSportsGames($season: String) {
-    sportsGames(season: $season) {
-      id
-      awayTeam {
-        id
-        shortName
-      }
-      homeTeam {
-        id
-        shortName
-      }
-      week
-      result {
-        complete
-        awayTeamScore
-        homeTeamScore
-      }
-    }
-  }
-`;
+import { GET_SPORTS_GAMES } from './SharedQueries';
 
 function PickGrid(props) {
   const activeUser = useContext(UserContext);

@@ -3,6 +3,125 @@
 
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
+import { useQuery } from '@apollo/client';
+import { GET_SPORTS_GAMES } from './SharedQueries';
+
+const PickOutcome = (props) => {
+  const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
+    GET_SPORTS_GAMES,
+    {
+      variables: {
+        season: props.league.season
+      },
+      skip: !props.league
+    }
+  );
+
+  const getPickResult = function(league, firstTeam, secondTeam) {
+
+    let pickResult = {
+      week: league.currentWeek,
+    };
+
+    // Get the result of both picked games
+    const firstPickGame = gamesData.sportsGames.find(game => (game.week === league.currentWeek && (game.awayTeam.shortName === firstTeam || game.homeTeam.shortName === firstTeam)));
+
+    const secondPickGame = gamesData.sportsGames.find(game => (game.week === league.currentWeek && (game.awayTeam.shortName === secondTeam || game.homeTeam.shortName === secondTeam)));
+
+    // Result unknown if either game is incomplete
+    if (!(firstPickGame.result.complete && secondPickGame.result.complete )) {
+      pickResult.value = '?';
+      pickResult.outcome = 'UNKNOWN';
+      return pickResult;
+    }
+
+    // Get each game's margin of victory/loss
+    const firstGameMargin = getGameMargin(firstPickGame, firstTeam);
+
+    const secondGameMargin = getGameMargin(secondPickGame, secondTeam);
+
+    if (firstGameMargin >= 0 && secondGameMargin >= 0) {
+
+      // Double win, always points equal
+      // to margin of victory
+      pickResult.value = firstGameMargin + secondGameMargin;
+      pickResult.outcome = 'DOUBLE_WIN';
+      return pickResult;
+    } else if (firstGameMargin <= 0 && secondGameMargin <= 0) {
+
+      // Double loss, points depend on "larger" margin of loss
+
+      pickResult.outcome = 'DOUBLE_LOSS';
+      if (firstGameMargin < secondGameMargin) {
+        pickResult.value = -firstGameMargin;
+      } else {
+        pickResult.value = -secondGameMargin;
+      }
+
+      return pickResult;
+    } else {
+      // Split, no points
+      pickResult.value = '❌';
+      pickResult.outcome = 'SPLIT';
+      return pickResult;
+    }
+  };
+
+  const getResultClass = function(result) {
+    if (!result) {
+      return 'default-cell';
+    } else if (result.outcome === 'DOUBLE_WIN') {
+      return 'outcome-double-win';
+    } else if (result.outcome === 'DOUBLE_LOSS') {
+      return 'outcome-double-loss';
+    } else if (result.outcome === 'UNKNOWN') {
+      return 'outcome-unknown';
+    } else if (result.outcome === 'SPLIT') {
+      return 'outcome-split';
+    }
+  };
+
+  const getGameMargin = function(game, teamName) {
+    const isAwayTeam = (game.awayTeam.shortName === teamName);
+    let pickedTeamScore, otherTeamScore;
+    if (isAwayTeam) {
+      pickedTeamScore = game.result.awayTeamScore;
+      otherTeamScore = game.result.homeTeamScore
+    } else {
+      pickedTeamScore = game.result.homeTeamScore;
+      otherTeamScore = game.result.awayTeamScore;
+    }
+
+    return pickedTeamScore - otherTeamScore;
+  };
+
+  if (gamesLoading) {
+    return (
+      <td className="pickoutcome">
+        ...
+      </td>
+    );
+  }
+
+  if (gamesError) {
+    return (
+      <td className="pickoutcome">
+        ?
+      </td>
+    );
+  }
+
+  const pickResult = getPickResult(props.league, props.team1, props.team2);
+
+  return (
+    <td className={`${getResultClass(pickResult)}`}>
+      {
+        typeof pickResult.value === 'number' ? `+${pickResult.value}` : pickResult.value
+      }
+    </td>
+  );
+}
+
 
 function CurrentWeekPicks(props) {
   const activeUser = useContext(UserContext);
@@ -111,6 +230,7 @@ function CurrentWeekPicks(props) {
       <>
       <td className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
       <td className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
+      <PickOutcome team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
     }
     { playerPick.picks.length === 0 &&
@@ -132,6 +252,7 @@ function CurrentWeekPicks(props) {
               <th className="player-name">Competitor</th>
               <th className="default-cell">Team 1</th>
               <th className="default-cell">Team 2</th>
+              <th className="default-cell">Result</th>
             </tr>
           </thead>
           <tbody>
