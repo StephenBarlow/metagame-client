@@ -19,9 +19,17 @@ const PickOutcome = (props) => {
 
   const getPickResult = function(league, firstTeam, secondTeam) {
 
+
     let pickResult = {
       week: league.currentWeek,
     };
+
+    // If player picked BYE, no points
+    if (firstTeam === 'BYE') {
+      pickResult.value = '–';
+      pickResult.outcome = 'UNKNOWN';
+      return pickResult;
+    }
 
     // Get the result of both picked games
     const firstPickGame = gamesData.sportsGames.find(game => (game.week === league.currentWeek && (game.awayTeam.shortName === firstTeam || game.homeTeam.shortName === firstTeam)));
@@ -235,6 +243,7 @@ function CurrentWeekPicks(props) {
     }
     { playerPick.picks.length === 0 &&
       <>
+      <td className="outcome-unknown">?</td>
       <td className="outcome-unknown">?</td>
       <td className="outcome-unknown">?</td>
       </>
