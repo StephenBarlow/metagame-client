@@ -6,6 +6,61 @@ import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
+const TeamOutcome = (props) => {
+  const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
+    GET_SPORTS_GAMES,
+    {
+      variables: {
+        season: props.league.season
+      },
+      skip: !props.league
+    }
+  );
+
+  if (props.team === 'BYE') {
+    return (
+      <td className="team-bye">BYE</td>
+    );
+  }
+
+  if (gamesLoading || gamesError) {
+    return (
+      <td className={`team-${props.team.toLowerCase()} gameresult-unknown`}>{props.team}</td>
+    );
+  }
+
+  const teamGame = gamesData.sportsGames.find(game => (game.week === props.league.currentWeek && (game.awayTeam.shortName === props.team || game.homeTeam.shortName === props.team)));
+
+  let gameResult;
+
+  if (teamGame.result.awayTeamScore === null || teamGame.result.homeTeamScore === null) {
+    gameResult = 'unknown';
+  } else {
+    const isAwayTeam = (teamGame.awayTeam.shortName === props.team);
+    let pickedTeamScore, otherTeamScore;
+    if (isAwayTeam) {
+      pickedTeamScore = teamGame.result.awayTeamScore;
+      otherTeamScore = teamGame.result.homeTeamScore
+    } else {
+      pickedTeamScore = teamGame.result.homeTeamScore;
+      otherTeamScore = teamGame.result.awayTeamScore;
+    }
+
+
+    if (pickedTeamScore > otherTeamScore) {
+      gameResult = 'win';
+    } else if (pickedTeamScore < otherTeamScore) {
+      gameResult = 'loss';
+    } else {
+      gameResult = 'tie';
+    }
+  }
+
+  return (
+    <td className={`team-${props.team.toLowerCase()} gameresult-${gameResult}`}>{props.team}</td>
+  );
+}
+
 const PickOutcome = (props) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
@@ -236,8 +291,8 @@ function CurrentWeekPicks(props) {
     <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
-      <td className={'team-' + playerPick.picks[0].toLowerCase()}>{playerPick.picks[0]}</td>
-      <td className={'team-' + playerPick.picks[1].toLowerCase()}>{playerPick.picks[1]}</td>
+      <TeamOutcome team={playerPick.picks[0]} league={props.league} />
+      <TeamOutcome team={playerPick.picks[1]} league={props.league} />
       <PickOutcome team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
     }
