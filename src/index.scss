@@ -318,9 +318,8 @@ td.gameresult-tie {
 }
 
 td.gameresult-unknown {
-  opacity: 0.25;
-  border-style: dashed;
-  border-color: white;
+  opacity: 0.5;
+  filter: saturate(2%) brightness(70%)  ;
 }
 
 .team-ari {
