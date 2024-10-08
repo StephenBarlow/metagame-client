@@ -324,7 +324,7 @@ td.gameresult-win {
   &::after {
     content: 'W';
     color: white;
-    background: #005706;
+    background: #018d08;
   }
 }
 
@@ -333,7 +333,7 @@ td.gameresult-loss {
   &::after {
     content: 'L';
     color: white;
-    background: red;
+    background: #eb1717;
   }
 }
 
