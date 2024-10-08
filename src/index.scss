@@ -306,10 +306,43 @@ td.outcome-split {
   color: #eb1717;
 }
 
+td.gameresult {
+  &::after {
+    display:inline-block;
+    font-size: 0.8rem;
+    position: absolute;
+    bottom: 0px;
+    padding-left: 2px;
+    padding-right: 2px;
+    width: 16px;
+    border: 1px solid black;
+  }
+}
+
+td.gameresult-win {
+  position: relative;
+  &::after {
+    content: 'W';
+    color: white;
+    background: #005706;
+  }
+}
+
 td.gameresult-loss {
-  text-decoration: line-through;
-  text-decoration-thickness: 5px;
-  text-decoration-color: black;
+  position: relative;
+  &::after {
+    content: 'L';
+    color: white;
+    background: red;
+  }
+}
+
+td.gameresult-left::after {
+  right: 0px;
+}
+
+td.gameresult-right::after {
+  left: 0px;
 }
 
 td.gameresult-tie {
@@ -318,8 +351,7 @@ td.gameresult-tie {
 }
 
 td.gameresult-unknown {
-  opacity: 0.5;
-  filter: saturate(2%) brightness(70%)  ;
+
 }
 
 .team-ari {

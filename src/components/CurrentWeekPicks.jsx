@@ -57,7 +57,7 @@ const TeamOutcome = (props) => {
   }
 
   return (
-    <td className={`team-${props.team.toLowerCase()} gameresult-${gameResult}`}>{props.team}</td>
+    <td className={`team-${props.team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${props.side}`}>{props.team}</td>
   );
 }
 
@@ -291,8 +291,8 @@ function CurrentWeekPicks(props) {
     <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
-      <TeamOutcome team={playerPick.picks[0]} league={props.league} />
-      <TeamOutcome team={playerPick.picks[1]} league={props.league} />
+      <TeamOutcome team={playerPick.picks[0]} league={props.league} side="left" />
+      <TeamOutcome team={playerPick.picks[1]} league={props.league} side="right" />
       <PickOutcome team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
     }
