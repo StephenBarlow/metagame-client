@@ -4,9 +4,10 @@ import React, { useContext } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
-import PickSubmitForm from './PickSubmitForm'
+import PickSubmitForm from './PickSubmitForm';
 import CurrentPick from './CurrentPick';
-import CurrentWeekPicks from './CurrentWeekPicks'
+import SingleWeekPicks from './SingleWeekPicks';
+import PickArchive from './PickArchive';
 import { useParams } from 'react-router-dom';
 
 const GET_SPORTS_TEAMS = gql`
@@ -75,7 +76,7 @@ function LeagueDetails() {
       <h2>{leagueData.league.name}</h2>
 
       { !userMustPick &&
-        <CurrentWeekPicks league={leagueData.league}/>
+        <SingleWeekPicks league={leagueData.league}/>
       }
 
       { (leagueData.currentSeason === leagueData.league.season) &&
@@ -85,7 +86,11 @@ function LeagueDetails() {
       <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} />
 
       { !userMustPick &&
-        <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
+        <>
+          <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
+
+          <PickArchive league={leagueData.league} teams={teamsData.sportsTeams} />
+        </>
       }
     </>
   );

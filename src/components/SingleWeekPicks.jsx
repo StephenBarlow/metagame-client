@@ -6,18 +6,18 @@ import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
-const TeamOutcome = (props) => {
+const TeamOutcome = ({weekToShow, league, team, ...props}) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
       variables: {
-        season: props.league.season
+        season: league.season
       },
-      skip: !props.league
+      skip: !league
     }
   );
 
-  if (props.team === 'BYE') {
+  if (team === 'BYE') {
     return (
       <td className="team-bye">BYE</td>
     );
@@ -25,18 +25,18 @@ const TeamOutcome = (props) => {
 
   if (gamesLoading || gamesError) {
     return (
-      <td className={`team-${props.team.toLowerCase()} gameresult-unknown`}>{props.team}</td>
+      <td className={`team-${team.toLowerCase()} gameresult-unknown`}>{team}</td>
     );
   }
 
-  const teamGame = gamesData.sportsGames.find(game => (game.week === props.league.currentWeek && (game.awayTeam.shortName === props.team || game.homeTeam.shortName === props.team)));
+  const teamGame = gamesData.sportsGames.find(game => (game.week === weekToShow && (game.awayTeam.shortName === team || game.homeTeam.shortName === team)));
 
   let gameResult;
 
   if (teamGame.result.awayTeamScore === null || teamGame.result.homeTeamScore === null) {
     gameResult = 'unknown';
   } else {
-    const isAwayTeam = (teamGame.awayTeam.shortName === props.team);
+    const isAwayTeam = (teamGame.awayTeam.shortName === team);
     let pickedTeamScore, otherTeamScore;
     if (isAwayTeam) {
       pickedTeamScore = teamGame.result.awayTeamScore;
@@ -57,11 +57,11 @@ const TeamOutcome = (props) => {
   }
 
   return (
-    <td className={`team-${props.team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${props.side}`}>{props.team}</td>
+    <td className={`team-${team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${props.side}`}>{team}</td>
   );
 }
 
-const PickOutcome = (props) => {
+const PickOutcome = ({weekToShow, ...props}) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
@@ -76,7 +76,7 @@ const PickOutcome = (props) => {
 
 
     let pickResult = {
-      week: league.currentWeek,
+      week: weekToShow,
     };
 
     // If player picked BYE, no points
@@ -87,9 +87,9 @@ const PickOutcome = (props) => {
     }
 
     // Get the result of both picked games
-    const firstPickGame = gamesData.sportsGames.find(game => (game.week === league.currentWeek && (game.awayTeam.shortName === firstTeam || game.homeTeam.shortName === firstTeam)));
+    const firstPickGame = gamesData.sportsGames.find(game => (game.week === weekToShow && (game.awayTeam.shortName === firstTeam || game.homeTeam.shortName === firstTeam)));
 
-    const secondPickGame = gamesData.sportsGames.find(game => (game.week === league.currentWeek && (game.awayTeam.shortName === secondTeam || game.homeTeam.shortName === secondTeam)));
+    const secondPickGame = gamesData.sportsGames.find(game => (game.week === weekToShow && (game.awayTeam.shortName === secondTeam || game.homeTeam.shortName === secondTeam)));
 
     // Result unknown if either game is incomplete
     if (!(firstPickGame.result.complete && secondPickGame.result.complete )) {
@@ -186,11 +186,13 @@ const PickOutcome = (props) => {
 }
 
 
-function CurrentWeekPicks(props) {
+function SingleWeekPicks (props) {
   const activeUser = useContext(UserContext);
 
-  // Get picks from this week only
-  const currentPicks = props.league.picks.filter(pick => (pick.week === props.league.currentWeek));
+  const weekToShow = (props.weekToShow) ? props.weekToShow : props.league.currentWeek;
+
+  // Get picks from specified week only
+  const currentPicks = props.league.picks.filter(pick => (pick.week === weekToShow));
 
   // Make a convenient array mapping users and their picks
   let playerPicks = [];
@@ -291,9 +293,9 @@ function CurrentWeekPicks(props) {
     <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
-      <TeamOutcome team={playerPick.picks[0]} league={props.league} side="left" />
-      <TeamOutcome team={playerPick.picks[1]} league={props.league} side="right" />
-      <PickOutcome team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
+      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" />
+      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" />
+      <PickOutcome weekToShow={weekToShow} team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
     }
     { playerPick.picks.length === 0 &&
@@ -307,9 +309,9 @@ function CurrentWeekPicks(props) {
 
   return (
     <>
-      { props.league.currentWeek === props.league.revealedWeek &&
+      { weekToShow <= props.league.revealedWeek &&
       <>
-        <h3>All picks for week {props.league.currentWeek}</h3>
+        <h3>All picks for week {weekToShow}</h3>
         <table className="pick-grid week-picks">
           <thead>
             <tr>
@@ -329,4 +331,4 @@ function CurrentWeekPicks(props) {
   );
 }
 
-export default CurrentWeekPicks;
+export default SingleWeekPicks;
