@@ -4,9 +4,8 @@ import SingleWeekPicks from './SingleWeekPicks';
 function PickArchive({league, ...props}) {
 
   const [weekToShow, setWeekToShow] = useState('none');
-  console.log(weekToShow);
   return (
-    <div class="pick-archive">
+    <div className="pick-archive">
       <h3>THE ARCHIVE</h3>
       <label style={{paddingLeft: '4px'}}>Show picks for week </label>
       <select
