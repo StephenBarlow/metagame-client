@@ -19,6 +19,10 @@ function PickSubmitForm(props) {
   const [secondTeam, setSecondTeam] = useState('');
   const [message, setMessage] = useState('\xa0');
   const [showPicked, setShowPicked] = useState(props.config?.showPicked);
+  const currentWeek = props.league.currentWeek;
+  const maxWeek = 18;
+  // selectedWeek and setSelectedWeek are now props
+  const { selectedWeek, setSelectedWeek } = props;
 
   const updateShowPicked = function(sp) {
     setShowPicked(sp);
@@ -33,7 +37,7 @@ function PickSubmitForm(props) {
       userID: activeUser().id,
       leagueID: props.league.id,
       teamIDs: teams,
-      week: props.league.currentWeek
+      week: selectedWeek
     } }});
   };
 
@@ -97,9 +101,9 @@ function PickSubmitForm(props) {
   teams = teams.map((team) => <option value={team.id} key={team.id} disabled={alreadyPicked(team.id)}>{team.name}</option>)
 
   // Don't show the form if picks have been revealed
-  // and this player has already picked
-  const userHasPicked = props.league.picks.find(pick => (pick.user.id === activeUser().id && pick.week === props.league.currentWeek));
-  if (userHasPicked && props.league.currentWeek === props.league.revealedWeek) {
+  // and this player has already picked for the current week
+  const userHasPickedCurrent = props.league.picks.find(pick => (pick.user.id === activeUser().id && pick.week === currentWeek));
+  if (userHasPickedCurrent && currentWeek === props.league.revealedWeek) {
     return (null);
   }
 
@@ -110,7 +114,18 @@ function PickSubmitForm(props) {
           The week's games have started and you haven't submitted a pick! You must pick before league details are shown.
         </p>
       }
-      <h3>Submit your picks for week {props.league.currentWeek}</h3>
+      <h3>
+        Submit your picks for week {' '}
+        <select
+          value={selectedWeek}
+          onChange={e => setSelectedWeek(Number(e.target.value))}
+          style={{ fontSize: '1em', fontWeight: 'bold', marginLeft: 4, marginRight: 4 }}
+        >
+          {Array.from({length: maxWeek - currentWeek + 1}, (_, i) => currentWeek + i).map(week => (
+            <option value={week} key={week}> {week} </option>
+          ))}
+        </select>
+      </h3>
       <p className="resources">
         <a href="https://www.vegas.com/gaming/sportsline/football/" target="_blank" rel="noopener noreferrer">Odds</a>
 

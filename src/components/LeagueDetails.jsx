@@ -1,6 +1,6 @@
 // Shows all of the details of the current league.
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { gql, useQuery } from '@apollo/client';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
@@ -59,12 +59,20 @@ function LeagueDetails() {
       'leagueID': leagueID
     }
   });
+  const [selectedWeek, setSelectedWeek] = useState(undefined);
+  // Set default selectedWeek to currentWeek after data loads
+  useEffect(() => {
+    if (selectedWeek === undefined && leagueData?.league?.currentWeek) {
+      setSelectedWeek(leagueData.league.currentWeek);
+    }
+  }, [selectedWeek, leagueData]);
 
   const userConfig = JSON.parse(localStorage.getItem('userConfig'));
 
   if (teamsLoading || leagueLoading) return 'Loading...';
   if (teamsError) return `Error! ${teamsError.message}`;
   if (leagueError) return `Error! ${leagueError.message}`;
+
 
   // User must pick if the current week's picks
   // have been revealed and this user
@@ -79,11 +87,20 @@ function LeagueDetails() {
         <SingleWeekPicks league={leagueData.league}/>
       }
 
-      { (leagueData.currentSeason === leagueData.league.season) &&
-        <PickSubmitForm league={leagueData.league} teams={teamsData.sportsTeams} userMustPick={userMustPick} config={userConfig} />
+      { (leagueData.currentSeason === leagueData.league.season) && selectedWeek !== undefined &&
+        <PickSubmitForm
+          league={leagueData.league}
+          teams={teamsData.sportsTeams}
+          userMustPick={userMustPick}
+          config={userConfig}
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+        />
       }
 
-      <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} />
+      {selectedWeek !== undefined &&
+        <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} selectedWeek={selectedWeek} />
+      }
 
       { !userMustPick &&
         <>

@@ -20,10 +20,12 @@ const GET_CURRENT_PICK = gql`
 
 function CurrentPick(props) {
   const activeUser = useContext(UserContext);
+  const week = props.selectedWeek || props.league.currentWeek;
   const { loading, error, data } = useQuery(GET_CURRENT_PICK, {
     variables: {
       leagueID: props.league.id,
-      userID: activeUser().id
+      userID: activeUser().id,
+      week: week
     },
     skip: props.currentSeason !== props.league.season
   });
@@ -34,7 +36,7 @@ function CurrentPick(props) {
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
   if (!data.currentPick.length) {
-    return (<p className="warning">You have not yet submitted picks for week {props.league.currentWeek}.</p>)
+    return (<p className="warning">You have not yet submitted picks for week {week}.</p>)
   }
 
   // Don't bother showing this if the table of
@@ -45,7 +47,7 @@ function CurrentPick(props) {
 
   return (
     <>
-      <h3>Your picks for week {props.league.currentWeek}</h3>
+      <h3>Your picks for week {week}</h3>
       <div>
       {
         data.currentPick.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
