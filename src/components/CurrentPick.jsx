@@ -5,10 +5,11 @@ import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql, useQuery } from '@apollo/client';
 
-const GET_CURRENT_PICK = gql`
-  query GetCurrentPick($leagueID: ID!, $userID: ID!) {
-    currentPick(leagueID: $leagueID, userID: $userID) {
+const GET_USER_PICKS = gql`
+  query GetUserPicks($leagueID: ID!, $userID: ID!) {
+    picksForUser(leagueID: $leagueID, userID: $userID) {
       id
+      week
       team {
         id
         name
@@ -21,7 +22,7 @@ const GET_CURRENT_PICK = gql`
 function CurrentPick(props) {
   const activeUser = useContext(UserContext);
   const week = props.selectedWeek || props.league.currentWeek;
-  const { loading, error, data } = useQuery(GET_CURRENT_PICK, {
+  const { loading, error, data } = useQuery(GET_USER_PICKS, {
     variables: {
       leagueID: props.league.id,
       userID: activeUser().id,
@@ -35,7 +36,10 @@ function CurrentPick(props) {
   }
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
-  if (!data.currentPick.length) {
+
+  const selectedWeekPicks = data.picksForUser.filter(pick => pick.week === week);
+
+  if (!selectedWeekPicks.length) {
     return (<p className="warning">You have not yet submitted picks for week {week}.</p>)
   }
 
@@ -50,7 +54,7 @@ function CurrentPick(props) {
       <h3>Your picks for week {week}</h3>
       <div>
       {
-        data.currentPick.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
+        selectedWeekPicks.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
           {pick.team.shortName}
         </span>)
       }

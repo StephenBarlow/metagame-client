@@ -66,8 +66,7 @@ function PickSubmitForm(props) {
     {
       refetchQueries: [
         'GetLeagueDetails',
-        'GetCurrentPick',
-        'GetPickGrid'
+        'GetUserPicks',
       ],
       onCompleted: ({submitPick}) => {
         if (submitPick.pick) {
