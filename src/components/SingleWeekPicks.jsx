@@ -309,7 +309,7 @@ function SingleWeekPicks (props) {
 
   return (
     <>
-      { weekToShow <= props.league.revealedWeek &&
+      { (weekToShow <= props.league.revealedWeek || props.league.season < props.currentSeason) &&
       <>
         <h3>All picks for week {weekToShow}</h3>
         <table className="pick-grid week-picks">

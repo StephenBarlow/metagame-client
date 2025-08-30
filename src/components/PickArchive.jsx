@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import SingleWeekPicks from './SingleWeekPicks';
 
-function PickArchive({league, ...props}) {
+const NFL_FINAL_WEEK = 18;
+
+function PickArchive({league, currentSeason, ...props}) {
 
   const [weekToShow, setWeekToShow] = useState('none');
+  if (league.currentWeek < 2 && currentSeason === league.season) {
+    return (
+      <div className="pick-archive" />
+    );
+  }
+  let maxWeek = currentSeason === league.season ? league.currentWeek - 1 : NFL_FINAL_WEEK - 1;
   return (
     <div className="pick-archive">
       <h3>THE ARCHIVE</h3>
@@ -13,12 +21,12 @@ function PickArchive({league, ...props}) {
         onChange={event => setWeekToShow(event.target.value)}
       >
         <option value="none"></option>
-        {Array.from({length: league.currentWeek - 1}, (_, i) => i + 1).map(week => (
+        {Array.from({length: maxWeek}, (_, i) => i + 1).map(week => (
           <option value={week} key={week}>{week}</option>
         ))}  
       </select>
       { weekToShow !== 'none' &&
-        <SingleWeekPicks league={league} weekToShow={+weekToShow} />
+        <SingleWeekPicks league={league} weekToShow={+weekToShow} currentSeason={currentSeason} />
       }
     </div>
   );

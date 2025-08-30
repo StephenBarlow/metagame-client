@@ -84,7 +84,7 @@ function LeagueDetails() {
       <h2>{leagueData.league.name}</h2>
 
       { !userMustPick &&
-        <SingleWeekPicks league={leagueData.league}/>
+        <SingleWeekPicks league={leagueData.league} currentSeason={leagueData.currentSeason}/>
       }
 
       { (leagueData.currentSeason === leagueData.league.season) && selectedWeek !== undefined &&
@@ -106,7 +106,7 @@ function LeagueDetails() {
         <>
           <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
 
-          <PickArchive league={leagueData.league} teams={teamsData.sportsTeams} />
+          <PickArchive league={leagueData.league} teams={teamsData.sportsTeams} currentSeason={leagueData.currentSeason} />
         </>
       }
     </>
