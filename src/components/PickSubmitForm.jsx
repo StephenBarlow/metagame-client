@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`
@@ -13,6 +13,20 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 }
 `;
 
+const GET_USER_PICKS = gql`
+  query GetUserPicks($leagueID: ID!, $userID: ID!) {
+    picksForUser(leagueID: $leagueID, userID: $userID) {
+      id
+      week
+      team {
+        id
+        name
+        shortName
+      }
+    }
+  }
+`;
+
 function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');
@@ -23,6 +37,14 @@ function PickSubmitForm(props) {
   const maxWeek = 18;
   // selectedWeek and setSelectedWeek are now props
   const { selectedWeek, setSelectedWeek } = props;
+
+  // Get user's picks to check which weeks have picks
+  const { data: userPicksData } = useQuery(GET_USER_PICKS, {
+    variables: {
+      leagueID: props.league.id,
+      userID: activeUser().id
+    }
+  });
 
   const updateShowPicked = function(sp) {
     setShowPicked(sp);
@@ -120,9 +142,14 @@ function PickSubmitForm(props) {
           onChange={e => setSelectedWeek(Number(e.target.value))}
           style={{ fontSize: '1em', fontWeight: 'bold', marginLeft: 4, marginRight: 4 }}
         >
-          {Array.from({length: maxWeek - currentWeek + 1}, (_, i) => currentWeek + i).map(week => (
-            <option value={week} key={week}> {week} </option>
-          ))}
+          {Array.from({length: maxWeek - currentWeek + 1}, (_, i) => currentWeek + i).map(week => {
+            const hasPick = userPicksData?.picksForUser?.find(pick => pick.week === week);
+            return (
+              <option value={week} key={week}>
+                {week}{hasPick ? ' ✓' : ''}
+              </option>
+            );
+          })}
         </select>
       </h3>
       <p className="resources">
