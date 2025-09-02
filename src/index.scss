@@ -169,6 +169,19 @@ input#show-picked {
   border-radius: 3px;
 }
 
+.clear-pick-button {
+  padding: 6px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  &:hover {
+    background-color: #b02a37;
+  }
+}
+
 .content {
   padding-left: 20px;
   padding-right: 20px;

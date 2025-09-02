@@ -104,7 +104,8 @@ function PickSubmitForm(props) {
   // Checks if the active user has already
   // picked a particular team
   const alreadyPicked = function(teamID) {
-    return !!props.league.picks.find(pick => pick.user.id === activeUser().id && pick.team.id === teamID);
+    // Check if the user has picked this team in any week
+    return !!userPicksData?.picksForUser?.find(pick => pick.team.id === teamID);
   }
 
   let teams = props.teams.slice().sort(function(a, b) {
@@ -146,7 +147,7 @@ function PickSubmitForm(props) {
             const hasPick = userPicksData?.picksForUser?.find(pick => pick.week === week);
             return (
               <option value={week} key={week}>
-                {week}{hasPick ? ' ✓' : ''}
+                {week}{hasPick ? ' •' : ''}
               </option>
             );
           })}

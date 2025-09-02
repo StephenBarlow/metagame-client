@@ -3,7 +3,7 @@
 
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 
 const GET_USER_PICKS = gql`
   query GetUserPicks($leagueID: ID!, $userID: ID!) {
@@ -14,6 +14,18 @@ const GET_USER_PICKS = gql`
         id
         name
         shortName
+      }
+    }
+  }
+`;
+
+const INVALIDATE_PICKS = gql`
+  mutation InvalidatePicks($request: InvalidatePicksRequest!) {
+    invalidatePicks(request: $request) {
+      success
+      errors {
+        code
+        message
       }
     }
   }
@@ -30,6 +42,23 @@ function CurrentPick(props) {
     },
     skip: props.currentSeason !== props.league.season
   });
+
+  const [invalidatePicks] = useMutation(
+    INVALIDATE_PICKS,
+    {
+      refetchQueries: [
+        'GetLeagueDetails',
+        'GetUserPicks',
+      ],
+      onCompleted: ({invalidatePicks: invalidatePicksResult}) => {
+        if (invalidatePicksResult.success) {
+          console.log('Picks invalidated successfully');
+        } else if (invalidatePicksResult.errors) {
+          console.error('Error invalidating picks:', invalidatePicksResult.errors[0].message);
+        }
+      }
+    }
+  );
 
   if (props.currentSeason !== props.league.season) {
     return (<p className="warning">This league has concluded.</p>)
@@ -52,12 +81,36 @@ function CurrentPick(props) {
   return (
     <>
       <h3>Your picks for week {week}</h3>
-      <div>
-      {
-        selectedWeekPicks.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
-          {pick.team.shortName}
-        </span>)
-      }
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div>
+        {
+          selectedWeekPicks.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
+            {pick.team.shortName}
+          </span>)
+        }
+        </div>
+
+        {/* Clear pick button for future weeks */}
+        {week > props.league.currentWeek && (
+          <button
+            className="clear-pick-button"
+            type="button"
+            onClick={() => {
+              // Show confirmation dialog before clearing picks
+              if (window.confirm(`Are you sure you want to clear your picks for week ${week}?`)) {
+                // Invalidate all picks for this week
+                const pickIDs = selectedWeekPicks.map(pick => pick.id);
+                invalidatePicks({
+                  variables: {
+                    request: { pickIDs }
+                  }
+                });
+              }
+            }}
+          >
+            Clear week {week} picks
+          </button>
+        )}
       </div>
       <p style={{maxWidth: '400px', fontSize: '14px'}}>You can change these teams until one of their games starts or the pick list is revealed (whichever happens first).</p>
     </>
