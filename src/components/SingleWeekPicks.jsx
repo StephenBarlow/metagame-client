@@ -19,7 +19,7 @@ const TeamOutcome = ({weekToShow, league, team, ...props}) => {
 
   if (team === 'BYE') {
     return (
-      <td className="team-bye">BYE</td>
+      <td colSpan={2} className="team-bye">BYE</td>
     );
   }
 
@@ -294,7 +294,10 @@ function SingleWeekPicks (props) {
     { playerPick.picks.length > 0 &&
       <>
       <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" />
-      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" />
+      {/* Bye has colspan 2, no need for right column */}
+      {playerPick.picks[1] !== 'BYE' && 
+        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" />
+      }
       <PickOutcome weekToShow={weekToShow} team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
     }
