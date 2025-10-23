@@ -104,8 +104,8 @@ function PickSubmitForm(props) {
   // Checks if the active user has already
   // picked a particular team
   const alreadyPicked = function(teamID) {
-    // Check if the user has picked this team in any week
-    return !!userPicksData?.picksForUser?.find(pick => pick.team.id === teamID);
+    // Check if the user has picked this team in any week except the selected week
+    return !!userPicksData?.picksForUser?.find(pick => pick.team.id === teamID && pick.week !== selectedWeek);
   }
 
   let teams = props.teams.slice().sort(function(a, b) {
@@ -155,7 +155,6 @@ function PickSubmitForm(props) {
       </h3>
       <p className="resources">
         <a href="https://www.espn.com/nfl/odds" target="_blank" rel="noopener noreferrer">Odds</a>
-
         <a href="https://docs.google.com/document/d/1Ui9Nwc9xW597GhBqPj6KhbDCau997BFU6OVWYOcVVMc/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Rules</a>
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
