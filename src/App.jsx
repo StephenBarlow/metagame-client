@@ -1,9 +1,10 @@
 import React from 'react';
 import {
   BrowserRouter as Router,
-  Switch,
+  Link,
   Route,
-} from "react-router-dom";
+  Routes,
+} from "react-router";
 import './App.css';
 import { ApolloClient, HttpLink, InMemoryCache, makeVar } from '@apollo/client';
 import { ApolloProvider, useReactiveVar } from '@apollo/client/react';
@@ -49,20 +50,17 @@ function App() {
               <AccountPanel/>
             </header>
             <div className="content">
-              <Switch>
-                <Route path="/leagues/:id">
-                  { loggedIn
-                    ? <LeagueDetails />
-                    : <p>You must sign in to view a league's details. <a href="/">Return to home</a></p>
+              <Routes>
+                <Route
+                  path="/leagues/:id"
+                  element={
+                    loggedIn
+                      ? <LeagueDetails />
+                      : <p>You must sign in to view a league's details. <Link to="/">Return to home</Link></p>
                   }
-                </Route>
-                <Route exact path="/">
-                  { loggedIn
-                    ? <FantasyLeagueList/>
-                    : <Home/>
-                  }
-                </Route>
-              </Switch>
+                />
+                <Route path="/" element={loggedIn ? <FantasyLeagueList /> : <Home />} />
+              </Routes>
             </div>
           </Router>
         </div>

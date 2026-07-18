@@ -8,7 +8,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-indiana-drag-scroll": "^2.2.1",
-    "react-router-dom": "^5.3.4",
+    "react-router": "^8.2.0",
     "react-tooltip": "^6.0.8",
     "rxjs": "^7.8.2",
     "victory-axis": "^37.3.6",

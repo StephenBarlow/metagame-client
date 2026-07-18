@@ -9,7 +9,7 @@ import PickSubmitForm from './PickSubmitForm';
 import CurrentPick from './CurrentPick';
 import SingleWeekPicks from './SingleWeekPicks';
 import PickArchive from './PickArchive';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 const GET_SPORTS_TEAMS = gql`
   query GetSportsTeams {

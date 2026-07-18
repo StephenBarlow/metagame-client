@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 function Logo() {
   return (
-    <h1 className="logo"><a href="/">NFL Pick 2</a></h1>
+    <h1 className="logo"><Link to="/">NFL Pick 2</Link></h1>
   );
 }
 
