@@ -33,8 +33,8 @@ function SignupForm() {
 
   const signIn = function({ createUser }) {
     if (createUser?.user) {
-      activeUser(createUser.user.email);
-      localStorage.setItem('activeUser',createUser.user.email);
+      activeUser(createUser.user);
+      localStorage.setItem('activeUser', JSON.stringify(createUser.user));
     }
 
     if (createUser?.errors?.length > 0) {

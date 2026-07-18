@@ -17,28 +17,29 @@ import AccountPanel from './components/AccountPanel';
 import LeagueDetails from './components/LeagueDetails';
 import { UserProvider } from './components/ActiveUserContext';
 
-function App() {
-  const serverURL = import.meta.env.VITE_SERVER_URL || 'https://metagame.onrender.com';
-  const activeUser = makeVar(JSON.parse(localStorage.getItem('activeUser')));
-  const loggedIn = useReactiveVar(activeUser);
+const serverURL = import.meta.env.VITE_SERVER_URL || 'https://metagame.onrender.com';
+const activeUser = makeVar(JSON.parse(localStorage.getItem('activeUser')));
 
-  const client = new ApolloClient({
-    devtools: { enabled: true },
-    link: new HttpLink({ uri: serverURL }),
-    cache: new InMemoryCache({
-      typePolicies: {
-        Query: {
-          fields: {
-            me: {
-              read() {
-                return activeUser();
-              }
+const client = new ApolloClient({
+  devtools: { enabled: true },
+  link: new HttpLink({ uri: serverURL }),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          me: {
+            read() {
+              return activeUser();
             }
           }
         }
       }
-    }),
-  });
+    }
+  }),
+});
+
+function App() {
+  const loggedIn = useReactiveVar(activeUser);
 
   return (
     <ApolloProvider client={client}>
