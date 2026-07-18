@@ -2,8 +2,8 @@
 
 import React, { useContext, useState } from 'react';
 import UserContext from './ActiveUserContext';
-import { useQuery } from '@apollo/client';
-import ReactTooltip from 'react-tooltip';
+import { useQuery } from '@apollo/client/react';
+import { Tooltip } from 'react-tooltip';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import ScoreHistogram from './ScoreHistogram';
 import { GET_SPORTS_GAMES } from './SharedQueries';
@@ -248,7 +248,7 @@ function PickGrid(props) {
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">+{calculatePlayerLast(player.id)}</td>
     {
-      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tip={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : null}>
+      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tooltip-id="pick-grid-tooltip" data-tooltip-content={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : null}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}
@@ -263,7 +263,7 @@ function PickGrid(props) {
 
   return (
     <>
-      <ReactTooltip effect="solid" backgroundColor="#000000"/>
+      <Tooltip id="pick-grid-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000' }} />
       <h3>THE GRID</h3>
       <label style={{paddingLeft: '4px'}}>Sort by: </label>
       <select

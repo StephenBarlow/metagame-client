@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`

@@ -3,7 +3,7 @@
 
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
 const TeamOutcome = ({weekToShow, league, team, ...props}) => {

@@ -3,7 +3,8 @@
 
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 
 const GET_USER_PICKS = gql`
   query GetUserPicks($leagueID: ID!, $userID: ID!) {

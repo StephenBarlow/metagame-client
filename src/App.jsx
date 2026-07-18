@@ -4,9 +4,9 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import {Helmet} from "react-helmet";
 import './App.css';
-import { ApolloClient, InMemoryCache, ApolloProvider, makeVar, useReactiveVar } from '@apollo/client'
+import { ApolloClient, HttpLink, InMemoryCache, makeVar } from '@apollo/client';
+import { ApolloProvider, useReactiveVar } from '@apollo/client/react';
 
 import Home from './components/Home';
 import Logo from './components/Logo';
@@ -22,8 +22,8 @@ function App() {
   const loggedIn = useReactiveVar(activeUser);
 
   const client = new ApolloClient({
-    connectToDevTools: true,
-    uri: serverURL,
+    devtools: { enabled: true },
+    link: new HttpLink({ uri: serverURL }),
     cache: new InMemoryCache({
       typePolicies: {
         Query: {
@@ -43,10 +43,6 @@ function App() {
     <ApolloProvider client={client}>
       <UserProvider value={activeUser}>
         <div className="App">
-          <Helmet>
-            <meta charSet="utf-8" />
-            <title>NFL Pick 2</title>
-          </Helmet>
           <Router>
             <header className="global-header">
               <Logo/>

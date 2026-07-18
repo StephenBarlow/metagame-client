@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { gql, useLazyQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 
 const LOG_IN = gql`

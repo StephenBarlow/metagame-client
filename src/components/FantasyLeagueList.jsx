@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 import { Redirect } from "react-router-dom";
 
