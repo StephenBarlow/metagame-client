@@ -5,39 +5,26 @@
   "dependencies": {
     "@apollo/client": "^3.7.0",
     "@data-ui/histogram": "^0.0.84",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
     "graphql": "^15.3.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-helmet": "^6.1.0",
     "react-indiana-drag-scroll": "^2.0.1",
     "react-router-dom": "^5.3.4",
-    "react-scripts": "3.4.1",
-    "react-test-renderer": "^16.14.0",
-    "react-tooltip": "^4.5.1",
-    "sass": "^1.54.4"
+    "react-tooltip": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "jsdom": "^26.1.0",
+    "sass": "^1.54.4",
+    "vite": "^7.0.0",
+    "vitest": "^4.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "start": "vite",
+    "build": "vite build",
+    "test": "vitest"
   }
 }

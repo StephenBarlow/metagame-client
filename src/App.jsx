@@ -17,7 +17,7 @@ import LeagueDetails from './components/LeagueDetails';
 import { UserProvider } from './components/ActiveUserContext';
 
 function App() {
-  const serverURL = process.env.REACT_APP_SERVER_URL || 'http://localhost:4000';
+  const serverURL = import.meta.env.VITE_SERVER_URL || 'https://metagame.onrender.com';
   const activeUser = makeVar(JSON.parse(localStorage.getItem('activeUser')));
   const loggedIn = useReactiveVar(activeUser);
 
@@ -38,8 +38,6 @@ function App() {
       }
     }),
   });
-
-
 
   return (
     <ApolloProvider client={client}>
