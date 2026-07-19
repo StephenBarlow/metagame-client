@@ -7,7 +7,7 @@ import { useQuery } from '@apollo/client/react';
 import { Tooltip } from 'react-tooltip';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
-const TeamOutcome = ({weekToShow, league, team, side, hoveredTeam, setHoveredTeam}) => {
+const TeamOutcome = ({weekToShow, league, team, side, rowSpan, hoveredTeam, setHoveredTeam}) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
@@ -23,25 +23,26 @@ const TeamOutcome = ({weekToShow, league, team, side, hoveredTeam, setHoveredTea
 
   if (team === 'BYE') {
     return (
-      <td colSpan={2} className={`team-bye${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>BYE</td>
+      <td colSpan={2} rowSpan={rowSpan} className={`team-bye${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>BYE</td>
     );
   }
 
   if (gamesLoading || gamesError) {
     return (
-      <td className={`team-${team.toLowerCase()} gameresult-unknown${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>{team}</td>
+      <td rowSpan={rowSpan} className={`team-${team.toLowerCase()} gameresult-unknown${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>{team}</td>
     );
   }
 
   const teamGame = gamesData.sportsGames.find(game => (game.week === weekToShow && (game.awayTeam.shortName === team || game.homeTeam.shortName === team)));
 
   let gameResult;
+  let pickedTeamScore;
+  let otherTeamScore;
 
   if (teamGame.result.awayTeamScore === null || teamGame.result.homeTeamScore === null) {
     gameResult = 'unknown';
   } else {
     const isAwayTeam = (teamGame.awayTeam.shortName === team);
-    let pickedTeamScore, otherTeamScore;
     if (isAwayTeam) {
       pickedTeamScore = teamGame.result.awayTeamScore;
       otherTeamScore = teamGame.result.homeTeamScore
@@ -60,9 +61,23 @@ const TeamOutcome = ({weekToShow, league, team, side, hoveredTeam, setHoveredTea
     }
   }
 
+  const gameResultTooltip = gameResult === 'unknown'
+    ? null
+    : gameResult === 'tie'
+      ? 'Tied'
+      : `${gameResult === 'win' ? 'Won' : 'Lost'} by ${Math.abs(pickedTeamScore - otherTeamScore)}`;
+
   return (
-    <td className={`team-${team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${side}${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>{team}</td>
-  );
+      <td
+        rowSpan={rowSpan}
+        className={`team-${team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${side}${teamHighlightClass}`}
+        onMouseEnter={handleMouseEnter}
+        data-tooltip-id="single-week-game-result-tooltip"
+        data-tooltip-content={gameResultTooltip}
+      >
+        {team}
+      </td>
+    );
 }
 
 const PickOutcome = ({weekToShow, ...props}) => {
@@ -463,7 +478,22 @@ function SingleWeekPicks (props) {
 
   const isActiveUser = (playerID) => playerID === activeUser().id;
 
-  const playerRows = orderedPlayerPicks.map((playerPick) => <tr key={playerPick.player.id}>
+  const getTeamRowSpan = (rowIndex, teamIndex) => {
+    const team = orderedPlayerPicks[rowIndex].picks[teamIndex];
+    if (!team || orderedPlayerPicks[rowIndex - 1]?.picks[teamIndex] === team) return 0;
+
+    let rowSpan = 1;
+    while (orderedPlayerPicks[rowIndex + rowSpan]?.picks[teamIndex] === team) {
+      rowSpan += 1;
+    }
+    return rowSpan;
+  };
+
+  const playerRows = orderedPlayerPicks.map((playerPick, rowIndex) => {
+    const firstTeamRowSpan = getTeamRowSpan(rowIndex, 0);
+    const secondTeamRowSpan = getTeamRowSpan(rowIndex, 1);
+
+    return <tr key={playerPick.player.id}>
     <td
       className={ "player-name " + (isActiveUser(playerPick.player.id) ? 'is-active-user' : '')}
       data-tooltip-id={isActiveUser(playerPick.player.id) ? 'single-week-active-user-tooltip' : undefined}
@@ -473,10 +503,12 @@ function SingleWeekPicks (props) {
     </td>
     { playerPick.picks.length > 0 &&
       <>
-      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
+      {firstTeamRowSpan > 0 &&
+        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" rowSpan={firstTeamRowSpan} hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
+      }
       {/* Bye has colspan 2, no need for right column */}
-      {playerPick.picks[1] !== 'BYE' && 
-        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
+      {playerPick.picks[1] !== 'BYE' && secondTeamRowSpan > 0 &&
+        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" rowSpan={secondTeamRowSpan} hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
       }
       <PickOutcome weekToShow={weekToShow} team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
@@ -488,7 +520,8 @@ function SingleWeekPicks (props) {
       <td className="outcome-unknown">?</td>
       </>
     }
-</tr>);
+</tr>;
+  });
 
   return (
     <>
@@ -496,6 +529,7 @@ function SingleWeekPicks (props) {
       <>
         <h3>All picks for week {weekToShow}</h3>
         <Tooltip id="single-week-active-user-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
+        <Tooltip id="single-week-game-result-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
         <table className="pick-grid week-picks">
           <thead>
             <tr>

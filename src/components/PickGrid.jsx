@@ -11,7 +11,20 @@ import { GET_SPORTS_GAMES } from './SharedQueries';
 function PickGrid(props) {
   const activeUser = useContext(UserContext);
   const [sortMethod, setSortMethod] = useState('total');
+  const [showTeamLogos, setShowTeamLogos] = useState(() => {
+    const userConfig = JSON.parse(localStorage.getItem('userConfig'));
+    return userConfig?.showTeamLogos ?? false;
+  });
   const league = props.league;
+
+  const updateShowTeamLogos = (showLogos) => {
+    setShowTeamLogos(showLogos);
+    const userConfig = JSON.parse(localStorage.getItem('userConfig')) || {};
+    localStorage.setItem('userConfig', JSON.stringify({
+      ...userConfig,
+      showTeamLogos: showLogos,
+    }));
+  };
 
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
@@ -152,9 +165,19 @@ function PickGrid(props) {
     }
   });
 
-  const teamHeaders = teams.map((team) =>
-    <th data-team-id={team.id} key={team.id} className={'team-' + team.shortName.toLowerCase()} title={team.name}>{team.shortName}</th>
-  );
+  const teamHeaders = teams.map((team) => {
+    const headerClassName = `team-${team.shortName.toLowerCase()}${showTeamLogos ? ' team-logo-header' : ''}`;
+    const logoFilename = `${team.name.toLowerCase().replaceAll(' ', '-')}.png`;
+
+    return (
+      <th data-team-id={team.id} key={team.id} className={headerClassName} title={team.name}>
+        {showTeamLogos
+          ? <img src={`/logos/${logoFilename}`} alt={`${team.name} logo`} draggable={false} />
+          : team.shortName
+        }
+      </th>
+    );
+  });
 
   const hidePlayer = function(player) {
     return (sortMethod === 'me' && !isActiveUser(player.id));
@@ -281,9 +304,17 @@ function PickGrid(props) {
           <option value="last" key="last">Week {league.revealedWeek} score</option>
           <option value="me" key="me">Just me</option>
         </select>
+      <label className="team-logo-toggle">
+        <input
+          type="checkbox"
+          checked={showTeamLogos}
+          onChange={(event) => updateShowTeamLogos(event.target.checked)}
+        />
+        Team logos
+      </label>
       <ScrollContainer vertical="false" className="grid-wrapper" hideScrollbars="false">
 
-          <table className="pick-grid">
+          <table className={`pick-grid${showTeamLogos ? ' logo-headers' : ''}`}>
             <thead>
               <tr>
                 <th className="default-cell player-name sticky">Competitor</th>
