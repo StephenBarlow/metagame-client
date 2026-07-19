@@ -3,6 +3,7 @@ import { VictoryAxis } from 'victory-axis';
 import { VictoryChart } from 'victory-chart';
 import { VictoryContainer } from 'victory-core';
 import { VictoryHistogram } from 'victory-histogram';
+import { VictoryTooltip } from 'victory-tooltip';
 
 const roundForPrecision = (value) => Number(value.toPrecision(12));
 
@@ -44,9 +45,33 @@ const axisStyle = {
   tickLabels: { fill: '#ddd' },
 };
 
-function ScoreHistogram({ scores }) {
+function ScoreHistogram({ scores, playerScores = [] }) {
   const data = scores.map((score) => ({ x: score }));
   const bins = createHistogramBins(scores);
+
+  if (!bins || bins.length - 1 < 3) return null;
+
+  const getBinLabel = ({ datum }) => {
+    const lowerBound = datum.x0;
+    const upperBound = datum.x1;
+    const playersInBin = playerScores
+      .filter(({ score }) => score >= lowerBound && score <= upperBound)
+      .sort((firstPlayer, secondPlayer) =>
+        secondPlayer.score - firstPlayer.score || firstPlayer.name.localeCompare(secondPlayer.name)
+      )
+      .map(({ name, score }) => ({ name: name.split(' ')[0], score }));
+
+    const longestName = Math.max(...playersInBin.map(({ name }) => name.length), 0);
+    const longestScore = Math.max(...playersInBin.map(({ score }) => String(score).length), 0);
+
+    return playersInBin
+      .map(({ name, score }) => {
+        const namePadding = '\u00a0'.repeat(longestName - name.length);
+        const scorePadding = '\u00a0'.repeat(longestScore - String(score).length);
+        return `${name}${namePadding}\u00a0\u00a0${scorePadding}${score}`;
+      })
+      .join('\n');
+  };
 
   return (
     <VictoryChart
@@ -75,6 +100,8 @@ function ScoreHistogram({ scores }) {
         ariaLabel="Histogram of Pick 2 scores"
         bins={bins}
         data={data}
+        labels={getBinLabel}
+        labelComponent={<VictoryTooltip constrainToVisibleArea flyoutStyle={{ fill: '#000' }} style={{ fill: '#fff', textAnchor: 'start', fontFamily: 'monospace' }} />}
         style={{ data: { fill: 'cyan', stroke: 'black', strokeWidth: 2 } }}
       />
     </VictoryChart>

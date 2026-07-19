@@ -1,12 +1,12 @@
 // Table that shows all picks for the current
 // week after they're revealed.
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client/react';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
-const TeamOutcome = ({weekToShow, league, team, ...props}) => {
+const TeamOutcome = ({weekToShow, league, team, side, hoveredTeam, setHoveredTeam}) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
@@ -17,15 +17,18 @@ const TeamOutcome = ({weekToShow, league, team, ...props}) => {
     }
   );
 
+  const teamHighlightClass = hoveredTeam === team ? ' team-highlighted' : '';
+  const handleMouseEnter = () => setHoveredTeam(team);
+
   if (team === 'BYE') {
     return (
-      <td colSpan={2} className="team-bye">BYE</td>
+      <td colSpan={2} className={`team-bye${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>BYE</td>
     );
   }
 
   if (gamesLoading || gamesError) {
     return (
-      <td className={`team-${team.toLowerCase()} gameresult-unknown`}>{team}</td>
+      <td className={`team-${team.toLowerCase()} gameresult-unknown${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>{team}</td>
     );
   }
 
@@ -57,7 +60,7 @@ const TeamOutcome = ({weekToShow, league, team, ...props}) => {
   }
 
   return (
-    <td className={`team-${team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${props.side}`}>{team}</td>
+    <td className={`team-${team.toLowerCase()} gameresult gameresult-${gameResult} gameresult-${side}${teamHighlightClass}`} onMouseEnter={handleMouseEnter}>{team}</td>
   );
 }
 
@@ -396,6 +399,7 @@ const sortPlayerPicks = sortPlayerPicksAdjacency;
 
 function SingleWeekPicks (props) {
   const activeUser = useContext(UserContext);
+  const [hoveredTeam, setHoveredTeam] = useState(null);
 
   const weekToShow = (props.weekToShow) ? props.weekToShow : props.league.currentWeek;
 
@@ -464,10 +468,10 @@ function SingleWeekPicks (props) {
     <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
-      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" />
+      <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
       {/* Bye has colspan 2, no need for right column */}
       {playerPick.picks[1] !== 'BYE' && 
-        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" />
+        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
       }
       <PickOutcome weekToShow={weekToShow} team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
       </>
@@ -495,7 +499,7 @@ function SingleWeekPicks (props) {
               <th className="default-cell">Result</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody onMouseLeave={() => setHoveredTeam(null)}>
             {playerRows}
           </tbody>
         </table>

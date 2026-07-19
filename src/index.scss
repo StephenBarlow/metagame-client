@@ -56,6 +56,7 @@ h3 {
 
 .pick-grid {
   border-collapse: separate;
+
   margin-bottom: 20px;
   background-color: #282828;
 
@@ -126,8 +127,13 @@ h3 {
 }
 
 table.week-picks {
+  border-spacing: 0;
+
   td.player-name {
     font-weight: normal;
+  }
+  td.team-highlighted {
+    box-shadow: inset 0 0 0 1.5px white;
   }
   td {
     font-weight: bold;

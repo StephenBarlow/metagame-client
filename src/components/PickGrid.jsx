@@ -49,13 +49,14 @@ function PickGrid(props) {
   // These next few functions are like the only Pick-2-specific logic
   const calculatePickResult = function(playerID, firstPick) {
 
-    let pickResult = {
-      week: firstPick.week
-    };
-
     // Find the other pick by the same
     // player from the same week
     const secondPick = league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
+
+    let pickResult = {
+      week: firstPick.week,
+      otherTeam: secondPick?.team.shortName
+    };
 
     // Get the result of both picked games
     const firstPickGame = gamesData.sportsGames.find(game => (game.week === firstPick.week && (game.awayTeam.id === firstPick.team.id || game.homeTeam.id === firstPick.team.id)));
@@ -248,7 +249,7 @@ function PickGrid(props) {
     <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
     <td className="player-last default-cell">+{calculatePlayerLast(player.id)}</td>
     {
-      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tooltip-id="pick-grid-tooltip" data-tooltip-content={ pickResults[player.id][team.id] ? 'Week ' + pickResults[player.id][team.id].week : null}>
+      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tooltip-id="pick-grid-tooltip" data-tooltip-content={ pickResults[player.id][team.id] ? `Week ${pickResults[player.id][team.id].week}\n+ ${pickResults[player.id][team.id].otherTeam}` : null}>
         {pickResults[player.id][team.id] &&
           <>
             {pickResults[player.id][team.id].value}
@@ -263,7 +264,23 @@ function PickGrid(props) {
 
   return (
     <>
-      <Tooltip id="pick-grid-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000' }} />
+      <Tooltip
+        id="pick-grid-tooltip"
+        classNameArrow="hidden"
+        style={{ backgroundColor: '#000000', textAlign: 'center' }}
+        render={({ content }) => {
+          if (!content) return null;
+
+          const [week, pairing] = content.split('\n');
+          return (
+            <>
+              <strong>{week}</strong>
+              <br />
+              {pairing}
+            </>
+          );
+        }}
+      />
       <h3>THE GRID</h3>
       <label style={{paddingLeft: '4px'}}>Sort by: </label>
       <select
@@ -293,7 +310,13 @@ function PickGrid(props) {
       </ScrollContainer>
       <h3>THE GRAPH</h3>
       <div className="histogram">
-        <ScoreHistogram scores={allScores} />
+        <ScoreHistogram
+          scores={allScores}
+          playerScores={league.users.map((user) => ({
+            name: user.displayName,
+            score: calculatePlayerScore(user.id),
+          }))}
+        />
       </div>
     </>
   );
