@@ -78,7 +78,7 @@ function ScoreHistogram({ scores, playerScores = [] }) {
       containerComponent={<VictoryContainer responsive={false} style={{ touchAction: 'pan-x' }} />}
       height={400}
       width={600}
-      domainPadding={{ x: 10, y: 8 }}
+      domainPadding={{ x: 0, y: 8 }}
       padding={{ top: 20, right: 30, bottom: 60, left: 60 }}
     >
       <VictoryAxis
