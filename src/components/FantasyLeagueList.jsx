@@ -28,25 +28,27 @@ function FantasyLeagueList({ autoRedirect = true }) {
 
   const leagues = data.leagues ?? [];
   const currentLeagues = leagues.filter((league) => league.season === data.currentSeason);
-  const pastLeagues = leagues.filter((league) => league.season !== data.currentSeason);
+  const completedLeagues = leagues
+    .filter((league) => league.season !== data.currentSeason)
+    .sort((a, b) => String(b.season).localeCompare(String(a.season), undefined, { numeric: true }));
 
   if (autoRedirect && currentLeagues.length === 1) {
     return <Navigate to={'/leagues/' + currentLeagues[0].id} />
   }
 
   const currentLeagueLinks = currentLeagues.map((league) => <li key={league.id}><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
-  const pastLeagueLinks = pastLeagues.map((league) => <li key={league.id}><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
+  const completedLeagueLinks = completedLeagues.map((league) => <li key={league.id}><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
 
   return (
     <div className="league-list">
-      <h2>Current leagues</h2>
+      <h2>Active leagues</h2>
       <ul>
       { currentLeagueLinks }
       </ul>
 
-      <h2>Past leagues</h2>
+      <h2>Completed leagues</h2>
       <ul>
-        { pastLeagueLinks }
+        { completedLeagueLinks }
       </ul>
     </div>
   );
