@@ -244,6 +244,15 @@ form label {
   cursor: pointer;
 }
 
+.my-leagues-link {
+  display: inline-flex;
+  height: inherit;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
+  text-decoration: none;
+}
+
 form input:not(:first-of-type) {
   margin-left: 10px;
 }

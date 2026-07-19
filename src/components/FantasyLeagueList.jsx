@@ -15,7 +15,7 @@ const GET_FANTASY_LEAGUES = gql`
   }
 `;
 
-function FantasyLeagueList() {
+function FantasyLeagueList({ autoRedirect = true }) {
   const activeUser = useContext(UserContext);
   const { loading, error, data } = useQuery(GET_FANTASY_LEAGUES, {
     variables: {
@@ -26,32 +26,27 @@ function FantasyLeagueList() {
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
 
-  if (data.leagues && data.leagues.length === 1) {
-    return <Navigate to={'/leagues/' + data.leagues[0].id} />
+  const leagues = data.leagues ?? [];
+  const currentLeagues = leagues.filter((league) => league.season === data.currentSeason);
+  const pastLeagues = leagues.filter((league) => league.season !== data.currentSeason);
+
+  if (autoRedirect && currentLeagues.length === 1) {
+    return <Navigate to={'/leagues/' + currentLeagues[0].id} />
   }
 
-  let currentLeagues = [];
-  let pastLeagues = [];
-
-  if (data.leagues) {
-
-    const cLeagues = data.leagues.filter((league) => league.season === data.currentSeason);
-    const pLeagues = data.leagues.filter((league) => league.season !== data.currentSeason);
-
-    currentLeagues = cLeagues.map((league) => <li><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
-    pastLeagues = pLeagues.map((league) => <li><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
-  }
+  const currentLeagueLinks = currentLeagues.map((league) => <li key={league.id}><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
+  const pastLeagueLinks = pastLeagues.map((league) => <li key={league.id}><Link to={'/leagues/' + league.id}>{league.name}</Link></li>);
 
   return (
     <div className="league-list">
       <h2>Current leagues</h2>
       <ul>
-      { currentLeagues }
+      { currentLeagueLinks }
       </ul>
 
       <h2>Past leagues</h2>
       <ul>
-        { pastLeagues }
+        { pastLeagueLinks }
       </ul>
     </div>
   );

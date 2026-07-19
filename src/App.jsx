@@ -48,6 +48,7 @@ function App() {
           <Router>
             <header className="global-header">
               <Logo/>
+              {loggedIn && <Link className="my-leagues-link" to="/leagues">My leagues</Link>}
               <AccountPanel/>
             </header>
             <div className="content">
@@ -59,6 +60,10 @@ function App() {
                       ? <LeagueDetails />
                       : <p>You must sign in to view a league's details. <Link to="/">Return to home</Link></p>
                   }
+                />
+                <Route
+                  path="/leagues"
+                  element={loggedIn ? <FantasyLeagueList autoRedirect={false} /> : <Home />}
                 />
                 <Route path="/" element={loggedIn ? <FantasyLeagueList /> : <Home />} />
               </Routes>

@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { gql } from '@apollo/client';
 import { useLazyQuery } from '@apollo/client/react';
+import { useNavigate } from 'react-router';
 import UserContext from './ActiveUserContext';
 
 const LOG_IN = gql`
@@ -21,22 +22,26 @@ function LoginForm() {
 
   // Keeping track of the address entered in the form
   const [email, setEmail] = useState('');
+  const [message, setMessage] = useState(null);
   const activeUser = useContext(UserContext);
+  const navigate = useNavigate();
 
-  const signIn = function({ user }) {
-    if (user) {
-      activeUser(user);
-      localStorage.setItem('activeUser', JSON.stringify(user));
-      window.location.reload(false);
+  const [login, { loading, error, data }] = useLazyQuery(LOG_IN);
+
+  useEffect(() => {
+    if (!data?.user) {
+      return;
     }
-  };
-  
-  const [login, { loading, error, data }] = useLazyQuery(
-    LOG_IN,
-    {
-      onCompleted: signIn
-    }
-  );
+
+    setMessage('Login successful! Loading...');
+    const timeoutId = setTimeout(() => {
+      activeUser(data.user);
+      localStorage.setItem('activeUser', JSON.stringify(data.user));
+      navigate('/', { replace: true });
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [activeUser, data, navigate]);
 
   return (
     <>
@@ -49,10 +54,10 @@ function LoginForm() {
         <input id="login-submit" type="submit" />
       </form>
       <p className="form-status">
-        { loading && <>Loading...</> }
+        { loading && <>Logging in...</> }
         { error && <>Server error logging in</> }
         { data && !data.user && <>User not found!</>}
-        { data?.user?.email && <>Success! Click the top-left logo to return to home.</>}
+        { message && <>{message}</>}
       </p>
     </>
   );
