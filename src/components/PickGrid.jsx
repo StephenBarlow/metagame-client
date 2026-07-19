@@ -1,6 +1,6 @@
 // The big-ass table showing the entire pick history for a league.
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client/react';
 import { Tooltip } from 'react-tooltip';
@@ -23,135 +23,118 @@ function PickGrid(props) {
     }
   );
 
-  const getPickResults = function() {
-    let results = {};
+  const { pickResults, playerScores, playerLastScores, byePicksByPlayer } = useMemo(() => {
+    if (!gamesData) {
+      return {
+        pickResults: {},
+        playerScores: new Map(),
+        playerLastScores: new Map(),
+        byePicksByPlayer: new Map(),
+      };
+    }
 
-    // For each player...
-    for (const player of league.users) {
-      results[player.id] = {};
+    const gamesByWeekAndTeam = new Map();
+    for (const game of gamesData.sportsGames) {
+      gamesByWeekAndTeam.set(`${game.week}:${game.awayTeam.id}`, game);
+      gamesByWeekAndTeam.set(`${game.week}:${game.homeTeam.id}`, game);
+    }
 
-      // For each team...
-      for (const team of props.teams) {
+    const picksByPlayerAndTeam = new Map();
+    const picksByPlayerAndWeek = new Map();
+    const byePicks = new Map();
+    for (const pick of league.picks) {
+      picksByPlayerAndTeam.set(`${pick.user.id}:${pick.team.id}`, pick);
 
-        // If the player has picked that team...
-        const teamPick = league.picks.find(pick => (pick.team.id === team.id && pick.user.id === player.id));
+      const playerWeekKey = `${pick.user.id}:${pick.week}`;
+      const weekPicks = picksByPlayerAndWeek.get(playerWeekKey) || [];
+      weekPicks.push(pick);
+      picksByPlayerAndWeek.set(playerWeekKey, weekPicks);
 
-        // Calculate the result of that pick
-        if (teamPick) {
-          results[player.id][team.id] = calculatePickResult(player.id, teamPick);
-        }
+      if (pick.team.id === 'bye') {
+        const playerByePicks = byePicks.get(pick.user.id) || [];
+        playerByePicks.push(pick);
+        byePicks.set(pick.user.id, playerByePicks);
       }
     }
 
-    return results;
-  };
-
-  // These next few functions are like the only Pick-2-specific logic
-  const calculatePickResult = function(playerID, firstPick) {
-
-    // Find the other pick by the same
-    // player from the same week
-    const secondPick = league.picks.find(pick => (pick.week === firstPick.week && pick.user.id === firstPick.user.id && pick.id !== firstPick.id));
-
-    let pickResult = {
-      week: firstPick.week,
-      otherTeam: secondPick?.team.shortName
+    const getGameMargin = (game, teamID) => {
+      const isAwayTeam = game.awayTeam.id === teamID;
+      const pickedTeamScore = isAwayTeam ? game.result.awayTeamScore : game.result.homeTeamScore;
+      const otherTeamScore = isAwayTeam ? game.result.homeTeamScore : game.result.awayTeamScore;
+      return pickedTeamScore - otherTeamScore;
     };
 
-    // Get the result of both picked games
-    const firstPickGame = gamesData.sportsGames.find(game => (game.week === firstPick.week && (game.awayTeam.id === firstPick.team.id || game.homeTeam.id === firstPick.team.id)));
+    const results = {};
+    const scores = new Map();
+    const lastScores = new Map();
+    const weekToCheck = league.currentWeek === league.revealedWeek ? league.currentWeek : league.currentWeek - 1;
 
-    const secondPickGame = gamesData.sportsGames.find(game => (game.week === secondPick.week && (game.awayTeam.id === secondPick.team.id || game.homeTeam.id === secondPick.team.id)));
+    for (const player of league.users) {
+      const playerResults = {};
+      let totalScore = 0;
+      let lastScore = 0;
 
-    // Result unknown if either game is incomplete
-    if (!(firstPickGame.result.complete && secondPickGame.result.complete )) {
-      pickResult.value = '?';
-      pickResult.outcome = 'UNKNOWN';
-      return pickResult;
-    }
+      for (const team of props.teams) {
+        const firstPick = picksByPlayerAndTeam.get(`${player.id}:${team.id}`);
+        if (!firstPick) continue;
 
-    // Get each game's margin of victory/loss
-    const firstGameMargin = calculateGameMargin(firstPickGame, firstPick.team.id);
+        const sameWeekPicks = picksByPlayerAndWeek.get(`${player.id}:${firstPick.week}`) || [];
+        const secondPick = sameWeekPicks.find(pick => pick.id !== firstPick.id);
+        const pickResult = {
+          week: firstPick.week,
+          otherTeam: secondPick?.team.shortName,
+        };
+        const firstPickGame = gamesByWeekAndTeam.get(`${firstPick.week}:${firstPick.team.id}`);
+        const secondPickGame = secondPick && gamesByWeekAndTeam.get(`${secondPick.week}:${secondPick.team.id}`);
 
-    const secondGameMargin = calculateGameMargin(secondPickGame, secondPick.team.id);
-
-    if (firstGameMargin >= 0 && secondGameMargin >= 0) {
-
-      // Double win, always points equal
-      // to margin of victory
-      pickResult.value = firstGameMargin;
-      pickResult.outcome = 'DOUBLE_WIN';
-      return pickResult;
-    } else if (firstGameMargin <= 0 && secondGameMargin <= 0) {
-
-      // Double loss, points depend on "larger" margin of loss
-      pickResult.outcome = 'DOUBLE_LOSS';
-      let firstGameScore;
-
-      if (firstGameMargin < secondGameMargin) {
-        // This margin is larger, so use it
-        firstGameScore = -firstGameMargin;
-      } else if (firstGameMargin === secondGameMargin) {
-        // The two margins are equal, so always use a deterministic one
-        if (firstPickGame.id < secondPickGame.id) {
-          firstGameScore = -firstGameMargin;
+        if (!(firstPickGame?.result.complete && secondPickGame?.result.complete)) {
+          pickResult.value = '?';
+          pickResult.outcome = 'UNKNOWN';
         } else {
-          firstGameScore = 0;
+          const firstGameMargin = getGameMargin(firstPickGame, firstPick.team.id);
+          const secondGameMargin = getGameMargin(secondPickGame, secondPick.team.id);
+
+          if (firstGameMargin >= 0 && secondGameMargin >= 0) {
+            pickResult.value = firstGameMargin;
+            pickResult.outcome = 'DOUBLE_WIN';
+          } else if (firstGameMargin <= 0 && secondGameMargin <= 0) {
+            pickResult.outcome = 'DOUBLE_LOSS';
+            if (firstGameMargin < secondGameMargin) {
+              pickResult.value = -firstGameMargin;
+            } else if (firstGameMargin === secondGameMargin) {
+              pickResult.value = firstPickGame.id < secondPickGame.id ? -firstGameMargin : 0;
+            } else {
+              pickResult.value = 0;
+            }
+          } else {
+            pickResult.value = 0;
+            pickResult.outcome = 'SPLIT';
+          }
         }
-      } else {
-        // The other margin is larger, so use that one
-        firstGameScore = 0;
+
+        playerResults[team.id] = pickResult;
+        if (Number.isInteger(pickResult.value)) totalScore += pickResult.value;
+        if (pickResult.week === weekToCheck) {
+          if (pickResult.value === '?') {
+            lastScore = '?';
+          } else if (lastScore !== '?' && Number.isInteger(pickResult.value)) {
+            lastScore += pickResult.value;
+          }
+        }
       }
 
-      pickResult.value = firstGameScore;
-
-      return pickResult;
-    } else {
-      // Split, no points
-      pickResult.value = 0;
-      pickResult.outcome = 'SPLIT';
-      return pickResult;
-    }
-  };
-
-  const calculateGameMargin = function(game, teamID) {
-    const isAwayTeam = (game.awayTeam.id === teamID);
-    let pickedTeamScore, otherTeamScore;
-    if (isAwayTeam) {
-      pickedTeamScore = game.result.awayTeamScore;
-      otherTeamScore = game.result.homeTeamScore
-    } else {
-      pickedTeamScore = game.result.homeTeamScore;
-      otherTeamScore = game.result.awayTeamScore;
+      results[player.id] = playerResults;
+      scores.set(player.id, totalScore);
+      lastScores.set(player.id, lastScore);
     }
 
-    return pickedTeamScore - otherTeamScore;
-  }
-
-  const calculatePlayerScore = function(playerID) {
-    let totalScore = 0;
-    for (const [key, value] of Object.entries(pickResults[playerID])) {
-      if (Number.isInteger(value.value)) {
-        totalScore += value.value;
-      }
-    }
-    return totalScore;
-  };
-
-  const calculatePlayerLast = function(playerID) {
-    const weekToCheck = (league.currentWeek === league.revealedWeek ? league.currentWeek : league.currentWeek - 1);
-
-    let totalScore = 0;
-    for (const [key, value] of Object.entries(pickResults[playerID])) {
-      if (value.week === weekToCheck && Number.isInteger(value.value)) {
-        totalScore += value.value;
-      } else if (value.week === weekToCheck && value.value === '?') {
-        totalScore = '?';
-        break;
-      }
-    }
-    return totalScore;
-  };
+    return {
+      pickResults: results,
+      playerScores: scores,
+      playerLastScores: lastScores,
+      byePicksByPlayer: byePicks,
+    };
+  }, [gamesData, league, props.teams]);
 
   const isActiveUser = function(playerID) {
     return (playerID === activeUser().id) ? 'is-active-user' : '';
@@ -159,8 +142,6 @@ function PickGrid(props) {
 
   if (gamesLoading) return 'Loading...';
   if (gamesError) return `Error! ${gamesError.message}`;
-
-  const pickResults = getPickResults();
 
   // Sort teams alphabetically
   let teams = props.teams.slice().sort(function(a, b) {
@@ -195,7 +176,7 @@ function PickGrid(props) {
   }
 
   const getByeCell = function(playerID) {
-    const byePicks = league.picks.filter(pick => (pick.user.id === playerID && pick.team.id === 'bye'));
+    const byePicks = byePicksByPlayer.get(playerID) || [];
     const byeThisWeek = byePicks.find(pick => pick.week === league.currentWeek);
     const byesRemaining = 2 - (byePicks.length / 2);
 
@@ -214,18 +195,20 @@ function PickGrid(props) {
     }
   }
 
-  const allScores = league.users.map((user) => calculatePlayerScore(user.id));
+  const allScores = league.users.map((user) => playerScores.get(user.id));
 
   // Generate the grid row for each competitor
   const sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
     let firstScore, secondScore;
 
     if (sortMethod === 'total') {
-      firstScore = calculatePlayerScore(firstPlayer.id);
-      secondScore = calculatePlayerScore(secondPlayer.id);
+      firstScore = playerScores.get(firstPlayer.id);
+      secondScore = playerScores.get(secondPlayer.id);
     } else if (sortMethod === 'last') {
-      firstScore = calculatePlayerLast(firstPlayer.id);
-      secondScore = calculatePlayerLast(secondPlayer.id);
+      firstScore = playerLastScores.get(firstPlayer.id);
+      secondScore = playerLastScores.get(secondPlayer.id);
+    } else {
+      return 0;
     }
 
     if (firstScore === '?') {
@@ -246,8 +229,8 @@ function PickGrid(props) {
 
   const playerRows = sortedUsers.map((player) => <tr key={player.id} className={(hidePlayer(player) ? 'hidden' : '')}>
     <td className={"player-name sticky " + isActiveUser(player.id)} >{player.displayName}</td>
-    <td className="player-total default-cell">{calculatePlayerScore(player.id)}</td>
-    <td className="player-last default-cell">+{calculatePlayerLast(player.id)}</td>
+    <td className="player-total default-cell">{playerScores.get(player.id)}</td>
+    <td className="player-last default-cell">+{playerLastScores.get(player.id)}</td>
     {
       teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tooltip-id="pick-grid-tooltip" data-tooltip-content={ pickResults[player.id][team.id] ? `Week ${pickResults[player.id][team.id].week}\n+ ${pickResults[player.id][team.id].otherTeam}` : null}>
         {pickResults[player.id][team.id] &&
@@ -314,7 +297,7 @@ function PickGrid(props) {
           scores={allScores}
           playerScores={league.users.map((user) => ({
             name: user.displayName,
-            score: calculatePlayerScore(user.id),
+            score: playerScores.get(user.id),
           }))}
         />
       </div>

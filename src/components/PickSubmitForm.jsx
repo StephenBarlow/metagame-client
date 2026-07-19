@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { gql } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`
@@ -14,20 +14,6 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 }
 `;
 
-const GET_USER_PICKS = gql`
-  query GetUserPicks($leagueID: ID!, $userID: ID!) {
-    picksForUser(leagueID: $leagueID, userID: $userID) {
-      id
-      week
-      team {
-        id
-        name
-        shortName
-      }
-    }
-  }
-`;
-
 function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');
@@ -38,14 +24,6 @@ function PickSubmitForm(props) {
   const maxWeek = 18;
   // selectedWeek and setSelectedWeek are now props
   const { selectedWeek, setSelectedWeek } = props;
-
-  // Get user's picks to check which weeks have picks
-  const { data: userPicksData } = useQuery(GET_USER_PICKS, {
-    variables: {
-      leagueID: props.league.id,
-      userID: activeUser().id
-    }
-  });
 
   const updateShowPicked = function(sp) {
     setShowPicked(sp);
@@ -89,7 +67,6 @@ function PickSubmitForm(props) {
     {
       refetchQueries: [
         'GetLeagueDetails',
-        'GetUserPicks',
       ],
       onCompleted: ({submitPick}) => {
         if (submitPick.pick) {
@@ -106,7 +83,7 @@ function PickSubmitForm(props) {
   // picked a particular team
   const alreadyPicked = function(teamID) {
     // Check if the user has picked this team in any week except the selected week
-    return !!userPicksData?.picksForUser?.find(pick => pick.team.id === teamID && pick.week !== selectedWeek);
+    return !!props.userPicks.find(pick => pick.team.id === teamID && pick.week !== selectedWeek);
   }
 
   let teams = props.teams.slice().sort(function(a, b) {
@@ -145,7 +122,7 @@ function PickSubmitForm(props) {
           style={{ fontSize: '1em', fontWeight: 'bold', marginLeft: 4, marginRight: 4 }}
         >
           {Array.from({length: maxWeek - currentWeek + 1}, (_, i) => currentWeek + i).map(week => {
-            const hasPick = userPicksData?.picksForUser?.find(pick => pick.week === week);
+            const hasPick = props.userPicks.find(pick => pick.week === week);
             return (
               <option value={week} key={week}>
                 {week}{hasPick ? ' •' : ''}

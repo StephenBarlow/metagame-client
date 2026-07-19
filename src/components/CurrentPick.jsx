@@ -4,21 +4,7 @@
 import React, { useContext } from 'react';
 import UserContext from './ActiveUserContext';
 import { gql } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client/react';
-
-const GET_USER_PICKS = gql`
-  query GetUserPicks($leagueID: ID!, $userID: ID!) {
-    picksForUser(leagueID: $leagueID, userID: $userID) {
-      id
-      week
-      team {
-        id
-        name
-        shortName
-      }
-    }
-  }
-`;
+import { useMutation } from '@apollo/client/react';
 
 const INVALIDATE_PICKS = gql`
   mutation InvalidatePicks($request: InvalidatePicksRequest!) {
@@ -35,21 +21,12 @@ const INVALIDATE_PICKS = gql`
 function CurrentPick(props) {
   const activeUser = useContext(UserContext);
   const week = props.selectedWeek || props.league.currentWeek;
-  const { loading, error, data } = useQuery(GET_USER_PICKS, {
-    variables: {
-      leagueID: props.league.id,
-      userID: activeUser().id,
-      week: week
-    },
-    skip: props.currentSeason !== props.league.season
-  });
 
   const [invalidatePicks] = useMutation(
     INVALIDATE_PICKS,
     {
       refetchQueries: [
         'GetLeagueDetails',
-        'GetUserPicks',
       ],
       onCompleted: ({invalidatePicks: invalidatePicksResult}) => {
         if (invalidatePicksResult.success) {
@@ -64,10 +41,7 @@ function CurrentPick(props) {
   if (props.currentSeason !== props.league.season) {
     return (<p className="warning">This league has concluded.</p>)
   }
-  if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
-
-  const selectedWeekPicks = data.picksForUser.filter(pick => pick.week === week);
+  const selectedWeekPicks = props.userPicks.filter(pick => pick.week === week);
 
   if (!selectedWeekPicks.length) {
     return (<p className="warning">You have not yet submitted picks for week {week}.</p>)

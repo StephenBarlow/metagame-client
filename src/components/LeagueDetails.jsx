@@ -11,19 +11,23 @@ import SingleWeekPicks from './SingleWeekPicks';
 import PickArchive from './PickArchive';
 import { useParams } from 'react-router';
 
-const GET_SPORTS_TEAMS = gql`
-  query GetSportsTeams {
+const GET_LEAGUE_DETAILS = gql`
+  query GetLeagueDetails($leagueID: ID!, $userID: ID!) {
+    currentSeason
     sportsTeams {
       id
       name
       shortName
     }
-  }
-`;
-
-const GET_LEAGUE_DETAILS = gql`
-  query GetLeagueDetails($leagueID: ID!) {
-    currentSeason
+    picksForUser(leagueID: $leagueID, userID: $userID) {
+      id
+      week
+      team {
+        id
+        name
+        shortName
+      }
+    }
     league(leagueID: $leagueID) {
       id
       name
@@ -54,10 +58,10 @@ function LeagueDetails() {
   const { id: leagueID } = useParams();
   const activeUser = useContext(UserContext);
 
-  const { loading: teamsLoading, error: teamsError, data: teamsData } = useQuery(GET_SPORTS_TEAMS);
   const { loading: leagueLoading, error: leagueError, data: leagueData } = useQuery(GET_LEAGUE_DETAILS, {
     variables: {
-      'leagueID': leagueID
+      leagueID,
+      userID: activeUser().id,
     }
   });
   const [selectedWeek, setSelectedWeek] = useState(undefined);
@@ -70,8 +74,7 @@ function LeagueDetails() {
 
   const userConfig = JSON.parse(localStorage.getItem('userConfig'));
 
-  if (teamsLoading || leagueLoading) return 'Loading...';
-  if (teamsError) return `Error! ${teamsError.message}`;
+  if (leagueLoading) return 'Loading...';
   if (leagueError) return `Error! ${leagueError.message}`;
 
 
@@ -91,7 +94,8 @@ function LeagueDetails() {
       { (leagueData.currentSeason === leagueData.league.season) && selectedWeek !== undefined &&
         <PickSubmitForm
           league={leagueData.league}
-          teams={teamsData.sportsTeams}
+          teams={leagueData.sportsTeams}
+          userPicks={leagueData.picksForUser}
           userMustPick={userMustPick}
           config={userConfig}
           selectedWeek={selectedWeek}
@@ -100,14 +104,19 @@ function LeagueDetails() {
       }
 
       {selectedWeek !== undefined &&
-        <CurrentPick league={leagueData.league} currentSeason={leagueData.currentSeason} selectedWeek={selectedWeek} />
+        <CurrentPick
+          league={leagueData.league}
+          currentSeason={leagueData.currentSeason}
+          selectedWeek={selectedWeek}
+          userPicks={leagueData.picksForUser}
+        />
       }
 
       { !userMustPick &&
         <>
-          <PickGrid league={leagueData.league} teams={teamsData.sportsTeams} />
+          <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
 
-          <PickArchive league={leagueData.league} teams={teamsData.sportsTeams} currentSeason={leagueData.currentSeason} />
+          <PickArchive league={leagueData.league} teams={leagueData.sportsTeams} currentSeason={leagueData.currentSeason} />
         </>
       }
     </>
