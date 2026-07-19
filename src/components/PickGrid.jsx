@@ -228,7 +228,13 @@ function PickGrid(props) {
   });
 
   const playerRows = sortedUsers.map((player) => <tr key={player.id} className={(hidePlayer(player) ? 'hidden' : '')}>
-    <td className={"player-name sticky " + isActiveUser(player.id)} >{player.displayName}</td>
+    <td
+      className={"player-name sticky " + isActiveUser(player.id)}
+      data-tooltip-id={player.id === activeUser().id ? 'active-user-tooltip' : undefined}
+      data-tooltip-content={player.id === activeUser().id ? "That's you!" : undefined}
+    >
+      {player.displayName}
+    </td>
     <td className="player-total default-cell">{playerScores.get(player.id)}</td>
     <td className="player-last default-cell">+{playerLastScores.get(player.id)}</td>
     {
@@ -264,6 +270,7 @@ function PickGrid(props) {
           );
         }}
       />
+      <Tooltip id="active-user-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
       <h3>THE GRID</h3>
       <label style={{paddingLeft: '4px'}}>Sort by: </label>
       <select

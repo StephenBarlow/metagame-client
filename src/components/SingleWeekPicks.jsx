@@ -4,6 +4,7 @@
 import React, { useContext, useState } from 'react';
 import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client/react';
+import { Tooltip } from 'react-tooltip';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
 const TeamOutcome = ({weekToShow, league, team, side, hoveredTeam, setHoveredTeam}) => {
@@ -460,12 +461,16 @@ function SingleWeekPicks (props) {
   ];
 
 
-  const isActiveUser = function(playerID) {
-    return (playerID === activeUser().id) ? 'is-active-user' : '';
-  }
+  const isActiveUser = (playerID) => playerID === activeUser().id;
 
   const playerRows = orderedPlayerPicks.map((playerPick) => <tr key={playerPick.player.id}>
-    <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
+    <td
+      className={ "player-name " + (isActiveUser(playerPick.player.id) ? 'is-active-user' : '')}
+      data-tooltip-id={isActiveUser(playerPick.player.id) ? 'single-week-active-user-tooltip' : undefined}
+      data-tooltip-content={isActiveUser(playerPick.player.id) ? "That's you!" : undefined}
+    >
+      {playerPick.player.displayName}
+    </td>
     { playerPick.picks.length > 0 &&
       <>
       <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
@@ -490,6 +495,7 @@ function SingleWeekPicks (props) {
       { (weekToShow <= props.league.revealedWeek || props.league.season < props.currentSeason) &&
       <>
         <h3>All picks for week {weekToShow}</h3>
+        <Tooltip id="single-week-active-user-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
         <table className="pick-grid week-picks">
           <thead>
             <tr>
