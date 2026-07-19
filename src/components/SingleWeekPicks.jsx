@@ -185,6 +185,214 @@ const PickOutcome = ({weekToShow, ...props}) => {
   );
 }
 
+const clonePlayerPicks = (playerPicks) => playerPicks.map((playerPick) => ({
+  player: playerPick.player,
+  picks: [...playerPick.picks],
+}));
+
+const comparePlayerPicks = (playerOne, playerTwo, pickFrequencies) => {
+  // Put the most frequent team picks on top for left column.
+  if (pickFrequencies[playerOne.picks[0]] > pickFrequencies[playerTwo.picks[0]]) {
+    return -1;
+  } else if (pickFrequencies[playerOne.picks[0]] < pickFrequencies[playerTwo.picks[0]]) {
+    return 1;
+  }
+
+  // Fall back to alphabetical sorting.
+  if (playerOne.picks[0] < playerTwo.picks[0]) {
+    return -1;
+  } else if (playerTwo.picks[0] < playerOne.picks[0]) {
+    return 1;
+  }
+
+  // Flip the sort for the right-hand column so its most-frequent teams
+  // might join up with the left-hand column's second-most-frequent teams.
+  if (pickFrequencies[playerOne.picks[1]] < pickFrequencies[playerTwo.picks[1]]) {
+    return -1;
+  } else if (pickFrequencies[playerOne.picks[1]] > pickFrequencies[playerTwo.picks[1]]) {
+    return 1;
+  }
+
+  if (playerOne.picks[1] < playerTwo.picks[1]) {
+    return -1;
+  } else if (playerTwo.picks[1] < playerOne.picks[1]) {
+    return 1;
+  }
+
+  return 0;
+};
+
+const orientPlayerPicks = (playerPicks) => {
+  for (let i = 1; i < playerPicks.length; i++) {
+    if (playerPicks[i].picks[0] === playerPicks[i - 1].picks[1]) {
+      playerPicks[i].picks.reverse();
+    }
+  }
+
+  return playerPicks;
+};
+
+// Previous algorithm: frequency/alphabetical sorting followed by the
+// same-column adjacency adjustment.
+const sortPlayerPicksOriginal = (playerPicks, pickFrequencies) => {
+  const orderedPlayerPicks = clonePlayerPicks(playerPicks).sort(
+    (playerOne, playerTwo) => comparePlayerPicks(playerOne, playerTwo, pickFrequencies)
+  );
+
+  return orientPlayerPicks(orderedPlayerPicks);
+};
+
+// Current algorithm: grow the table from one end, switching ends when the
+// opposite end offers a closer matching team.
+const sortPlayerPicksCurrent = (playerPicks, pickFrequencies) => {
+  const sortedPlayerPicks = clonePlayerPicks(playerPicks).sort(
+    (playerOne, playerTwo) => comparePlayerPicks(playerOne, playerTwo, pickFrequencies)
+  );
+
+  const sharesTeam = (playerOne, playerTwo) =>
+    playerOne.picks.some(team => playerTwo.picks.includes(team));
+
+  const nearestSharedTeamDistance = (playerPick, rows, fromTop) => {
+    let nearestDistance = Infinity;
+
+    rows.forEach((row, index) => {
+      if (sharesTeam(playerPick, row)) {
+        const distance = fromTop ? index + 1 : rows.length - index;
+        nearestDistance = Math.min(nearestDistance, distance);
+      }
+    });
+
+    return nearestDistance;
+  };
+
+  const orderedPlayerPicks = [];
+  let insertionDirection = 'bottom';
+
+  for (const playerPick of sortedPlayerPicks) {
+    if (!orderedPlayerPicks.length) {
+      orderedPlayerPicks.push(playerPick);
+      continue;
+    }
+
+    const previousRow = insertionDirection === 'bottom'
+      ? orderedPlayerPicks[orderedPlayerPicks.length - 1]
+      : orderedPlayerPicks[0];
+
+    if (sharesTeam(playerPick, previousRow)) {
+      if (insertionDirection === 'bottom') {
+        orderedPlayerPicks.push(playerPick);
+      } else {
+        orderedPlayerPicks.unshift(playerPick);
+      }
+      continue;
+    }
+
+    const topDistance = nearestSharedTeamDistance(playerPick, orderedPlayerPicks, true);
+    const bottomDistance = nearestSharedTeamDistance(playerPick, orderedPlayerPicks, false);
+
+    if (insertionDirection === 'bottom' && topDistance < bottomDistance) {
+      orderedPlayerPicks.unshift(playerPick);
+      insertionDirection = 'top';
+      continue;
+    }
+
+    if (insertionDirection === 'top' && bottomDistance < topDistance) {
+      orderedPlayerPicks.push(playerPick);
+      insertionDirection = 'bottom';
+      continue;
+    }
+
+    if (insertionDirection === 'bottom') {
+      orderedPlayerPicks.push(playerPick);
+    } else {
+      orderedPlayerPicks.unshift(playerPick);
+    }
+  }
+
+  return orientPlayerPicks(orderedPlayerPicks);
+};
+
+const sharedTeamCount = (playerOne, playerTwo) =>
+  playerOne.picks.filter(team => playerTwo.picks.includes(team)).length;
+
+const getAdjacencyScore = (playerPicks) => {
+  let score = 0;
+
+  for (let i = 1; i < playerPicks.length; i++) {
+    score += sharedTeamCount(playerPicks[i - 1], playerPicks[i]);
+  }
+
+  return score;
+};
+
+const getProximityScore = (playerPicks) => {
+  let score = 0;
+
+  for (let firstIndex = 0; firstIndex < playerPicks.length; firstIndex++) {
+    for (let secondIndex = firstIndex + 1; secondIndex < playerPicks.length; secondIndex++) {
+      const sharedTeams = sharedTeamCount(playerPicks[firstIndex], playerPicks[secondIndex]);
+      if (sharedTeams) {
+        score += sharedTeams / (secondIndex - firstIndex);
+      }
+    }
+  }
+
+  return score;
+};
+
+const isBetterOrder = (candidate, current) => {
+  const candidateAdjacency = getAdjacencyScore(candidate);
+  const currentAdjacency = getAdjacencyScore(current);
+
+  if (candidateAdjacency !== currentAdjacency) {
+    return candidateAdjacency > currentAdjacency;
+  }
+
+  return getProximityScore(candidate) > getProximityScore(current);
+};
+
+const movePlayerPick = (playerPicks, fromIndex, toIndex) => {
+  const movedPlayerPicks = [...playerPicks];
+  const [playerPick] = movedPlayerPicks.splice(fromIndex, 1);
+  movedPlayerPicks.splice(toIndex, 0, playerPick);
+  return movedPlayerPicks;
+};
+
+// Third algorithm: start with the original order, then use a greedy local
+// search to maximize shared-team adjacency first and overall team proximity
+// second. It is intentionally heuristic rather than a global optimization.
+const sortPlayerPicksAdjacency = (playerPicks, pickFrequencies) => {
+  let bestOrder = sortPlayerPicksOriginal(playerPicks, pickFrequencies);
+  let improved = true;
+  let iterations = 0;
+  const maxIterations = Math.min(playerPicks.length * playerPicks.length, 10);
+
+  while (improved && iterations < maxIterations) {
+    improved = false;
+    iterations += 1;
+
+    for (let fromIndex = 0; fromIndex < bestOrder.length; fromIndex++) {
+      for (let toIndex = 0; toIndex < bestOrder.length; toIndex++) {
+        if (fromIndex === toIndex) {
+          continue;
+        }
+
+        const candidateOrder = movePlayerPick(bestOrder, fromIndex, toIndex);
+        if (isBetterOrder(candidateOrder, bestOrder)) {
+          bestOrder = candidateOrder;
+          improved = true;
+        }
+      }
+    }
+  }
+
+  return orientPlayerPicks(bestOrder);
+};
+
+// Swap this assignment among sortPlayerPicksOriginal,
+// sortPlayerPicksCurrent, and sortPlayerPicksAdjacency to compare them.
+const sortPlayerPicks = sortPlayerPicksAdjacency;
+
 
 function SingleWeekPicks (props) {
   const activeUser = useContext(UserContext);
@@ -228,68 +436,31 @@ function SingleWeekPicks (props) {
     }
   }
 
-  playerPicks.sort((playerOne, playerTwo) => {
+  const pickedPlayerPicks = playerPicks.filter((playerPick) =>
+    playerPick.picks.length > 0 && !playerPick.picks.includes('BYE')
+  );
+  const byePlayerPicks = playerPicks.filter((playerPick) =>
+    playerPick.picks.includes('BYE')
+  );
+  const unpickedPlayerPicks = playerPicks.filter((playerPick) =>
+    playerPick.picks.length === 0
+  );
 
-    // If somebody hasn't made picks yet, shove 'em to the bottom
-    if (!playerOne.picks.length) {
-      return 1;
-    } else if (!playerTwo.picks.length) {
-      return -1;
-    }
+  const orderedPickedPlayerPicks = sortPlayerPicks(pickedPlayerPicks, pickFrequencies);
 
-    // If somebody picked BYE, shove 'em to the almost-botom
-    if (playerOne.picks[0] === 'BYE') {
-      return 1;
-    } else if (playerTwo.picks[0] === 'BYE') {
-      return -1;
-    }
-
-    // Put the most frequent team picks on top for left column
-    if (pickFrequencies[playerOne.picks[0]] > pickFrequencies[playerTwo.picks[0]]) {
-      return -1;
-    } else if (pickFrequencies[playerOne.picks[0]] < pickFrequencies[playerTwo.picks[0]]) {
-      return 1;
-    }
-
-    // Fall back to alphabetical sorting
-    if (playerOne.picks[0] < playerTwo.picks[0]) {
-      return -1;
-    } else if (playerTwo.picks[0] < playerOne.picks[0]) {
-      return 1;
-    }
-
-    // Flip the sort for right-hand column so the right-column
-    // most-frequent might join up with the left-column second-most-frequent
-    if (pickFrequencies[playerOne.picks[1]] < pickFrequencies[playerTwo.picks[1]]) {
-      return -1;
-    } else if (pickFrequencies[playerOne.picks[1]] > pickFrequencies[playerTwo.picks[1]]) {
-      return 1;
-    }
-
-    // Fall back to alphabetical sorting again
-    if (playerOne.picks[1] < playerTwo.picks[1]) {
-      return -1;
-    } else if (playerTwo.picks[1] < playerOne.picks[1]) {
-      return 1;
-    }
-
-    return 0;
-  });
-
-  if (playerPicks.length > 1) {
-    for (let i = 1; i < playerPicks.length; i++){
-      if (playerPicks[i].picks[0] === playerPicks[i-1].picks[1]){
-        playerPicks[i].picks.reverse();
-      }
-    }
-  }
+  // Keep the table tail reserved for BYEs, followed by users without picks.
+  const orderedPlayerPicks = [
+    ...orderedPickedPlayerPicks,
+    ...byePlayerPicks,
+    ...unpickedPlayerPicks,
+  ];
 
 
   const isActiveUser = function(playerID) {
     return (playerID === activeUser().id) ? 'is-active-user' : '';
   }
 
-  const playerRows = playerPicks.map((playerPick) => <tr key={playerPick.player.id}>
+  const playerRows = orderedPlayerPicks.map((playerPick) => <tr key={playerPick.player.id}>
     <td className={ "player-name " + isActiveUser(playerPick.player.id)}>{playerPick.player.displayName}</td>
     { playerPick.picks.length > 0 &&
       <>
