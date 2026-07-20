@@ -15,6 +15,7 @@
     "victory-chart": "^37.3.6",
     "victory-core": "^37.3.6",
     "victory-histogram": "^37.3.6",
+    "victory-scatter": "^37.3.6",
     "victory-tooltip": "^37.3.6"
   },
   "devDependencies": {

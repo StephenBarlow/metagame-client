@@ -75,7 +75,12 @@ function LeagueDetails() {
   const userConfig = JSON.parse(localStorage.getItem('userConfig'));
 
   if (leagueLoading) {
-    return <span className="loading-football" role="status" aria-label="Loading">🏈</span>;
+    return (
+      <span className="loading-footballs" role="status" aria-label="Loading">
+        <span className="loading-football" aria-hidden="true">🏈</span>
+        <span className="loading-football" aria-hidden="true">🏈</span>
+      </span>
+    );
   }
   if (leagueError) return `Error! ${leagueError.message}`;
 

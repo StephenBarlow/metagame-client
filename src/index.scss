@@ -60,12 +60,21 @@ h3 {
   }
 }
 
+.loading-footballs {
+  display: flex;
+  gap: 8px;
+  margin-top: 40px;
+  margin-left: 20px;
+}
+
 .loading-football {
   display: inline-block;
   font-size: 32px;
-  margin-top: 50px;
-  margin-left: 50px;
   animation: loading-football-spin 1.2s linear infinite;
+
+  &:nth-child(2) {
+    animation-delay: -0.6s;
+  }
 }
 
 .league-list {
@@ -146,6 +155,7 @@ h3 {
 
 table.week-picks {
   border-spacing: 0;
+  user-select: none;
 
   td[rowspan] {
     vertical-align: middle;
@@ -219,11 +229,30 @@ input#show-picked {
   overflow-x: auto;
 }
 
-.team-logo-toggle {
+.team-header-toggle {
+  display: inline-flex;
   margin-left: 12px;
+  border: 1px solid #777;
+  border-radius: 4px;
+  overflow: hidden;
 
-  input {
-    margin-right: 4px;
+  button {
+    padding: 4px 8px;
+    border: 0;
+    border-right: 1px solid #777;
+    background: #333;
+    color: #eee;
+    cursor: pointer;
+
+    &:last-child {
+      border-right: 0;
+    }
+
+    &.active {
+      background: $highlight;
+      color: #181818;
+      font-weight: bold;
+    }
   }
 }
 
@@ -352,7 +381,7 @@ form input:not(:first-of-type) {
 
 .histogram {
   background: #222;
-  width: 600px;
+  width: 700px;
   border: 1px solid black;
   margin-bottom: 20px;
   max-width: 100%;

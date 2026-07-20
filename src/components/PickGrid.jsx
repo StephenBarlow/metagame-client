@@ -320,14 +320,24 @@ function PickGrid(props) {
           <option value="last" key="last">Week {league.revealedWeek} score</option>
           <option value="me" key="me">Just me</option>
         </select>
-      <label className="team-logo-toggle">
-        <input
-          type="checkbox"
-          checked={showTeamLogos}
-          onChange={(event) => updateShowTeamLogos(event.target.checked)}
-        />
-        Team logos
-      </label>
+      <div className="team-header-toggle" role="group" aria-label="Team header display">
+        <button
+          type="button"
+          className={!showTeamLogos ? 'active' : ''}
+          aria-pressed={!showTeamLogos}
+          onClick={() => updateShowTeamLogos(false)}
+        >
+          Names
+        </button>
+        <button
+          type="button"
+          className={showTeamLogos ? 'active' : ''}
+          aria-pressed={showTeamLogos}
+          onClick={() => updateShowTeamLogos(true)}
+        >
+          Logos
+        </button>
+      </div>
       <ScrollContainer vertical="false" className="grid-wrapper" hideScrollbars="false">
 
           <table className={`pick-grid${showTeamLogos ? ' logo-headers' : ''}`}>

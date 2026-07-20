@@ -3,6 +3,7 @@ import { VictoryAxis } from 'victory-axis';
 import { VictoryChart } from 'victory-chart';
 import { VictoryContainer } from 'victory-core';
 import { VictoryHistogram } from 'victory-histogram';
+import { VictoryScatter } from 'victory-scatter';
 import { VictoryTooltip } from 'victory-tooltip';
 
 const roundForPrecision = (value) => Number(value.toPrecision(12));
@@ -49,6 +50,12 @@ const axisStyle = {
 
 function ScoreHistogram({ scores, playerScores = [] }) {
   const data = scores.map((score) => ({ x: score }));
+  const scoreDotCounts = new Map();
+  const playerPositionData = scores.map((score) => {
+    const dotCount = scoreDotCounts.get(score) || 0;
+    scoreDotCounts.set(score, dotCount + 1);
+    return { x: score, y: 0.5 + dotCount * 0.15 };
+  });
   const bins = createHistogramBins(scores);
 
   if (!bins || bins.length - 1 < 3) return null;
@@ -79,7 +86,7 @@ function ScoreHistogram({ scores, playerScores = [] }) {
     <VictoryChart
       containerComponent={<VictoryContainer responsive={false} style={{ touchAction: 'pan-x' }} />}
       height={400}
-      width={600}
+      width={700}
       domainPadding={{ x: 0, y: 8 }}
       padding={{ top: 20, right: 30, bottom: 60, left: 60 }}
     >
@@ -106,6 +113,13 @@ function ScoreHistogram({ scores, playerScores = [] }) {
         labels={getBinLabel}
         labelComponent={<VictoryTooltip constrainToVisibleArea flyoutStyle={{ fill: '#000' }} style={{ fill: '#fff', textAnchor: 'start', fontFamily: 'monospace' }} />}
         style={{ data: { fill: 'cyan', stroke: 'black', strokeWidth: 2 } }}
+      />
+      <VictoryScatter
+        ariaLabel="Player score positions"
+        data={playerPositionData}
+        symbol="diamond"
+        size={2}
+        style={{ data: { fill: 'cyan', stroke: 'magenta', strokeWidth: 1.5 } }}
       />
     </VictoryChart>
   );

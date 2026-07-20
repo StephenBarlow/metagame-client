@@ -31,13 +31,13 @@ describe('createHistogramBins', () => {
   });
 });
 
-test('renders at a fixed 600 by 400 size', () => {
+test('renders at a fixed 700 by 400 size', () => {
   const { container } = render(<ScoreHistogram scores={[30, 31, 35, 40, 45]} />);
   const victoryContainer = container.querySelector('.VictoryContainer');
   const svg = victoryContainer.querySelector('svg');
 
-  expect(victoryContainer.style.width).toBe('600px');
+  expect(victoryContainer.style.width).toBe('700px');
   expect(victoryContainer.style.height).toBe('400px');
-  expect(svg.getAttribute('width')).toBe('600');
+  expect(svg.getAttribute('width')).toBe('700');
   expect(svg.getAttribute('height')).toBe('400');
 });
