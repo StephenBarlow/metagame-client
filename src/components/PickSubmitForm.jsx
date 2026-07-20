@@ -1,11 +1,20 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { gql } from '@apollo/client';
-import { useApolloClient, useMutation } from '@apollo/client/react';
+import { useMutation } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`
 mutation SubmitPicks($request: SubmitPickRequest!) {
   submitPick(request: $request) {
+    pick {
+      id
+      week
+      team {
+        id
+        name
+        shortName
+      }
+    }
     errors {
       code
       message
@@ -14,17 +23,116 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 }
 `;
 
+const logoFilenameForTeam = (teamName) => `${teamName.toLowerCase().replaceAll(' ', '-')}.png`;
+
+function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOpenPicker }) {
+  const isOpen = openPicker === id;
+  const options = [
+    { value: '', name: '' },
+    { value: '-1', name: 'BYE' },
+    ...teams.map((team) => ({
+      ...team,
+      value: team.id,
+    })),
+  ];
+  const selectedOption = options.find((option) => option.value === value);
+  const selectedTeamClass = selectedOption?.shortName
+    ? `team-${selectedOption.shortName.toLowerCase()}`
+    : '';
+
+  const selectOption = (option) => {
+    if (option.disabled) return;
+    onChange(option.value);
+    setOpenPicker(null);
+  };
+
+  return (
+    <>
+      <div className="team-picker-custom">
+        <button
+          type="button"
+          className="team-picker-button"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-label={id}
+          onClick={() => setOpenPicker(isOpen ? null : id)}
+          >
+          {(selectedOption?.shortName || selectedOption?.value === '-1') &&
+            <span className={`team-picker-logo-frame ${selectedTeamClass}`}>
+              {selectedOption.value === '-1'
+                ? <span className="team-picker-bye-logo" aria-hidden="true">💤</span>
+                : <img src={`/logos/${logoFilenameForTeam(selectedOption.name)}`} alt="" aria-hidden="true" />}
+            </span>
+          }
+          <span className={!selectedOption?.name ? 'team-picker-placeholder' : ''}>{selectedOption?.name || placeholder}</span>
+        </button>
+        {isOpen &&
+          <div className="team-picker-menu" role="listbox">
+            {options.map((option) => (
+              <button
+                type="button"
+                role="option"
+                aria-selected={option.value === value}
+                className="team-picker-option"
+                key={option.value || 'blank'}
+                disabled={option.disabled}
+                onClick={() => selectOption(option)}
+              >
+                {option.name &&
+                  <span className={`team-picker-logo-frame${option.shortName ? ` team-${option.shortName.toLowerCase()}` : ''}`}>
+                    {option.value === '-1'
+                      ? <span className="team-picker-bye-logo" aria-hidden="true">💤</span>
+                      : <img src={`/logos/${logoFilenameForTeam(option.name)}`} alt="" aria-hidden="true" />}
+                  </span>
+                }
+                <span>{option.name || placeholder}</span>
+              </button>
+            ))}
+          </div>
+        }
+      </div>
+      <select
+        className="team-picker team-picker-native"
+        name={id}
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      >
+        <option value=""></option>
+        <option value="-1">BYE</option>
+        {teams.map((team) => (
+          <option value={team.id} key={team.id} disabled={team.disabled}>{team.name}</option>
+        ))}
+      </select>
+    </>
+  );
+}
+
 function PickSubmitForm(props) {
   const activeUser = useContext(UserContext);
   const [firstTeam, setFirstTeam] = useState('');
   const [secondTeam, setSecondTeam] = useState('');
+  const [openPicker, setOpenPicker] = useState(null);
+  const teamPickerGroupRef = useRef(null);
   const [message, setMessage] = useState('\xa0');
   const [showPicked, setShowPicked] = useState(props.config?.showPicked);
   const currentWeek = props.league.currentWeek;
   const maxWeek = 18;
   // selectedWeek and setSelectedWeek are now props
   const { selectedWeek, setSelectedWeek } = props;
-  const client = useApolloClient();
+
+  useEffect(() => {
+    if (!openPicker) return undefined;
+
+    const closeOnOutsideClick = (event) => {
+      if (!teamPickerGroupRef.current?.contains(event.target)) {
+        setOpenPicker(null);
+      }
+    };
+
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
+  }, [openPicker]);
 
   const updateShowPicked = function(sp) {
     setShowPicked(sp);
@@ -35,6 +143,7 @@ function PickSubmitForm(props) {
 
   const formSubmit = function(event, submitPicks, teams) {
     event.preventDefault();
+    setMessage('\xa0');
     submitPicks({ variables: { "request": {
       userID: activeUser().id,
       leagueID: props.league.id,
@@ -63,16 +172,66 @@ function PickSubmitForm(props) {
     return true;
   }
 
+  const optimisticTeams = [firstTeam, secondTeam].map((teamID) =>
+    teamID === '-1'
+      ? { id: '-1', name: 'BYE', shortName: 'BYE' }
+      : props.teams.find((team) => team.id === teamID)
+  );
+
   const [submitPicks] = useMutation (
     SUBMIT_PICKS,
     {
+      optimisticResponse: {
+        submitPick: {
+          __typename: 'SubmitPickResponse',
+          pick: optimisticTeams.map((team, index) => ({
+            __typename: 'Pick',
+            id: `optimistic-${selectedWeek}-${team?.id}-${index}`,
+            week: selectedWeek,
+            team: {
+              __typename: 'SportsTeam',
+              ...team,
+            },
+          })),
+          errors: [],
+        },
+      },
+      update: (cache, { data }) => {
+        const picks = data?.submitPick?.pick || [];
+        if (!picks.length) return;
+
+        cache.modify({
+          id: 'ROOT_QUERY',
+          fields: {
+            picksForUser(existingPicks = [], { args, readField, toReference }) {
+              if (String(args?.leagueID) !== String(props.league.id) ||
+                  String(args?.userID) !== String(activeUser().id)) {
+                return existingPicks;
+              }
+
+              const updatedPicks = existingPicks.filter((pickReference) => {
+                const teamReference = readField('team', pickReference);
+                return !picks.some((pick) =>
+                  readField('week', pickReference) === pick.week &&
+                  readField('id', teamReference) === pick.team.id
+                );
+              });
+
+              return [
+                ...updatedPicks,
+                ...picks.map((pick) => toReference(pick, true)),
+              ];
+            },
+          },
+        });
+      },
       onCompleted: ({submitPick}) => {
         if (submitPick?.errors?.length) {
           setMessage(`Error: ${submitPick.errors[0].message}`);
           return;
         }
         setMessage('Picks submitted successfully!');
-        client.refetchQueries({ include: ['GetLeagueDetails'] });
+        props.onPicksSubmitted(submitPick.pick || []);
       },
       onError: (error) => {
         setMessage(`Error: ${error.message}`);
@@ -99,7 +258,10 @@ function PickSubmitForm(props) {
     teams = teams.filter((team) => !alreadyPicked(team.id));
   }
 
-  teams = teams.map((team) => <option value={team.id} key={team.id} disabled={alreadyPicked(team.id)}>{team.name}</option>)
+  teams = teams.map((team) => ({
+    ...team,
+    disabled: alreadyPicked(team.id),
+  }));
 
   // Don't show the form if picks have been revealed
   // and this player has already picked for the current week
@@ -137,21 +299,10 @@ function PickSubmitForm(props) {
         <a href="https://docs.google.com/document/d/1Ui9Nwc9xW597GhBqPj6KhbDCau997BFU6OVWYOcVVMc/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Rules</a>
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
-        <select
-          className="team-picker" name="first-team-picker" id="first-team-picker"
-          onChange={event => setFirstTeam(event.target.value)}
-        >
-          <option value="" key="blank"></option>
-          <option value="-1" key="bye">BYE</option>
-          {teams}
-        </select>
-        <select
-          className="team-picker" name="second-team-picker" id="second-team-picker"
-          onChange={event => setSecondTeam(event.target.value)}>
-          <option value="" key="blank"></option>
-          <option value="-1" key="bye">BYE</option>
-          {teams}
-        </select>
+        <div className="team-picker-group" ref={teamPickerGroupRef}>
+          <TeamPicker id="first-team-picker" value={firstTeam} onChange={setFirstTeam} teams={teams} placeholder="Select your first team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
+          <TeamPicker id="second-team-picker" value={secondTeam} onChange={setSecondTeam} teams={teams} placeholder="Select your second team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
+        </div>
         <input className="pick-submit" type="submit" value="Submit" disabled={!canSubmit()} />
       </form>
       <input

@@ -64,7 +64,15 @@ function LeagueDetails() {
       userID: activeUser().id,
     }
   });
+  const [submittedPicks, setSubmittedPicks] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(undefined);
+
+  const onPicksSubmitted = (picks) => {
+    setSubmittedPicks((currentPicks) => [
+      ...currentPicks.filter((currentPick) => !picks.some((pick) => pick.week === currentPick.week)),
+      ...picks,
+    ]);
+  };
   // Set default selectedWeek to currentWeek after data loads
   useEffect(() => {
     if (selectedWeek === undefined && leagueData?.league?.currentWeek) {
@@ -74,7 +82,7 @@ function LeagueDetails() {
 
   const userConfig = JSON.parse(localStorage.getItem('userConfig'));
 
-  if (leagueLoading) {
+  if (leagueLoading && !leagueData) {
     return (
       <span className="loading-footballs" role="status" aria-label="Loading">
         <span className="loading-football" aria-hidden="true">🏈</span>
@@ -82,7 +90,13 @@ function LeagueDetails() {
       </span>
     );
   }
-  if (leagueError) return `Error! ${leagueError.message}`;
+  if (leagueError && !leagueData) return `Error! ${leagueError.message}`;
+
+  const submittedWeeks = new Set(submittedPicks.map((pick) => pick.week));
+  const userPicks = [
+    ...(leagueData.picksForUser || []).filter((pick) => !submittedWeeks.has(pick.week)),
+    ...submittedPicks,
+  ];
 
 
   // User must pick if the current week's picks
@@ -102,11 +116,12 @@ function LeagueDetails() {
         <PickSubmitForm
           league={leagueData.league}
           teams={leagueData.sportsTeams}
-          userPicks={leagueData.picksForUser}
+          userPicks={userPicks}
           userMustPick={userMustPick}
           config={userConfig}
           selectedWeek={selectedWeek}
           setSelectedWeek={setSelectedWeek}
+          onPicksSubmitted={onPicksSubmitted}
         />
       }
 
@@ -115,7 +130,7 @@ function LeagueDetails() {
           league={leagueData.league}
           currentSeason={leagueData.currentSeason}
           selectedWeek={selectedWeek}
-          userPicks={leagueData.picksForUser}
+          userPicks={userPicks}
         />
       }
 

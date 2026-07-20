@@ -6,6 +6,8 @@ import UserContext from './ActiveUserContext';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 
+const logoFilenameForTeam = (teamName) => `${teamName.toLowerCase().replaceAll(' ', '-')}.png`;
+
 const INVALIDATE_PICKS = gql`
   mutation InvalidatePicks($request: InvalidatePicksRequest!) {
     invalidatePicks(request: $request) {
@@ -57,11 +59,23 @@ function CurrentPick(props) {
     <>
       <h3>Your picks for week {week}</h3>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div>
+        <div className="current-picks">
         {
-          selectedWeekPicks.map((pick) => <span key={pick.id} className={`team-${pick.team.shortName.toLowerCase()} current-pick`}>
-            {pick.team.shortName}
-          </span>)
+          selectedWeekPicks.map((pick) => {
+            const isBye = pick.team.shortName === 'BYE';
+            const teamClass = isBye ? '' : ` team-${pick.team.shortName.toLowerCase()}`;
+
+            return (
+              <span key={pick.id} className="current-pick">
+                <span className={`team-picker-logo-frame${teamClass}`}>
+                  {isBye
+                    ? <span className="team-picker-bye-logo" aria-hidden="true">💤</span>
+                    : <img src={`/logos/${logoFilenameForTeam(pick.team.name)}`} alt="" aria-hidden="true" />}
+                </span>
+                <span>{pick.team.name}</span>
+              </span>
+            );
+          })
         }
         </div>
 
