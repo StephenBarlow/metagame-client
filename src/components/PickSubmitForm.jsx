@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { gql } from '@apollo/client';
-import { useMutation } from '@apollo/client/react';
+import { useApolloClient, useMutation } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
 
 const SUBMIT_PICKS = gql`
@@ -24,6 +24,7 @@ function PickSubmitForm(props) {
   const maxWeek = 18;
   // selectedWeek and setSelectedWeek are now props
   const { selectedWeek, setSelectedWeek } = props;
+  const client = useApolloClient();
 
   const updateShowPicked = function(sp) {
     setShowPicked(sp);
@@ -65,17 +66,17 @@ function PickSubmitForm(props) {
   const [submitPicks] = useMutation (
     SUBMIT_PICKS,
     {
-      refetchQueries: [
-        'GetLeagueDetails',
-      ],
       onCompleted: ({submitPick}) => {
-        if (submitPick.pick) {
-          setMessage('Picks submitted successfully!');
-        }
-        if (submitPick.errors) {
+        if (submitPick?.errors?.length) {
           setMessage(`Error: ${submitPick.errors[0].message}`);
+          return;
         }
-      }
+        setMessage('Picks submitted successfully!');
+        client.refetchQueries({ include: ['GetLeagueDetails'] });
+      },
+      onError: (error) => {
+        setMessage(`Error: ${error.message}`);
+      },
     }
   );
 
