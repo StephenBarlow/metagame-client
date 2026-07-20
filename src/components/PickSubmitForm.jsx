@@ -281,7 +281,12 @@ function PickSubmitForm(props) {
         Submit your picks for week {' '}
         <select
           value={selectedWeek}
-          onChange={e => setSelectedWeek(Number(e.target.value))}
+          onChange={e => {
+            setFirstTeam('');
+            setSecondTeam('');
+            setOpenPicker(null);
+            setSelectedWeek(Number(e.target.value));
+          }}
           style={{ fontSize: '1em', fontWeight: 'bold', marginLeft: 4, marginRight: 4 }}
         >
           {Array.from({length: maxWeek - currentWeek + 1}, (_, i) => currentWeek + i).map(week => {

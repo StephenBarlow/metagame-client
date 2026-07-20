@@ -5,7 +5,7 @@ import UserContext from './ActiveUserContext';
 import { useQuery } from '@apollo/client/react';
 import { Tooltip } from 'react-tooltip';
 import ScrollContainer from 'react-indiana-drag-scroll';
-import ScoreHistogram from './ScoreHistogram';
+import ScoreHistogram, { createHistogramBins } from './ScoreHistogram';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
 function PickGrid(props) {
@@ -221,6 +221,8 @@ function PickGrid(props) {
   }
 
   const allScores = league.users.map((user) => playerScores.get(user.id));
+  const histogramBins = createHistogramBins(allScores);
+  const shouldRenderHistogram = histogramBins && histogramBins.length - 1 >= 3;
   const getPickKey = (playerID, week) => `${playerID}:${week}`;
 
   // Generate the grid row for each competitor
@@ -355,16 +357,19 @@ function PickGrid(props) {
             </tbody>
           </table>
       </ScrollContainer>
-      <h3>THE GRAPH</h3>
-      <div className="histogram">
-        <ScoreHistogram
-          scores={allScores}
-          playerScores={league.users.map((user) => ({
-            name: user.displayName,
-            score: playerScores.get(user.id),
-          }))}
-        />
-      </div>
+      {shouldRenderHistogram &&
+        <>
+          <h3>THE GRAPH</h3>
+          <div className="histogram">
+            <ScoreHistogram
+              scores={allScores}
+              playerScores={league.users.map((user) => ({
+                name: user.displayName,
+                score: playerScores.get(user.id),
+              }))}
+            />
+          </div>
+        </>}
     </>
   );
 }
