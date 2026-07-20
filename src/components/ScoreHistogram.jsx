@@ -17,6 +17,8 @@ const getNiceStep = (rawStep) => {
   return 10 * magnitude;
 };
 
+const MAX_BUCKET_SIZE = 25;
+
 export const createHistogramBins = (scores) => {
   if (scores.length === 0) return undefined;
 
@@ -28,7 +30,7 @@ export const createHistogramBins = (scores) => {
   }
 
   const targetBinCount = Math.ceil(Math.log2(scores.length) + 1);
-  const step = getNiceStep((maximum - minimum) / targetBinCount);
+  const step = Math.min(getNiceStep((maximum - minimum) / targetBinCount), MAX_BUCKET_SIZE);
   const firstBoundary = Math.floor(minimum / step) * step;
   const lastBoundary = Math.ceil(maximum / step) * step;
   const boundaryCount = Math.round((lastBoundary - firstBoundary) / step) + 1;
@@ -82,6 +84,7 @@ function ScoreHistogram({ scores, playerScores = [] }) {
       padding={{ top: 20, right: 30, bottom: 60, left: 60 }}
     >
       <VictoryAxis
+        tickValues={bins}
         label="Score"
         style={{
           ...axisStyle,

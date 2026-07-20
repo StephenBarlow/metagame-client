@@ -47,9 +47,13 @@ function App() {
         <div className="App">
           <Router>
             <header className="global-header">
-              <Logo/>
-              {loggedIn && <Link className="my-leagues-link" to="/leagues">My leagues</Link>}
-              <AccountPanel/>
+              <div className="header-left">
+                <Logo/>
+                {loggedIn && <Link className="my-leagues-link" to="/leagues">My leagues</Link>}
+              </div>
+              <div className="header-right">
+                <AccountPanel/>
+              </div>
             </header>
             <div className="content">
               <Routes>

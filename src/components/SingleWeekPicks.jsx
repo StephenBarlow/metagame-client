@@ -143,7 +143,7 @@ const PickOutcome = ({weekToShow, ...props}) => {
       return pickResult;
     } else {
       // Split, no points
-      pickResult.value = '❌';
+      pickResult.value = '⟋';
       pickResult.outcome = 'SPLIT';
       return pickResult;
     }
@@ -196,7 +196,7 @@ const PickOutcome = ({weekToShow, ...props}) => {
   const pickResult = getPickResult(props.league, props.team1, props.team2);
 
   return (
-    <td className={`${getResultClass(pickResult)}`}>
+    <td className={`${getResultClass(pickResult)}${pickResult.outcome === 'SPLIT' ? ' split-marker' : ''}`}>
       {
         typeof pickResult.value === 'number' ? `+${pickResult.value}` : pickResult.value
       }

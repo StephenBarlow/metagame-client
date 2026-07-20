@@ -11,6 +11,7 @@ import { GET_SPORTS_GAMES } from './SharedQueries';
 function PickGrid(props) {
   const activeUser = useContext(UserContext);
   const [sortMethod, setSortMethod] = useState('total');
+  const [hoveredPickKey, setHoveredPickKey] = useState(null);
   const [showTeamLogos, setShowTeamLogos] = useState(() => {
     const userConfig = JSON.parse(localStorage.getItem('userConfig'));
     return userConfig?.showTeamLogos ?? false;
@@ -96,6 +97,7 @@ function PickGrid(props) {
         const pickResult = {
           week: firstPick.week,
           otherTeam: secondPick?.team.shortName,
+          otherTeamId: secondPick?.team.id,
         };
         const firstPickGame = gamesByWeekAndTeam.get(`${firstPick.week}:${firstPick.team.id}`);
         const secondPickGame = secondPick && gamesByWeekAndTeam.get(`${secondPick.week}:${secondPick.team.id}`);
@@ -219,6 +221,7 @@ function PickGrid(props) {
   }
 
   const allScores = league.users.map((user) => playerScores.get(user.id));
+  const getPickKey = (playerID, week) => `${playerID}:${week}`;
 
   // Generate the grid row for each competitor
   const sortedUsers = league.users.slice().sort((firstPlayer, secondPlayer) => {
@@ -261,13 +264,26 @@ function PickGrid(props) {
     <td className="player-total default-cell">{playerScores.get(player.id)}</td>
     <td className="player-last default-cell">+{playerLastScores.get(player.id)}</td>
     {
-      teams.map((team) => <td key={team.id} className={'player-team ' + getOutcomeClass(pickResults[player.id][team.id])} data-tooltip-id="pick-grid-tooltip" data-tooltip-content={ pickResults[player.id][team.id] ? `Week ${pickResults[player.id][team.id].week}\n+ ${pickResults[player.id][team.id].otherTeam}` : null}>
-        {pickResults[player.id][team.id] &&
-          <>
-            {pickResults[player.id][team.id].value}
-          </>
-        }
-      </td>)
+      teams.map((team) => {
+        const pickResult = pickResults[player.id][team.id];
+        const pickKey = pickResult && getPickKey(player.id, pickResult.week);
+        const isHighlighted = hoveredPickKey === pickKey;
+        const isPairedTeamHighlighted = pickResult && hoveredPickKey === pickKey
+          && pickResult.otherTeamId === team.id;
+        const isSplitZero = pickResult?.outcome === 'SPLIT' && pickResult.value === 0;
+
+        return (
+          <td
+            key={team.id}
+            className={'player-team ' + getOutcomeClass(pickResult) + (isHighlighted || isPairedTeamHighlighted ? ' pick-grid-team-highlighted' : '') + (isSplitZero ? ' split-marker' : '')}
+            data-tooltip-id="pick-grid-tooltip"
+            data-tooltip-content={pickResult ? `Week ${pickResult.week}\n+ ${pickResult.otherTeam}` : null}
+            onMouseEnter={() => pickResult && setHoveredPickKey(pickKey)}
+          >
+            {pickResult && (isSplitZero ? '⟋' : pickResult.value)}
+          </td>
+        );
+      })
     }
     {
       getByeCell(player.id)
@@ -324,7 +340,7 @@ function PickGrid(props) {
                 <th data-team-id="bye" className="player-byes">BYES</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody onMouseLeave={() => setHoveredPickKey(null)}>
               { playerRows }
             </tbody>
           </table>
