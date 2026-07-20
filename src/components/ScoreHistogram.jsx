@@ -84,7 +84,7 @@ function ScoreHistogram({ scores, playerScores = [] }) {
 
   return (
     <VictoryChart
-      containerComponent={<VictoryContainer responsive={false} style={{ touchAction: 'pan-x' }} />}
+      containerComponent={<VictoryContainer responsive={false} style={{ touchAction: 'auto' }} />}
       height={400}
       width={700}
       domainPadding={{ x: 0, y: 8 }}

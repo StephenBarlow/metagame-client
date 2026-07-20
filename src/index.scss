@@ -325,6 +325,9 @@ form label {
   align-items: center;
   justify-content: space-between;
   min-width: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .header-left {
