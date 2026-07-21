@@ -106,7 +106,7 @@ function LeagueDetails() {
 
   return (
     <>
-      <h2>{leagueData.league.name}</h2>
+      <h2 className="league-name">{leagueData.league.name}</h2>
 
       { !userMustPick &&
         <SingleWeekPicks league={leagueData.league} currentSeason={leagueData.currentSeason}/>

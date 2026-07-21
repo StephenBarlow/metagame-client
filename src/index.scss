@@ -1,8 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Commissioner', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #252535;
@@ -49,6 +47,8 @@ a, a:visited {
 
 h3 {
   margin-top: 50px;
+  font-size: 24px;
+  font-weight: 500;
 }
 
 @keyframes loading-football-spin {
@@ -79,6 +79,10 @@ h3 {
 
 .league-list {
   font-size: 20px;
+}
+
+.league-name {
+  font-size: 32px;
 }
 
 .pick-grid {
@@ -199,7 +203,7 @@ table.week-picks {
 }
 
 .team-picker-button {
-  width: 300px;
+  width: 320px;
   height: 40px;
   padding: 0 10px;
   padding-left: 0;
@@ -241,7 +245,7 @@ table.week-picks {
   top: 42px;
   left: 0;
   z-index: 20;
-  width: 295px;
+  width: 320px;
   max-height: 320px;
   overflow-y: auto;
   background: #333;
@@ -282,6 +286,21 @@ table.week-picks {
   > span:not(.team-picker-logo-frame) {
     transform: translateX(10px);
   }
+
+  .team-picker-option-name {
+    transform: translateX(10px);
+  }
+
+  .team-picker-opponent {
+    margin-left: auto;
+    padding-left: 8px;
+    color: #bbb;
+    font-size: 14px;
+    transform: none;
+    text-align: left;
+    white-space: nowrap;
+    width: 60px;
+  }
 }
 
 .team-picker-logo-frame {
@@ -321,6 +340,22 @@ table.week-picks {
 
 .team-picker-native {
   display: none;
+}
+
+@media screen and (max-width: 700px) {
+  .team-picker-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .team-picker-custom {
+    margin-right: 0;
+  }
+
+  .pick-submit {
+    margin-top: 10px;
+  }
 }
 
 @media screen and (max-width: $phone) {
@@ -517,7 +552,7 @@ form label {
   display: inline-flex;
   height: inherit;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 30px;
   margin-right: 20px;
   text-decoration: none;
 
@@ -537,6 +572,7 @@ form input:not(:first-of-type) {
   margin-left: 10px;
   align-items: center;
   flex: 0 0 auto;
+  font-family: 'Black Ops One', sans-serif;
 
   a {
     text-decoration: none;

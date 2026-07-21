@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { gql } from '@apollo/client';
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import UserContext from './ActiveUserContext';
+import { GET_SPORTS_GAMES } from './SharedQueries';
 
 const SUBMIT_PICKS = gql`
 mutation SubmitPicks($request: SubmitPickRequest!) {
@@ -36,6 +37,7 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
     })),
   ];
   const selectedOption = options.find((option) => option.value === value);
+  const optionLabel = (option) => option.name || placeholder;
   const selectedTeamClass = selectedOption?.shortName
     ? `team-${selectedOption.shortName.toLowerCase()}`
     : '';
@@ -64,7 +66,7 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
                 : <img src={`/logos/${logoFilenameForTeam(selectedOption.name)}`} alt="" aria-hidden="true" />}
             </span>
           }
-          <span className={!selectedOption?.name ? 'team-picker-placeholder' : ''}>{selectedOption?.name || placeholder}</span>
+          <span className={!selectedOption?.name ? 'team-picker-placeholder' : ''}>{selectedOption ? optionLabel(selectedOption) : placeholder}</span>
         </button>
         {isOpen &&
           <div className="team-picker-menu" role="listbox">
@@ -85,7 +87,11 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
                       : <img src={`/logos/${logoFilenameForTeam(option.name)}`} alt="" aria-hidden="true" />}
                   </span>
                 }
-                <span>{option.name || placeholder}</span>
+                <span className="team-picker-option-name">{optionLabel(option)}</span>
+                {(option.opponentShortName || option.isByeWeek) &&
+                  <div className="team-picker-opponent">
+                    {option.isByeWeek ? 'BYE' : `vs ${option.opponentShortName}`}
+                  </div>}
               </button>
             ))}
           </div>
@@ -120,6 +126,28 @@ function PickSubmitForm(props) {
   const maxWeek = 18;
   // selectedWeek and setSelectedWeek are now props
   const { selectedWeek, setSelectedWeek } = props;
+
+  const { data: gamesData } = useQuery(GET_SPORTS_GAMES, {
+    variables: { season: props.league.season },
+  });
+
+  const updateFirstTeam = (teamID) => {
+    setFirstTeam(teamID);
+    if (teamID === '-1') {
+      setSecondTeam('-1');
+    } else if (secondTeam === '-1') {
+      setSecondTeam('');
+    }
+  };
+
+  const updateSecondTeam = (teamID) => {
+    setSecondTeam(teamID);
+    if (teamID === '-1') {
+      setFirstTeam('-1');
+    } else if (firstTeam === '-1') {
+      setFirstTeam('');
+    }
+  };
 
   useEffect(() => {
     if (!openPicker) return undefined;
@@ -254,13 +282,32 @@ function PickSubmitForm(props) {
     }
   });
 
+  let teamsPlayingThisWeek;
+  let opponentsThisWeek;
+  if (gamesData?.sportsGames) {
+    teamsPlayingThisWeek = new Set(
+      gamesData.sportsGames
+        .filter((game) => game.week === selectedWeek)
+        .flatMap((game) => [game.awayTeam.id, game.homeTeam.id])
+    );
+    opponentsThisWeek = new Map();
+    gamesData.sportsGames
+      .filter((game) => game.week === selectedWeek)
+      .forEach((game) => {
+        opponentsThisWeek.set(game.awayTeam.id, game.homeTeam.shortName);
+        opponentsThisWeek.set(game.homeTeam.id, game.awayTeam.shortName);
+      });
+  }
+
   if (!showPicked) {
     teams = teams.filter((team) => !alreadyPicked(team.id));
   }
 
   teams = teams.map((team) => ({
     ...team,
-    disabled: alreadyPicked(team.id),
+    isByeWeek: teamsPlayingThisWeek && !teamsPlayingThisWeek.has(team.id),
+    opponentShortName: opponentsThisWeek?.get(team.id),
+    disabled: alreadyPicked(team.id) || (teamsPlayingThisWeek && !teamsPlayingThisWeek.has(team.id)),
   }));
 
   // Don't show the form if picks have been revealed
@@ -278,7 +325,7 @@ function PickSubmitForm(props) {
         </p>
       }
       <h3>
-        Submit your picks for week {' '}
+        Submit picks for week {' '}
         <select
           value={selectedWeek}
           onChange={e => {
@@ -305,15 +352,15 @@ function PickSubmitForm(props) {
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
         <div className="team-picker-group" ref={teamPickerGroupRef}>
-          <TeamPicker id="first-team-picker" value={firstTeam} onChange={setFirstTeam} teams={teams} placeholder="Select your first team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
-          <TeamPicker id="second-team-picker" value={secondTeam} onChange={setSecondTeam} teams={teams} placeholder="Select your second team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
+          <TeamPicker id="first-team-picker" value={firstTeam} onChange={updateFirstTeam} teams={teams} placeholder="Pick your first team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
+          <TeamPicker id="second-team-picker" value={secondTeam} onChange={updateSecondTeam} teams={teams} placeholder="Pick your second team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
         </div>
         <input className="pick-submit" type="submit" value="Submit" disabled={!canSubmit()} />
       </form>
       <input
         type="checkbox" id="show-picked" value="ShowPicked"
         checked={showPicked} onChange={event => updateShowPicked(event.target.checked)}
-        /><label htmlFor="show-picked">Show teams I've picked</label>
+        /><label htmlFor="show-picked">Show teams I've already picked</label>
       <p className="form-status">
         { message }
       </p>

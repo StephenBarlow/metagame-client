@@ -57,7 +57,7 @@ function CurrentPick(props) {
 
   return (
     <>
-      <h3>Your picks for week {week}</h3>
+      <h3>Your week {week} picks</h3>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div className="current-picks">
         {
