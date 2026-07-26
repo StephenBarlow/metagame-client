@@ -526,7 +526,7 @@ function SingleWeekPicks (props) {
   return (
     <>
       { (weekToShow <= props.league.revealedWeek || props.league.season < props.currentSeason) &&
-      <>
+      <section className="single-week-picks">
         <h3>All picks for week {weekToShow}</h3>
         <Tooltip id="single-week-active-user-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
         <Tooltip id="single-week-game-result-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
@@ -543,7 +543,7 @@ function SingleWeekPicks (props) {
             {playerRows}
           </tbody>
         </table>
-      </>
+      </section>
       }
     </>
   );

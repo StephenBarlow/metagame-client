@@ -2,13 +2,15 @@ import React, { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
 
-function AchievementIcon({ award }) {
+export function AchievementIcon({ award, tooltipId = 'achievement-tooltip' }) {
   const { achievement } = award;
   return (
     <span
       className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}`}
-      data-tooltip-id="achievement-tooltip"
-      data-tooltip-content={`Week ${award.week}`}
+      data-tooltip-id={tooltipId}
+      data-achievement-name={achievement.name}
+      data-achievement-description={achievement.description}
+      data-award-week={award.week}
       aria-label={`${achievement.name}, Week ${award.week}`}
     >
       {achievement.iconId
@@ -43,14 +45,27 @@ function AchievementsTable({ league }) {
 
   return (
     <>
-      <Tooltip id="achievement-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
-      <h3>ACHIEVEMENTS</h3>
+      <Tooltip
+        id="achievement-tooltip"
+        classNameArrow="hidden"
+        style={{ backgroundColor: '#000000', zIndex: 10 }}
+        render={({ activeAnchor }) => (
+          <>
+            <strong>{activeAnchor?.getAttribute('data-achievement-name')}</strong>
+            <br />
+            {activeAnchor?.getAttribute('data-achievement-description')}
+            <br />
+            Earned Week {activeAnchor?.getAttribute('data-award-week')}
+          </>
+        )}
+      />
+      <h3>BADGES</h3>
       <table className="achievement-table">
         <thead>
           <tr>
             <th>Competitor</th>
             <th className="achievement-total">Total</th>
-            <th>Achievements</th>
+            <th>Badges</th>
           </tr>
         </thead>
         <tbody>

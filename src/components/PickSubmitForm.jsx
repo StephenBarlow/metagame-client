@@ -319,7 +319,7 @@ function PickSubmitForm(props) {
   }
 
   return (
-    <>
+    <section className="pick-submit-form">
       { props.userMustPick &&
         <p className="warning">
           The week's games have started and you haven't submitted a pick! You must pick before league details are shown.
@@ -365,7 +365,7 @@ function PickSubmitForm(props) {
       <p className="form-status">
         { message }
       </p>
-    </>
+    </section>
   )
 
 }
