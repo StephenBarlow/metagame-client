@@ -10,6 +10,7 @@ import CurrentPick from './CurrentPick';
 import SingleWeekPicks from './SingleWeekPicks';
 import PickArchive from './PickArchive';
 import { TeamPicker } from './PickSubmitForm';
+import AchievementsTable from './AchievementsTable';
 import { useParams } from 'react-router';
 
 const GET_LEAGUE_DETAILS = gql`
@@ -46,6 +47,22 @@ const GET_LEAGUE_DETAILS = gql`
           shortName
         }
         week
+      }
+      achievementAwards {
+        id
+        week
+        awardedAt
+        user {
+          id
+          displayName(leagueID: $leagueID)
+        }
+        achievement {
+          id
+          key
+          name
+          description
+          iconId
+        }
       }
       users {
         id
@@ -239,6 +256,8 @@ function LeagueDetails() {
       { !needsFavoriteTeam && !userMustPick &&
         <>
           <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
+
+          <AchievementsTable league={leagueData.league} />
 
           <PickArchive league={leagueData.league} teams={leagueData.sportsTeams} currentSeason={leagueData.currentSeason} />
         </>
