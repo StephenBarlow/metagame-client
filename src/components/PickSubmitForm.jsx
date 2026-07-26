@@ -26,11 +26,11 @@ mutation SubmitPicks($request: SubmitPickRequest!) {
 
 const logoFilenameForTeam = (teamName) => `${teamName.toLowerCase().replaceAll(' ', '-')}.png`;
 
-function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOpenPicker }) {
+export function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOpenPicker, includeBye = true, ariaLabel = id, nudgePlaceholder = false }) {
   const isOpen = openPicker === id;
   const options = [
     { value: '', name: '' },
-    { value: '-1', name: 'BYE' },
+    ...(includeBye ? [{ value: '-1', name: 'BYE' }] : []),
     ...teams.map((team) => ({
       ...team,
       value: team.id,
@@ -56,7 +56,7 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
           className="team-picker-button"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          aria-label={id}
+          aria-label={ariaLabel}
           onClick={() => setOpenPicker(isOpen ? null : id)}
           >
           {(selectedOption?.shortName || selectedOption?.value === '-1') &&
@@ -66,7 +66,7 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
                 : <img src={`/logos/${logoFilenameForTeam(selectedOption.name)}`} alt="" aria-hidden="true" />}
             </span>
           }
-          <span className={!selectedOption?.name ? 'team-picker-placeholder' : ''}>{selectedOption ? optionLabel(selectedOption) : placeholder}</span>
+          <span className={!selectedOption?.name ? `team-picker-placeholder${nudgePlaceholder ? ' team-picker-placeholder-nudged' : ''}` : ''}>{selectedOption ? optionLabel(selectedOption) : placeholder}</span>
         </button>
         {isOpen &&
           <div className="team-picker-menu" role="listbox">
@@ -101,11 +101,12 @@ function TeamPicker({ id, value, onChange, teams, placeholder, openPicker, setOp
         className="team-picker team-picker-native"
         name={id}
         id={id}
+        aria-label={ariaLabel}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
         <option value=""></option>
-        <option value="-1">BYE</option>
+        {includeBye && <option value="-1">BYE</option>}
         {teams.map((team) => (
           <option value={team.id} key={team.id} disabled={team.disabled}>{team.name}</option>
         ))}
@@ -352,8 +353,8 @@ function PickSubmitForm(props) {
       </p>
       <form onSubmit={(event) => formSubmit(event, submitPicks, [firstTeam, secondTeam])}>
         <div className="team-picker-group" ref={teamPickerGroupRef}>
-          <TeamPicker id="first-team-picker" value={firstTeam} onChange={updateFirstTeam} teams={teams} placeholder="Pick your first team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
-          <TeamPicker id="second-team-picker" value={secondTeam} onChange={updateSecondTeam} teams={teams} placeholder="Pick your second team" openPicker={openPicker} setOpenPicker={setOpenPicker} />
+          <TeamPicker id="first-team-picker" value={firstTeam} onChange={updateFirstTeam} teams={teams} placeholder="Pick your first team" openPicker={openPicker} setOpenPicker={setOpenPicker} nudgePlaceholder />
+          <TeamPicker id="second-team-picker" value={secondTeam} onChange={updateSecondTeam} teams={teams} placeholder="Pick your second team" openPicker={openPicker} setOpenPicker={setOpenPicker} nudgePlaceholder />
         </div>
         <input className="pick-submit" type="submit" value="Submit" disabled={!canSubmit()} />
       </form>

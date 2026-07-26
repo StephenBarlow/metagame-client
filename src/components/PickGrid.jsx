@@ -261,6 +261,20 @@ function PickGrid(props) {
       data-tooltip-id={player.id === activeUser().id ? 'active-user-tooltip' : undefined}
       data-tooltip-content={player.id === activeUser().id ? "That's you!" : undefined}
     >
+      <span
+        className={`player-favorite-team${player.favoriteTeam ? ` team-${player.favoriteTeam.shortName.toLowerCase()}` : ' player-favorite-team-unknown'}`}
+        title={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
+        aria-label={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
+      >
+        {player.favoriteTeam
+          ? <img
+            src={`/logos/${player.favoriteTeam.name.toLowerCase().replaceAll(' ', '-')}.png`}
+            alt={`${player.favoriteTeam.name} logo`}
+            draggable={false}
+          />
+          : '?'
+        }
+      </span>
       {player.displayName}
     </td>
     <td className="player-total default-cell">{playerScores.get(player.id)}</td>

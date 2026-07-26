@@ -144,6 +144,32 @@ h3 {
   td {
     &.player-name {
       font-weight: normal;
+
+      .player-favorite-team {
+        display: inline-flex;
+        width: 22px;
+        height: 22px;
+        margin-right: 8px;
+        vertical-align: middle;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        transform: translateY(-1px);
+
+        img {
+          width: 20px;
+          height: 20px;
+          object-fit: contain;
+        }
+      }
+
+      .player-favorite-team-unknown {
+        background-color: #000;
+        color: #fff;
+        font-weight: bold;
+        line-height: 22px;
+        text-align: center;
+      }
     }
   }
 
@@ -238,6 +264,10 @@ table.week-picks {
   > span.team-picker-placeholder {
     transform: translate(15px, 2px);
   }
+
+  > span.team-picker-placeholder-nudged {
+    transform: translate(15px, 0);
+  }
 }
 
 .team-picker-menu {
@@ -324,6 +354,14 @@ table.week-picks {
     transform: translate(-50%, -50%);
     object-fit: contain;
     object-position: center;
+  }
+}
+
+.favorite-team-form {
+  margin: 0 0 24px;
+
+  p {
+    max-width: 700px;
   }
 }
 

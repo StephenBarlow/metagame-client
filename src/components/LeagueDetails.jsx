@@ -1,14 +1,15 @@
 // Shows all of the details of the current league.
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
 import PickSubmitForm from './PickSubmitForm';
 import CurrentPick from './CurrentPick';
 import SingleWeekPicks from './SingleWeekPicks';
 import PickArchive from './PickArchive';
+import { TeamPicker } from './PickSubmitForm';
 import { useParams } from 'react-router';
 
 const GET_LEAGUE_DETAILS = gql`
@@ -49,10 +50,100 @@ const GET_LEAGUE_DETAILS = gql`
       users {
         id
         displayName(leagueID: $leagueID)
+        favoriteTeam(leagueID: $leagueID) {
+          id
+          name
+          shortName
+        }
       }
     }
   }
 `;
+
+const SET_FAVORITE_TEAM = gql`
+  mutation SetFavoriteTeam($request: SetFavoriteTeamRequest!) {
+    setFavoriteTeam(request: $request) {
+      favoriteTeam {
+        id
+        name
+        shortName
+      }
+      errors {
+        code
+        message
+      }
+    }
+  }
+`;
+
+function FavoriteTeamForm({ league, teams, userID }) {
+  const [teamID, setTeamID] = useState('');
+  const [openPicker, setOpenPicker] = useState(null);
+  const [message, setMessage] = useState('');
+  const formRef = useRef(null);
+  const [setFavoriteTeam, { loading }] = useMutation(SET_FAVORITE_TEAM, {
+    refetchQueries: [{
+      query: GET_LEAGUE_DETAILS,
+      variables: { leagueID: league.id, userID },
+    }],
+    onCompleted: ({ setFavoriteTeam: result }) => {
+      if (result?.errors?.length) {
+        setMessage(`Error: ${result.errors[0].message}`);
+      }
+    },
+    onError: (error) => setMessage(`Error: ${error.message}`),
+  });
+
+  const submit = (event) => {
+    event.preventDefault();
+    setMessage('');
+    setFavoriteTeam({
+      variables: {
+        request: { userID, leagueID: league.id, teamID },
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (!openPicker) return undefined;
+
+    const closeOnOutsideClick = (event) => {
+      if (!formRef.current?.contains(event.target)) {
+        setOpenPicker(null);
+      }
+    };
+
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
+  }, [openPicker]);
+
+  return (
+    <section className="favorite-team-form" ref={formRef}>
+      <p>Welcome to <strong>{league.name}!</strong></p>
+      <p>First, which NFL team do you <em>personally</em> root for? (This won&apos;t affect standings at all. If you don&apos;t follow the NFL, feel free to pick anything.)</p>
+      <form onSubmit={submit}>
+        <TeamPicker
+          id="favorite-team"
+          value={teamID}
+          onChange={setTeamID}
+          teams={teams}
+          placeholder="Choose a team"
+          openPicker={openPicker}
+          setOpenPicker={setOpenPicker}
+          includeBye={false}
+          ariaLabel="Favorite team"
+        />
+        <input
+          className="pick-submit"
+          type="submit"
+          value={loading ? 'Saving…' : 'Save favorite team'}
+          disabled={!teamID || loading}
+        />
+      </form>
+      {message && <p className="form-status">{message}</p>}
+    </section>
+  );
+}
 
 function LeagueDetails() {
   const { id: leagueID } = useParams();
@@ -97,6 +188,9 @@ function LeagueDetails() {
     ...(leagueData.picksForUser || []).filter((pick) => !submittedWeeks.has(pick.week)),
     ...submittedPicks,
   ];
+  const currentLeagueUser = leagueData.league.users.find((user) => String(user.id) === String(activeUser().id));
+  const needsFavoriteTeam = leagueData.currentSeason === leagueData.league.season &&
+    currentLeagueUser && !currentLeagueUser.favoriteTeam;
 
 
   // User must pick if the current week's picks
@@ -108,11 +202,19 @@ function LeagueDetails() {
     <>
       <h2 className="league-name">{leagueData.league.name}</h2>
 
-      { !userMustPick &&
+      {needsFavoriteTeam &&
+        <FavoriteTeamForm
+          league={leagueData.league}
+          teams={leagueData.sportsTeams}
+          userID={activeUser().id}
+        />
+      }
+
+      { !needsFavoriteTeam && !userMustPick &&
         <SingleWeekPicks league={leagueData.league} currentSeason={leagueData.currentSeason}/>
       }
 
-      { (leagueData.currentSeason === leagueData.league.season) && selectedWeek !== undefined &&
+      { !needsFavoriteTeam && (leagueData.currentSeason === leagueData.league.season) && selectedWeek !== undefined &&
         <PickSubmitForm
           league={leagueData.league}
           teams={leagueData.sportsTeams}
@@ -125,7 +227,7 @@ function LeagueDetails() {
         />
       }
 
-      {selectedWeek !== undefined &&
+      { !needsFavoriteTeam && selectedWeek !== undefined &&
         <CurrentPick
           league={leagueData.league}
           currentSeason={leagueData.currentSeason}
@@ -134,7 +236,7 @@ function LeagueDetails() {
         />
       }
 
-      { !userMustPick &&
+      { !needsFavoriteTeam && !userMustPick &&
         <>
           <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
 
