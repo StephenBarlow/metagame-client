@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
 
+const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
+
 export function AchievementIcon({ award, tooltipId = 'achievement-tooltip' }) {
   const { achievement } = award;
   return (
@@ -25,6 +27,7 @@ function AchievementsTable({ league }) {
   const players = useMemo(() => {
     const awardsByUser = new Map(league.users.map((user) => [String(user.id), []]));
     for (const award of league.achievementAwards || []) {
+      if (String(award.user.id) === EXCLUDED_ACHIEVEMENT_USER_ID) continue;
       awardsByUser.get(String(award.user.id))?.push(award);
     }
 
@@ -41,7 +44,7 @@ function AchievementsTable({ league }) {
     );
   }, [league.users, league.achievementAwards]);
 
-  if (!league.achievementAwards?.length) return null;
+  if (!players.some(({ awards }) => awards.length)) return null;
 
   return (
     <>

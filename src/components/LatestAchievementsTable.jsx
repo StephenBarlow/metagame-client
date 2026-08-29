@@ -2,9 +2,13 @@ import React, { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
 
+const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
+
 function LatestAchievementsTable({ league }) {
   const displayedWeek = league.revealedWeek;
-  const awards = league.achievementAwards || [];
+  const awards = (league.achievementAwards || []).filter(
+    (award) => String(award.user.id) !== EXCLUDED_ACHIEVEMENT_USER_ID
+  );
   const rows = useMemo(() => {
     if (!displayedWeek) return [];
     const awardsByAchievement = new Map();

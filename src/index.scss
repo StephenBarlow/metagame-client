@@ -179,6 +179,10 @@ h3 {
   }
 }
 
+.pick-grid.main-pick-grid .player-name {
+  min-width: 175px;
+}
+
 .pick-archive {
   padding-bottom:40px;
 }
@@ -194,11 +198,25 @@ table.week-picks {
   td.player-name {
     font-weight: normal;
   }
-  td.team-highlighted {
-    box-shadow: inset 0 0 0 1.5px white;
+  td.team-dimmed {
+    filter: brightness(0.40);
+  }
+
+  td.team-bye.team-dimmed {
+    background-color: #181818;
   }
   td {
     font-weight: bold;
+  }
+
+  &.team-cell-hover tbody tr:hover td {
+    border-top-color: black;
+    border-bottom-color: black;
+  }
+
+  &.team-cell-hover tbody tr.misses-hovered-team td.player-name,
+  &.team-cell-hover tbody tr.misses-hovered-team td.pickoutcome {
+    filter: brightness(0.40);
   }
 }
 

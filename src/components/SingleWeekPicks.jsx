@@ -7,7 +7,9 @@ import { useQuery } from '@apollo/client/react';
 import { Tooltip } from 'react-tooltip';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
-const TeamOutcome = ({weekToShow, league, team, side, rowSpan, hoveredTeam, setHoveredTeam}) => {
+const isTeamCell = (element) => element?.closest('td.gameresult, td.team-bye');
+
+const TeamOutcome = ({ weekToShow, league, team, side, rowIndex, rowSpan, hover, onTeamHover }) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
@@ -18,8 +20,11 @@ const TeamOutcome = ({weekToShow, league, team, side, rowSpan, hoveredTeam, setH
     }
   );
 
-  const teamHighlightClass = hoveredTeam === team ? ' team-highlighted' : '';
-  const handleMouseEnter = () => setHoveredTeam(team);
+  const isHighlighted = hover?.type === 'row'
+    ? hover.rowIndex >= rowIndex && hover.rowIndex < rowIndex + rowSpan
+    : hover?.team === team;
+  const teamHighlightClass = hover && !isHighlighted ? ' team-dimmed' : '';
+  const handleMouseEnter = () => onTeamHover(team);
 
   if (team === 'BYE') {
     return (
@@ -80,7 +85,7 @@ const TeamOutcome = ({weekToShow, league, team, side, rowSpan, hoveredTeam, setH
     );
 }
 
-const PickOutcome = ({weekToShow, ...props}) => {
+const PickOutcome = ({ weekToShow, rowIndex, onRowHover, onFocusCellLeave, ...props }) => {
   const { loading: gamesLoading, error: gamesError, data: gamesData } = useQuery(
     GET_SPORTS_GAMES,
     {
@@ -177,9 +182,14 @@ const PickOutcome = ({weekToShow, ...props}) => {
     return pickedTeamScore - otherTeamScore;
   };
 
+  const hoverHandlers = {
+    onMouseEnter: () => onRowHover(rowIndex),
+    onMouseLeave: onFocusCellLeave,
+  };
+
   if (gamesLoading) {
     return (
-      <td className="pickoutcome">
+      <td className="pickoutcome" {...hoverHandlers}>
         ...
       </td>
     );
@@ -187,7 +197,7 @@ const PickOutcome = ({weekToShow, ...props}) => {
 
   if (gamesError) {
     return (
-      <td className="pickoutcome">
+      <td className="pickoutcome" {...hoverHandlers}>
         ?
       </td>
     );
@@ -196,7 +206,10 @@ const PickOutcome = ({weekToShow, ...props}) => {
   const pickResult = getPickResult(props.league, props.team1, props.team2);
 
   return (
-    <td className={`${getResultClass(pickResult)}${pickResult.outcome === 'SPLIT' ? ' split-marker' : ''}`}>
+    <td
+      className={`${getResultClass(pickResult)}${pickResult.outcome === 'SPLIT' ? ' split-marker' : ''}`}
+      {...hoverHandlers}
+    >
       {
         typeof pickResult.value === 'number' ? `+${pickResult.value}` : pickResult.value
       }
@@ -415,7 +428,14 @@ const sortPlayerPicks = sortPlayerPicksAdjacency;
 
 function SingleWeekPicks (props) {
   const activeUser = useContext(UserContext);
-  const [hoveredTeam, setHoveredTeam] = useState(null);
+  const [hover, setHover] = useState(null);
+
+  const handleTeamHover = (team) => setHover({ type: 'team', team });
+  const handleRowHover = (rowIndex) => setHover({ type: 'row', rowIndex });
+  const clearHover = () => setHover(null);
+  const clearHoverIfOutsideTeamCell = (event) => {
+    if (!isTeamCell(event.relatedTarget)) clearHover();
+  };
 
   const weekToShow = (props.weekToShow) ? props.weekToShow : props.league.currentWeek;
 
@@ -493,9 +513,13 @@ function SingleWeekPicks (props) {
     const firstTeamRowSpan = getTeamRowSpan(rowIndex, 0);
     const secondTeamRowSpan = getTeamRowSpan(rowIndex, 1);
 
-    return <tr key={playerPick.player.id}>
+    const rowMissesHoveredTeam = hover?.type === 'team' && !playerPick.picks.includes(hover.team);
+
+    return <tr key={playerPick.player.id} className={rowMissesHoveredTeam ? 'misses-hovered-team' : undefined}>
     <td
       className={ "player-name " + (isActiveUser(playerPick.player.id) ? 'is-active-user' : '')}
+      onMouseEnter={() => handleRowHover(rowIndex)}
+      onMouseLeave={clearHoverIfOutsideTeamCell}
       data-tooltip-id={isActiveUser(playerPick.player.id) ? 'single-week-active-user-tooltip' : undefined}
       data-tooltip-content={isActiveUser(playerPick.player.id) ? "That's you!" : undefined}
     >
@@ -504,13 +528,39 @@ function SingleWeekPicks (props) {
     { playerPick.picks.length > 0 &&
       <>
       {firstTeamRowSpan > 0 &&
-        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[0]} league={props.league} side="left" rowSpan={firstTeamRowSpan} hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
+        <TeamOutcome
+          weekToShow={weekToShow}
+          team={playerPick.picks[0]}
+          league={props.league}
+          side="left"
+          rowIndex={rowIndex}
+          rowSpan={firstTeamRowSpan}
+          hover={hover}
+          onTeamHover={handleTeamHover}
+        />
       }
       {/* Bye has colspan 2, no need for right column */}
       {playerPick.picks[1] !== 'BYE' && secondTeamRowSpan > 0 &&
-        <TeamOutcome weekToShow={weekToShow} team={playerPick.picks[1]} league={props.league} side="right" rowSpan={secondTeamRowSpan} hoveredTeam={hoveredTeam} setHoveredTeam={setHoveredTeam} />
+        <TeamOutcome
+          weekToShow={weekToShow}
+          team={playerPick.picks[1]}
+          league={props.league}
+          side="right"
+          rowIndex={rowIndex}
+          rowSpan={secondTeamRowSpan}
+          hover={hover}
+          onTeamHover={handleTeamHover}
+        />
       }
-      <PickOutcome weekToShow={weekToShow} team1={playerPick.picks[0]} team2={playerPick.picks[1]} league={props.league} />
+      <PickOutcome
+        weekToShow={weekToShow}
+        team1={playerPick.picks[0]}
+        team2={playerPick.picks[1]}
+        league={props.league}
+        rowIndex={rowIndex}
+        onRowHover={handleRowHover}
+        onFocusCellLeave={clearHoverIfOutsideTeamCell}
+      />
       </>
     }
     { playerPick.picks.length === 0 &&
@@ -530,7 +580,9 @@ function SingleWeekPicks (props) {
         <h3>All picks for week {weekToShow}</h3>
         <Tooltip id="single-week-active-user-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
         <Tooltip id="single-week-game-result-tooltip" classNameArrow="hidden" style={{ backgroundColor: '#000000', zIndex: 10 }} />
-        <table className="pick-grid week-picks">
+        <table
+          className={`pick-grid week-picks${hover?.type === 'team' ? ' team-cell-hover' : ''}`}
+        >
           <thead>
             <tr>
               <th className="player-name">Competitor</th>
@@ -539,7 +591,7 @@ function SingleWeekPicks (props) {
               <th className="default-cell">Result</th>
             </tr>
           </thead>
-          <tbody onMouseLeave={() => setHoveredTeam(null)}>
+          <tbody onMouseLeave={clearHover}>
             {playerRows}
           </tbody>
         </table>

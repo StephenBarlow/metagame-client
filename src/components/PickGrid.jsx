@@ -17,6 +17,7 @@ function PickGrid(props) {
     return userConfig?.showTeamLogos ?? false;
   });
   const league = props.league;
+  const hasFavoriteTeam = league.users.some((user) => user.favoriteTeam);
 
   const updateShowTeamLogos = (showLogos) => {
     setShowTeamLogos(showLogos);
@@ -261,20 +262,21 @@ function PickGrid(props) {
       data-tooltip-id={player.id === activeUser().id ? 'active-user-tooltip' : undefined}
       data-tooltip-content={player.id === activeUser().id ? "That's you!" : undefined}
     >
-      <span
-        className={`player-favorite-team${player.favoriteTeam ? ` team-${player.favoriteTeam.shortName.toLowerCase()}` : ' player-favorite-team-unknown'}`}
-        title={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
-        aria-label={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
-      >
-        {player.favoriteTeam
-          ? <img
-            src={`/logos/${player.favoriteTeam.name.toLowerCase().replaceAll(' ', '-')}.png`}
-            alt={`${player.favoriteTeam.name} logo`}
-            draggable={false}
-          />
-          : '?'
-        }
-      </span>
+      {hasFavoriteTeam &&
+        <span
+          className={`player-favorite-team${player.favoriteTeam ? ` team-${player.favoriteTeam.shortName.toLowerCase()}` : ' player-favorite-team-unknown'}`}
+          title={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
+          aria-label={player.favoriteTeam ? `${player.favoriteTeam.name} fan` : 'Favorite team not set'}
+        >
+          {player.favoriteTeam
+            ? <img
+              src={`/logos/${player.favoriteTeam.name.toLowerCase().replaceAll(' ', '-')}.png`}
+              alt={`${player.favoriteTeam.name} logo`}
+              draggable={false}
+            />
+            : '?'
+          }
+        </span>}
       {player.displayName}
     </td>
     <td className="player-total default-cell">{playerScores.get(player.id)}</td>
@@ -293,7 +295,7 @@ function PickGrid(props) {
             key={team.id}
             className={'player-team ' + getOutcomeClass(pickResult) + (isHighlighted || isPairedTeamHighlighted ? ' pick-grid-team-highlighted' : '') + (isSplitZero ? ' split-marker' : '')}
             data-tooltip-id="pick-grid-tooltip"
-            data-tooltip-content={pickResult ? `Week ${pickResult.week}\n+ ${pickResult.otherTeam}` : null}
+            data-tooltip-content={pickResult ? `Week ${pickResult.week}\nw/ ${pickResult.otherTeam}` : null}
             onMouseEnter={() => pickResult && setHoveredPickKey(pickKey)}
           >
             {pickResult && (isSplitZero ? '⟋' : pickResult.value)}
@@ -356,7 +358,7 @@ function PickGrid(props) {
       </div>
       <ScrollContainer vertical="false" className="grid-wrapper" hideScrollbars="false">
 
-          <table className={`pick-grid${showTeamLogos ? ' logo-headers' : ''}`}>
+          <table className={`pick-grid main-pick-grid${showTeamLogos ? ' logo-headers' : ''}`}>
             <thead>
               <tr>
                 <th className="default-cell player-name sticky">Competitor</th>
