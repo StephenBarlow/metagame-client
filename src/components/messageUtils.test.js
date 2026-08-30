@@ -21,6 +21,15 @@ describe('parseMessageFormat', () => {
       text: '{adjective}',
     });
   });
+
+  test('capitalizes a selected phrase when its slot begins a sentence', () => {
+    const fragments = parseMessageFormat(
+      '{opening} arrived. {next}',
+      (key) => key === 'opening' ? 'the first phrase' : 'another phrase'
+    );
+
+    expect(fragments.map(({ text }) => text).join('')).toBe('The first phrase arrived. Another phrase');
+  });
 });
 
 test('renders union selection values using their display fields', () => {

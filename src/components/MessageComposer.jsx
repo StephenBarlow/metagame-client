@@ -239,10 +239,10 @@ function MessageComposer({ league, teams, userID }) {
               type="button"
               className={`message-slot-trigger${selection ? ' selected' : ''}`}
               key={`${slot.id}-${index}`}
-              onClick={() => setActiveSlot(slot)}
-              aria-label={`${slot.prompt}: ${selection?.label || 'not selected'}`}
-            >
-              {selection?.label || '________'}
+            onClick={() => setActiveSlot(slot)}
+            aria-label={`${slot.prompt}: ${selection?.label || 'not selected'}`}
+          >
+              {selection ? fragment.text : '________'}
             </button>
           );
         })}

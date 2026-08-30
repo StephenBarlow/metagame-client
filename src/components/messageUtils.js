@@ -13,6 +13,15 @@ export const getMessageValueText = (value) => {
   return '';
 };
 
+const capitalizeSentenceStart = (text) => text.replace(/^(\s*)(\p{L})/u, (match, whitespace, letter) =>
+  `${whitespace}${letter.toLocaleUpperCase()}`
+);
+
+const slotStartsSentence = (format, slotIndex) => {
+  const precedingText = format.slice(0, slotIndex);
+  return !precedingText.trim() || /[.!?]["')\]]*\s*$/.test(precedingText);
+};
+
 export const parseMessageFormat = (format, getSelectionText) => {
   const fragments = [];
   const placeholderPattern = /\{([^{}]+)\}/g;
@@ -25,10 +34,13 @@ export const parseMessageFormat = (format, getSelectionText) => {
 
     const key = match[1];
     const selectionText = getSelectionText(key);
+    const text = selectionText && slotStartsSentence(format, match.index)
+      ? capitalizeSentenceStart(selectionText)
+      : selectionText || match[0];
     fragments.push({
       type: selectionText ? 'selection' : 'placeholder',
       key,
-      text: selectionText || match[0],
+      text,
     });
     cursor = match.index + match[0].length;
   }
