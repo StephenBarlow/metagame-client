@@ -12,6 +12,7 @@ import PickArchive from './PickArchive';
 import { TeamPicker } from './PickSubmitForm';
 import AchievementsTable from './AchievementsTable';
 import LatestAchievementsTable from './LatestAchievementsTable';
+import LeagueMessages from './LeagueMessages';
 import { useParams } from 'react-router';
 
 const GET_LEAGUE_DETAILS = gql`
@@ -63,6 +64,52 @@ const GET_LEAGUE_DETAILS = gql`
           name
           description
           iconId
+        }
+      }
+      messages {
+        id
+        week
+        createdAt
+        author {
+          id
+          displayName(leagueID: $leagueID)
+        }
+        template {
+          id
+          key
+          format
+          slots {
+            id
+            key
+            position
+            prompt
+            valueTypes
+          }
+        }
+        selections {
+          slot {
+            id
+            key
+            position
+          }
+          value {
+            __typename
+            ... on MessageValue {
+              id
+              key
+              text
+              kind
+            }
+            ... on SportsTeam {
+              id
+              name
+              shortName
+            }
+            ... on User {
+              id
+              displayName(leagueID: $leagueID)
+            }
+          }
         }
       }
       users {
@@ -260,6 +307,15 @@ function LeagueDetails() {
           currentSeason={leagueData.currentSeason}
           selectedWeek={selectedWeek}
           userPicks={userPicks}
+        />
+      }
+
+      {!needsFavoriteTeam &&
+        <LeagueMessages
+          league={leagueData.league}
+          teams={leagueData.sportsTeams}
+          userID={activeUser().id}
+          currentSeason={leagueData.currentSeason}
         />
       }
 

@@ -650,25 +650,351 @@ td.player-byes {
   font-size: 12px;
 }
 
+.league-messages {
+  max-width: 1050px;
 
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: black;
-  padding: 20px;
-  display: none;
-  color: white;
-  border-radius: 10px;
+  h3 {
+    margin-bottom: 12px;
+  }
 }
 
-.modal-active {
+.league-messages-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 20px;
+}
+
+.league-messages-read-only .league-messages-layout {
+  grid-template-columns: minmax(0, 700px);
+}
+
+.message-composer,
+.message-feed-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 16px;
+  background: #222;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+.message-composer {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-composer-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.message-template-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: #bbb;
+  font-size: 14px;
+
+  select {
+    min-width: 0;
+    max-width: 100%;
+    padding: 5px;
+    background: #333;
+    color: #eee;
+    border: 1px solid #777;
+    font-family: inherit;
+  }
+}
+
+.message-composer-sentence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 54px;
+  padding: 10px;
+  background: #333;
+  border-radius: 3px;
+  font-size: 21px;
+  line-height: 1.9;
+}
+
+.message-slot-trigger {
+  display: inline;
+  margin: 0 3px;
+  padding: 2px 7px;
+  background: #333;
+  color: $highlight;
+  border: 1px dashed $highlight;
+  border-radius: 3px;
+  font: inherit;
+  line-height: 1.25;
+  cursor: pointer;
+
+  &.selected {
+    border-style: solid;
+    background: #3a3528;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+}
+
+.message-composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+
+  button {
+    min-width: 80px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  .form-status {
+    color: $highlight;
+    font-size: 14px;
+  }
+}
+
+.message-composer-status,
+.message-feed-empty {
+  margin: 0;
+  color: #bbb;
+}
+
+.message-feed-heading {
   display: block;
+  margin-bottom: 10px;
+}
+
+.message-feed {
+  max-height: 215px;
+  overflow-y: auto;
+}
+
+.message-feed-item {
+  padding: 10px;
+  background: #333;
+  border-top: 1px solid #444;
+  border-radius: 3px;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  & + & {
+    margin-top: 8px;
+  }
+}
+
+.message-feed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-bottom: 4px;
+  color: #aaa;
+  font-size: 12px;
+
+  strong {
+    color: #eee;
+    font-size: 14px;
+  }
+}
+
+.message-pick-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.message-pick-chip-separator {
+  color: #aaa;
+  font-weight: bold;
+}
+
+.message-pick-chip {
+  min-width: 22px;
+  padding: 1px 4px;
+  background: #3b3b3b;
+  color: #eee;
+  border: 1px solid #666;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.message-feed-meta time {
+  margin-left: auto;
+}
+
+.message-sentence {
+  line-height: 1.45;
+}
+
+.message-selection {
+  color: $highlight;
+}
+
+.message-slot-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #555;
+
+  button {
+    padding: 7px 12px;
+    background: transparent;
+    color: #bbb;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+    cursor: pointer;
+
+    &.active {
+      color: $highlight;
+      border-bottom-color: $highlight;
+    }
+  }
+}
+
+.message-slot-filter {
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: #292929;
+  color: #eee;
+  border: 1px solid #666;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.message-slot-options {
+  max-height: min(430px, 60vh);
+  overflow-y: auto;
+}
+
+.message-slot-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 5px 9px;
+  background: #292929;
+  color: #eee;
+  border: 0;
+  border-bottom: 1px solid #444;
+  font-family: inherit;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &[aria-selected='true'] {
+    background: #444;
+  }
+}
+
+.message-slot-team-logo {
+  display: inline-flex;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 2px;
+
+  img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+}
+
+.message-slot-empty {
+  color: #bbb;
+}
+
+@media screen and (max-width: 800px) {
+  .league-messages-layout {
+    display: block;
+  }
+
+  .message-composer {
+    margin-top: 12px;
+  }
+}
+
+@media screen and (max-width: $phone) {
+  .message-composer-sentence {
+    font-size: 18px;
+  }
+}
+
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: black;
+  padding: 20px;
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 .modal h3 {
   margin-top: 0;
+  padding-right: 30px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: #eee;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media screen and (max-width: $phone) {
+  .modal-overlay {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: calc(100vh - 20px);
+    border-radius: 6px;
+  }
 }
 
 form label {

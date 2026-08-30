@@ -1,0 +1,81 @@
+export const MESSAGE_TYPE_LABELS = {
+  CATALOG_VALUE: 'Phrases',
+  ADJECTIVE: 'Adjectives',
+  LEAGUE_MEMBER: 'People',
+  TEAM: 'Teams',
+};
+
+export const getMessageValueText = (value) => {
+  if (!value) return '';
+  if (value.__typename === 'MessageValue' || value.text) return value.text;
+  if (value.__typename === 'SportsTeam' || value.name) return value.name;
+  if (value.__typename === 'User' || value.displayName) return value.displayName;
+  return '';
+};
+
+export const parseMessageFormat = (format, getSelectionText) => {
+  const fragments = [];
+  const placeholderPattern = /\{([^{}]+)\}/g;
+  let cursor = 0;
+
+  for (const match of format.matchAll(placeholderPattern)) {
+    if (match.index > cursor) {
+      fragments.push({ type: 'literal', text: format.slice(cursor, match.index) });
+    }
+
+    const key = match[1];
+    const selectionText = getSelectionText(key);
+    fragments.push({
+      type: selectionText ? 'selection' : 'placeholder',
+      key,
+      text: selectionText || match[0],
+    });
+    cursor = match.index + match[0].length;
+  }
+
+  if (cursor < format.length) {
+    fragments.push({ type: 'literal', text: format.slice(cursor) });
+  }
+
+  return fragments;
+};
+
+export const getMessageFragments = (message) => {
+  const selectionsByKey = new Map(
+    (message.selections || []).map((selection) => [selection.slot.key, selection.value])
+  );
+
+  return parseMessageFormat(
+    message.template.format,
+    (key) => getMessageValueText(selectionsByKey.get(key))
+  );
+};
+
+const mapOptions = (items, valueType, getLabel) => (items || []).map((item) => ({
+  id: String(item.id),
+  label: getLabel(item),
+  valueID: String(item.id),
+  valueType,
+  source: item,
+}));
+
+export const getSlotOptionGroups = (slot, { catalogValues, adjectives, users, teams }) => {
+  const optionsByType = {
+    CATALOG_VALUE: mapOptions(catalogValues, 'CATALOG_VALUE', (value) => value.text),
+    ADJECTIVE: mapOptions(adjectives, 'ADJECTIVE', (value) => value.text),
+    LEAGUE_MEMBER: mapOptions(
+      [...(users || [])].sort((firstUser, secondUser) =>
+        firstUser.displayName.localeCompare(secondUser.displayName)
+      ),
+      'LEAGUE_MEMBER',
+      (user) => user.displayName
+    ),
+    TEAM: mapOptions(teams, 'TEAM', (team) => team.name),
+  };
+
+  return slot.valueTypes.map((valueType) => ({
+    valueType,
+    label: MESSAGE_TYPE_LABELS[valueType] || valueType,
+    options: optionsByType[valueType] || [],
+  }));
+};

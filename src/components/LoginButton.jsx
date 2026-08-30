@@ -18,7 +18,7 @@ class LoginButton extends Component {
     return(
       <>
         <a onClick={this.showModal}> Sign in </a>
-        <Modal show={this.state.show} handleClose={this.hideModal}>
+        <Modal show={this.state.show} handleClose={this.hideModal} ariaLabel="Sign in">
           <LoginForm/>
         </Modal>
       </>
