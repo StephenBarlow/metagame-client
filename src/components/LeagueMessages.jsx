@@ -2,10 +2,11 @@ import React from 'react';
 import MessageComposer from './MessageComposer';
 import MessageFeed from './MessageFeed';
 
-function LeagueMessages({ league, teams, userID, currentSeason }) {
+function LeagueMessages({ league, teams, userID, currentSeason, currentUserLimited }) {
   const canCompose = league.season === currentSeason;
   const messages = league.messages || [];
 
+  if (currentUserLimited) return null;
   if (league.revealedWeek < 1 && String(userID) !== '1') return null;
   if (!canCompose && !messages.length) return null;
 

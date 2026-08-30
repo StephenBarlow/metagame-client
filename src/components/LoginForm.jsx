@@ -9,6 +9,7 @@ const LOG_IN = gql`
     user(email: $email) {
       id
       email
+      limited
     }
   }
 `;

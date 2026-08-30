@@ -114,9 +114,9 @@ function MessageComposer({ league, teams, userID }) {
   const optionSources = useMemo(() => ({
     catalogValues: composerData?.catalogValues || [],
     adjectives: composerData?.adjectives || [],
-    users: league.users,
+    users: league.messageEligibleUsers || [],
     teams,
-  }), [composerData, league.users, teams]);
+  }), [composerData, league.messageEligibleUsers, teams]);
 
   useEffect(() => {
     if (templates.length && !templates.some(({ id }) => String(id) === String(templateID))) {

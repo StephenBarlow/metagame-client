@@ -114,12 +114,17 @@ const GET_LEAGUE_DETAILS = gql`
       }
       users {
         id
+        limited
         displayName(leagueID: $leagueID)
         favoriteTeam(leagueID: $leagueID) {
           id
           name
           shortName
         }
+      }
+      messageEligibleUsers {
+        id
+        displayName(leagueID: $leagueID)
       }
     }
   }
@@ -316,6 +321,7 @@ function LeagueDetails() {
           teams={leagueData.sportsTeams}
           userID={activeUser().id}
           currentSeason={leagueData.currentSeason}
+          currentUserLimited={currentLeagueUser?.limited}
         />
       }
 

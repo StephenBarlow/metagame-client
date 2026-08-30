@@ -9,6 +9,7 @@ mutation CreateUser($request: CreateUserRequest!) {
     user {
       id
       email
+      limited
     }
     errors {
       code
