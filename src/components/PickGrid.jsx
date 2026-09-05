@@ -6,6 +6,7 @@ import { useQuery } from '@apollo/client/react';
 import { Tooltip } from 'react-tooltip';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import ScoreHistogram, { createHistogramBins } from './ScoreHistogram';
+import ScoreField from './ScoreField';
 import { GET_SPORTS_GAMES } from './SharedQueries';
 
 function PickGrid(props) {
@@ -375,6 +376,15 @@ function PickGrid(props) {
       </ScrollContainer>
       {shouldRenderHistogram &&
         <>
+          <h3>THE FIELD</h3>
+          <ScoreField
+            currentWeek={league.currentWeek}
+            playerScores={league.users.map((user) => ({
+              id: user.id,
+              name: user.displayName,
+              score: playerScores.get(user.id),
+            }))}
+          />
           <h3>THE GRAPH</h3>
           <div className="histogram">
             <ScoreHistogram

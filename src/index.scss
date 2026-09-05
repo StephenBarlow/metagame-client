@@ -1108,6 +1108,40 @@ form input:not(:first-of-type) {
   }
 }
 
+.score-field {
+  position: relative;
+  width: 700px;
+  max-width: 100%;
+  aspect-ratio: 2048 / 941;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background: url('/field.png') center / cover no-repeat;
+  border: 1px solid #111;
+}
+
+.score-field-player {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: clamp(28px, 5vw, 42px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #252535;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 70%);
+  color: $highlight;
+  cursor: default;
+  font-size: clamp(11px, 1.8vw, 15px);
+  font-weight: 800;
+  line-height: 1;
+
+  &:focus-visible {
+    outline: 3px solid cyan;
+    outline-offset: 2px;
+  }
+}
+
 
 td.outcome-double-win {
   background-color: $pickedColor;
