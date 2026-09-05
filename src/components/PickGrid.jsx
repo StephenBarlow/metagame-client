@@ -225,6 +225,7 @@ function PickGrid(props) {
   const allScores = league.users.map((user) => playerScores.get(user.id));
   const histogramBins = createHistogramBins(allScores);
   const shouldRenderHistogram = histogramBins && histogramBins.length - 1 >= 3;
+  const shouldRenderField = shouldRenderHistogram && league.currentWeek >= 3;
   const getPickKey = (playerID, week) => `${playerID}:${week}`;
 
   // Generate the grid row for each competitor
@@ -374,7 +375,7 @@ function PickGrid(props) {
             </tbody>
           </table>
       </ScrollContainer>
-      {shouldRenderHistogram &&
+      {shouldRenderField &&
         <>
           <h3>THE FIELD</h3>
           <ScoreField
@@ -385,6 +386,9 @@ function PickGrid(props) {
               score: playerScores.get(user.id),
             }))}
           />
+        </>}
+      {shouldRenderHistogram &&
+        <>
           <h3>THE GRAPH</h3>
           <div className="histogram">
             <ScoreHistogram

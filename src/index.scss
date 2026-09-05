@@ -1085,7 +1085,7 @@ form input:not(:first-of-type) {
   border: 1px solid black;
   margin-bottom: 20px;
   max-width: 100%;
-  overflow: auto;
+  overflow: hidden;
 
   text {
     fill: #ddd;
@@ -1123,7 +1123,7 @@ form input:not(:first-of-type) {
   position: absolute;
   display: grid;
   place-items: center;
-  width: clamp(28px, 5vw, 42px);
+  width: clamp(25.2px, 4.5vw, 37.8px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border: 2px solid #fff;
@@ -1132,6 +1132,7 @@ form input:not(:first-of-type) {
   box-shadow: 0 1px 4px rgb(0 0 0 / 70%);
   color: $highlight;
   cursor: default;
+  font-family: 'Fugaz One', sans-serif;
   font-size: clamp(11px, 1.8vw, 15px);
   font-weight: 800;
   line-height: 1;
@@ -1140,6 +1141,15 @@ form input:not(:first-of-type) {
     outline: 3px solid cyan;
     outline-offset: 2px;
   }
+}
+
+.score-field-player-leader {
+  background: $highlight;
+  color: #252535;
+}
+
+.score-field-player-initials {
+  transform: translateY(1px);
 }
 
 
