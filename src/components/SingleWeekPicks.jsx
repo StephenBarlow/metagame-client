@@ -189,7 +189,7 @@ const PickOutcome = ({ weekToShow, rowIndex, onRowHover, onFocusCellLeave, ...pr
 
   if (gamesLoading) {
     return (
-      <td className="pickoutcome" {...hoverHandlers}>
+      <td className="player-result pickoutcome" {...hoverHandlers}>
         ...
       </td>
     );
@@ -197,7 +197,7 @@ const PickOutcome = ({ weekToShow, rowIndex, onRowHover, onFocusCellLeave, ...pr
 
   if (gamesError) {
     return (
-      <td className="pickoutcome" {...hoverHandlers}>
+      <td className="player-result pickoutcome" {...hoverHandlers}>
         ?
       </td>
     );
@@ -207,7 +207,7 @@ const PickOutcome = ({ weekToShow, rowIndex, onRowHover, onFocusCellLeave, ...pr
 
   return (
     <td
-      className={`${getResultClass(pickResult)}${pickResult.outcome === 'SPLIT' ? ' split-marker' : ''}`}
+      className={`player-result ${getResultClass(pickResult)}${pickResult.outcome === 'SPLIT' ? ' split-marker' : ''}`}
       {...hoverHandlers}
     >
       {
@@ -514,8 +514,13 @@ function SingleWeekPicks (props) {
     const secondTeamRowSpan = getTeamRowSpan(rowIndex, 1);
 
     const rowMissesHoveredTeam = hover?.type === 'team' && !playerPick.picks.includes(hover.team);
+    const rowIsNotHovered = hover?.type === 'row' && hover.rowIndex !== rowIndex;
+    const rowClassName = [
+      rowMissesHoveredTeam && 'misses-hovered-team',
+      rowIsNotHovered && 'row-dimmed',
+    ].filter(Boolean).join(' ');
 
-    return <tr key={playerPick.player.id} className={rowMissesHoveredTeam ? 'misses-hovered-team' : undefined}>
+    return <tr key={playerPick.player.id} className={rowClassName || undefined}>
     <td
       className={ "player-name " + (isActiveUser(playerPick.player.id) ? 'is-active-user' : '')}
       onMouseEnter={() => handleRowHover(rowIndex)}
@@ -565,7 +570,10 @@ function SingleWeekPicks (props) {
     }
     { playerPick.picks.length === 0 &&
       <>
-      <td className="outcome-unknown">?</td>
+      <td className="player-result outcome-unknown" {...{
+        onMouseEnter: () => handleRowHover(rowIndex),
+        onMouseLeave: clearHoverIfOutsideTeamCell,
+      }}>?</td>
       <td className="outcome-unknown">?</td>
       <td className="outcome-unknown">?</td>
       </>

@@ -215,7 +215,9 @@ table.week-picks {
   }
 
   &.team-cell-hover tbody tr.misses-hovered-team td.player-name,
-  &.team-cell-hover tbody tr.misses-hovered-team td.pickoutcome {
+  &.team-cell-hover tbody tr.misses-hovered-team td.player-result,
+  tbody tr.row-dimmed td.player-name,
+  tbody tr.row-dimmed td.player-result {
     filter: brightness(0.40);
   }
 }
