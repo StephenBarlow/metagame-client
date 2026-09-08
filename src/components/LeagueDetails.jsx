@@ -286,36 +286,35 @@ function LeagueDetails() {
         />
       }
 
-      { !needsFavoriteTeam && currentWeekPicksVisible &&
+      { !needsFavoriteTeam && (currentWeekPicksVisible || pickFormVisible || selectedWeek !== undefined) &&
         <div className="league-current-week-layout">
-          <SingleWeekPicks league={leagueData.league} currentSeason={leagueData.currentSeason}/>
-          <LatestAchievementsTable league={leagueData.league} />
+          <div className="league-current-week-content">
+            {currentWeekPicksVisible &&
+              <SingleWeekPicks league={leagueData.league} currentSeason={leagueData.currentSeason}/>
+            }
+            {pickFormVisible &&
+              <PickSubmitForm
+                league={leagueData.league}
+                teams={leagueData.sportsTeams}
+                userPicks={userPicks}
+                userMustPick={userMustPick}
+                config={userConfig}
+                selectedWeek={selectedWeek}
+                setSelectedWeek={setSelectedWeek}
+                onPicksSubmitted={onPicksSubmitted}
+              />
+            }
+            {selectedWeek !== undefined &&
+              <CurrentPick
+                league={leagueData.league}
+                currentSeason={leagueData.currentSeason}
+                selectedWeek={selectedWeek}
+                userPicks={userPicks}
+              />
+            }
+          </div>
+          {(currentWeekPicksVisible || pickFormVisible) && <LatestAchievementsTable league={leagueData.league} />}
         </div>
-      }
-
-      { !needsFavoriteTeam && pickFormVisible &&
-        <div className={currentWeekPicksVisible ? undefined : 'league-current-week-layout'}>
-          <PickSubmitForm
-            league={leagueData.league}
-            teams={leagueData.sportsTeams}
-            userPicks={userPicks}
-            userMustPick={userMustPick}
-            config={userConfig}
-            selectedWeek={selectedWeek}
-            setSelectedWeek={setSelectedWeek}
-            onPicksSubmitted={onPicksSubmitted}
-          />
-          {!currentWeekPicksVisible && <LatestAchievementsTable league={leagueData.league} />}
-        </div>
-      }
-
-      { !needsFavoriteTeam && selectedWeek !== undefined &&
-        <CurrentPick
-          league={leagueData.league}
-          currentSeason={leagueData.currentSeason}
-          selectedWeek={selectedWeek}
-          userPicks={userPicks}
-        />
       }
 
       {!needsFavoriteTeam &&

@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
+import UserContext from './ActiveUserContext';
 
 const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
 
-export function AchievementIcon({ award, tooltipId = 'achievement-tooltip' }) {
+export function AchievementIcon({ award, isCurrent = false, tooltipId = 'achievement-tooltip' }) {
   const { achievement } = award;
   return (
     <span
-      className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}`}
+      className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${isCurrent && achievement.iconId ? ' achievement-icon-current' : ''}`}
       data-tooltip-id={tooltipId}
       data-achievement-name={achievement.name}
       data-achievement-description={achievement.description}
@@ -24,6 +25,7 @@ export function AchievementIcon({ award, tooltipId = 'achievement-tooltip' }) {
 }
 
 function AchievementsTable({ league }) {
+  const activeUser = useContext(UserContext);
   const players = useMemo(() => {
     const awardsByUser = new Map(league.users.map((user) => [String(user.id), []]));
     for (const award of league.achievementAwards || []) {
@@ -62,27 +64,36 @@ function AchievementsTable({ league }) {
           </>
         )}
       />
-      <h3>BADGES</h3>
-      <table className="achievement-table">
-        <thead>
-          <tr>
-            <th>Competitor</th>
-            <th className="achievement-total">Total</th>
-            <th>Badges</th>
-          </tr>
-        </thead>
-        <tbody>
-          {players.map(({ user, awards }) => (
-            <tr key={user.id}>
-              <td className="achievement-player-name">{user.displayName}</td>
+      <h3>THE BADGERBOARD</h3>
+      <p className="badge-board-legend"><span aria-hidden="true">✦</span>: New this week</p>
+      <div className="badge-board-scroll">
+        <table className="achievement-table badge-board">
+          <thead>
+            <tr>
+              <th>Competitor</th>
+              <th className="achievement-total">Total</th>
+              <th>Badges</th>
+            </tr>
+          </thead>
+          <tbody>
+            {players.map(({ user, awards }) => (
+              <tr key={user.id}>
+                <td className={`achievement-player-name${String(user.id) === String(activeUser()?.id) ? ' is-active-user' : ''}`}>{user.displayName}</td>
               <td className="achievement-total">{awards.length}</td>
               <td className="achievement-icons">
-                {awards.map((award) => <AchievementIcon award={award} key={award.id} />)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {awards.map((award) => (
+                    <AchievementIcon
+                      award={award}
+                      isCurrent={award.week === league.revealedWeek}
+                      key={award.id}
+                    />
+                  ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

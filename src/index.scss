@@ -246,6 +246,10 @@ table.week-picks {
   .achievement-player-name {
     width: 150px;
     background-color: #222;
+
+    &.is-active-user {
+      color: $highlight;
+    }
   }
 
   .achievement-total {
@@ -258,8 +262,63 @@ table.week-picks {
   }
 }
 
+.badge-board-scroll {
+  max-width: 100%;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  overscroll-behavior-x: none;
+}
+
+.badge-board-legend {
+  margin: -12px 0 12px;
+  color: #ccc;
+  font-size: 14px;
+
+  span {
+    display: inline-block;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 0;
+    vertical-align: -1px;
+    -webkit-text-stroke: 0.5px #252535;
+  }
+}
+
+.achievement-table.badge-board {
+  width: max-content;
+  min-width: 500px;
+  margin-bottom: 0;
+
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+  }
+
+  th:first-child {
+    z-index: 2;
+    background-color: #333;
+  }
+
+  td:first-child {
+    z-index: 1;
+    background-color: #222;
+  }
+
+  tbody tr {
+    // 36px badge icon plus 4px of vertical padding on each table cell.
+    height: 44px;
+  }
+
+  .achievement-icons {
+    white-space: nowrap;
+  }
+}
+
 .achievement-icon {
   display: inline-flex;
+  position: relative;
   width: 36px;
   height: 36px;
   margin-right: 6px;
@@ -272,6 +331,23 @@ table.week-picks {
   svg {
     width: 36px;
     height: 36px;
+  }
+}
+
+.achievement-icon-current {
+  &::after {
+    position: absolute;
+    z-index: 1;
+    top: -3px;
+    right: -4px;
+    color: #fff;
+    content: '✦';
+    font-family: sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+    -webkit-text-stroke: 0.5px #252535;
+    pointer-events: none;
   }
 }
 
@@ -321,8 +397,9 @@ table.week-picks {
 }
 
 .latest-achievements-scroll {
-  max-height: 270px;
+  max-height: 248px;
   overflow-y: auto;
+  border: 1px solid #111;
 
   .latest-achievements-table th {
     position: sticky;
@@ -511,6 +588,15 @@ table.week-picks {
   display: none;
 }
 
+@media screen and (min-width: 701px) {
+  .pick-submit-form form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 10px;
+  }
+}
+
 @media screen and (max-width: 700px) {
   .team-picker-group {
     display: flex;
@@ -599,6 +685,7 @@ input#show-picked {
 
 .grid-wrapper {
   overflow-x: auto;
+  overscroll-behavior-x: none;
 }
 
 .team-header-toggle {
@@ -631,12 +718,12 @@ input#show-picked {
 .pick-grid.logo-headers {
   th.team-logo-header {
     min-width: 48px;
-    padding: 4px;
+    padding: 4px 3px;
 
     img {
       display: block;
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       margin: auto;
       object-fit: contain;
     }

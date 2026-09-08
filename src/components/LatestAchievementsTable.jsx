@@ -45,7 +45,7 @@ function LatestAchievementsTable({ league }) {
           </>
         )}
       />
-      <h3>WEEK {displayedWeek} BADGES</h3>
+      <h3>Week {displayedWeek} badges</h3>
       <div className="latest-achievements-scroll">
         <table className="achievement-table latest-achievements-table">
           <thead>
