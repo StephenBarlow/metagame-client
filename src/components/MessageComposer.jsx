@@ -115,8 +115,9 @@ function MessageComposer({ league, teams, userID }) {
     catalogValues: composerData?.catalogValues || [],
     adjectives: composerData?.adjectives || [],
     users: league.messageEligibleUsers || [],
+    activeUserID: userID,
     teams,
-  }), [composerData, league.messageEligibleUsers, teams]);
+  }), [composerData, league.messageEligibleUsers, teams, userID]);
 
   useEffect(() => {
     if (templates.length && !templates.some(({ id }) => String(id) === String(templateID))) {
@@ -211,6 +212,53 @@ function MessageComposer({ league, teams, userID }) {
     }
   );
   const canSubmit = slots.every((slot) => selections[slot.id]);
+  const renderSentenceFragments = () => {
+    const renderedFragments = [];
+
+    for (let index = 0; index < sentenceFragments.length; index += 1) {
+      const fragment = sentenceFragments[index];
+      const slot = fragment.key ? slotsByKey.get(fragment.key) : null;
+
+      if (!slot) {
+        renderedFragments.push(<span key={`literal-${index}`}>{fragment.text}</span>);
+        continue;
+      }
+
+      const selection = selections[slot.id];
+      const trigger = (
+        <button
+          type="button"
+          className={`message-slot-trigger${selection ? ' selected' : ''}`}
+          key={`${slot.id}-${index}`}
+          onClick={() => setActiveSlot(slot)}
+          aria-label={`${slot.prompt}: ${selection?.label || 'not selected'}`}
+        >
+          {selection ? fragment.text : '________'}
+        </button>
+      );
+      const followingFragment = sentenceFragments[index + 1];
+      const punctuationMatch = !followingFragment?.key && followingFragment?.text.match(/^[,.;:!?]+/);
+
+      if (!punctuationMatch) {
+        renderedFragments.push(trigger);
+        continue;
+      }
+
+      renderedFragments.push(
+        <span className="message-slot-with-punctuation" key={`slot-${slot.id}-${index}`}>
+          {trigger}
+          {punctuationMatch[0]}
+        </span>
+      );
+      const remainingText = followingFragment.text.slice(punctuationMatch[0].length);
+      if (remainingText) {
+        renderedFragments.push(<span key={`literal-${index + 1}`}>{remainingText}</span>);
+      }
+      index += 1;
+    }
+
+    return renderedFragments;
+  };
 
   return (
     <form className="message-composer" onSubmit={submit}>
@@ -229,23 +277,7 @@ function MessageComposer({ league, teams, userID }) {
         </label>}
 
       <div className="message-composer-sentence">
-        {sentenceFragments.map((fragment, index) => {
-          const slot = fragment.key ? slotsByKey.get(fragment.key) : null;
-          if (!slot) return <span key={`literal-${index}`}>{fragment.text}</span>;
-
-          const selection = selections[slot.id];
-          return (
-            <button
-              type="button"
-              className={`message-slot-trigger${selection ? ' selected' : ''}`}
-              key={`${slot.id}-${index}`}
-            onClick={() => setActiveSlot(slot)}
-            aria-label={`${slot.prompt}: ${selection?.label || 'not selected'}`}
-          >
-              {selection ? fragment.text : '________'}
-            </button>
-          );
-        })}
+        {renderSentenceFragments()}
       </div>
 
       <div className="message-composer-actions">

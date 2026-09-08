@@ -44,6 +44,18 @@ test('renders union selection values using their display fields', () => {
   expect(fragments.map(({ text }) => text).join('')).toBe('Great pick, Sam!');
 });
 
+test('renders an author selecting themself as me for every reader', () => {
+  const fragments = getMessageFragments({
+    author: { id: '7', displayName: 'Alex' },
+    template: { format: '{player} made a bold pick.' },
+    selections: [
+      { slot: { key: 'player' }, value: { __typename: 'User', id: '7', displayName: 'Alex' } },
+    ],
+  });
+
+  expect(fragments.map(({ text }) => text).join('')).toBe('Me made a bold pick.');
+});
+
 test('assembles option groups in the slot type order', () => {
   const groups = getSlotOptionGroups(
     { valueTypes: ['TEAM', 'LEAGUE_MEMBER'] },
@@ -58,4 +70,23 @@ test('assembles option groups in the slot type order', () => {
   expect(groups.map(({ label }) => label)).toEqual(['Teams', 'People']);
   expect(groups[0].options[0]).toMatchObject({ valueType: 'TEAM', valueID: '2' });
   expect(groups[1].options.map(({ label }) => label)).toEqual(['Alex', 'Zoe']);
+});
+
+test('lists the active league member first as me', () => {
+  const groups = getSlotOptionGroups(
+    { valueTypes: ['LEAGUE_MEMBER'] },
+    {
+      teams: [],
+      users: [
+        { id: '7', displayName: 'Zoe' },
+        { id: '8', displayName: 'Alex' },
+        { id: '9', displayName: 'Sam' },
+      ],
+      activeUserID: '7',
+      catalogValues: [],
+      adjectives: [],
+    }
+  );
+
+  expect(groups[0].options.map(({ label }) => label)).toEqual(['me', 'Alex', 'Sam']);
 });

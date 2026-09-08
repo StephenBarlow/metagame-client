@@ -59,7 +59,14 @@ export const getMessageFragments = (message) => {
 
   return parseMessageFormat(
     message.template.format,
-    (key) => getMessageValueText(selectionsByKey.get(key))
+    (key) => {
+      const value = selectionsByKey.get(key);
+      const isAuthorSelfReference = value?.id != null && message.author?.id != null &&
+        (value.__typename === 'User' || value.displayName) &&
+        String(value?.id) === String(message.author?.id);
+
+      return isAuthorSelfReference ? 'me' : getMessageValueText(value);
+    }
   );
 };
 
@@ -71,16 +78,20 @@ const mapOptions = (items, valueType, getLabel) => (items || []).map((item) => (
   source: item,
 }));
 
-export const getSlotOptionGroups = (slot, { catalogValues, adjectives, users, teams }) => {
+export const getSlotOptionGroups = (slot, { catalogValues, adjectives, users, activeUserID, teams }) => {
   const optionsByType = {
     CATALOG_VALUE: mapOptions(catalogValues, 'CATALOG_VALUE', (value) => value.text),
     ADJECTIVE: mapOptions(adjectives, 'ADJECTIVE', (value) => value.text),
     LEAGUE_MEMBER: mapOptions(
-      [...(users || [])].sort((firstUser, secondUser) =>
-        firstUser.displayName.localeCompare(secondUser.displayName)
-      ),
+      [...(users || [])].sort((firstUser, secondUser) => {
+        const firstIsActiveUser = String(firstUser.id) === String(activeUserID);
+        const secondIsActiveUser = String(secondUser.id) === String(activeUserID);
+
+        if (firstIsActiveUser !== secondIsActiveUser) return firstIsActiveUser ? -1 : 1;
+        return firstUser.displayName.localeCompare(secondUser.displayName);
+      }),
       'LEAGUE_MEMBER',
-      (user) => user.displayName
+      (user) => String(user.id) === String(activeUserID) ? 'me' : user.displayName
     ),
     TEAM: mapOptions(teams, 'TEAM', (team) => team.name),
   };

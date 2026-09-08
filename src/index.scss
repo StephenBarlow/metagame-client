@@ -833,6 +833,10 @@ td.player-byes {
   }
 }
 
+.message-slot-with-punctuation {
+  white-space: nowrap;
+}
+
 .message-composer-actions {
   display: flex;
   align-items: center;
