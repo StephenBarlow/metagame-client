@@ -151,6 +151,9 @@ function FavoriteTeamForm({ league, teams, userID }) {
   const [openPicker, setOpenPicker] = useState(null);
   const [message, setMessage] = useState('');
   const formRef = useRef(null);
+  const sortedTeams = teams.slice().sort((firstTeam, secondTeam) =>
+    firstTeam.name.localeCompare(secondTeam.name)
+  );
   const [setFavoriteTeam, { loading }] = useMutation(SET_FAVORITE_TEAM, {
     refetchQueries: [{
       query: GET_LEAGUE_DETAILS,
@@ -196,7 +199,7 @@ function FavoriteTeamForm({ league, teams, userID }) {
           id="favorite-team"
           value={teamID}
           onChange={setTeamID}
-          teams={teams}
+          teams={sortedTeams}
           placeholder="Choose a team"
           openPicker={openPicker}
           setOpenPicker={setOpenPicker}
