@@ -334,6 +334,11 @@ table.week-picks {
   }
 }
 
+.achievement-tooltip-week {
+  display: block;
+  margin-top: 8px;
+}
+
 .achievement-icon-current {
   &::after {
     position: absolute;

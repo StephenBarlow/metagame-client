@@ -36,7 +36,7 @@ function LatestAchievementsTable({ league }) {
       <Tooltip
         id="latest-achievement-tooltip"
         classNameArrow="hidden"
-        style={{ backgroundColor: '#000000', zIndex: 10 }}
+        style={{ backgroundColor: '#000000', zIndex: 10, maxWidth: '300px' }}
         render={({ activeAnchor }) => (
           <>
             <strong>{activeAnchor?.getAttribute('data-achievement-name')}</strong>

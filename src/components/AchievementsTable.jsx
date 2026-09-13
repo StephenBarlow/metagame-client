@@ -132,14 +132,15 @@ function AchievementsTable({ league }) {
       <Tooltip
         id="achievement-tooltip"
         classNameArrow="hidden"
-        style={{ backgroundColor: '#000000', zIndex: 10 }}
+        style={{ backgroundColor: '#000000', zIndex: 10, maxWidth: '300px' }}
         render={({ activeAnchor }) => (
           <>
             <strong>{activeAnchor?.getAttribute('data-achievement-name')}</strong>
             <br />
             {activeAnchor?.getAttribute('data-achievement-description')}
-            <br />
-            Earned Week {activeAnchor?.getAttribute('data-award-week')}
+            <span className="achievement-tooltip-week">
+              Earned Week {activeAnchor?.getAttribute('data-award-week')}
+            </span>
           </>
         )}
       />
