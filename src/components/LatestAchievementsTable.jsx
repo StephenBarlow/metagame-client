@@ -50,7 +50,7 @@ function LatestAchievementsTable({ league }) {
         <table className="achievement-table latest-achievements-table">
           <thead>
             <tr>
-              <th>Badge</th>
+              <th className="latest-achievement-icon-cell">Badge</th>
               <th>Earned by</th>
             </tr>
           </thead>
@@ -69,7 +69,12 @@ function LatestAchievementsTable({ league }) {
                   </span>
                 </td>
                 <td className="latest-achievement-earners">
-                  {awards.map((award) => award.user.displayName).join(', ')}
+                  {awards.map((award, index) => (
+                    <React.Fragment key={award.id}>
+                      {index > 0 && ', '}
+                      <span className="latest-achievement-earner">{award.user.displayName}</span>
+                    </React.Fragment>
+                  ))}
                 </td>
               </tr>
             ))}

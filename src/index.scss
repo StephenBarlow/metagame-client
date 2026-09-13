@@ -382,17 +382,24 @@ table.week-picks {
 }
 
 .latest-achievements-table {
-  width: auto;
+  width: 750px;
+  max-width: 100%;
   min-width: 270px;
   margin-bottom: 0;
+  table-layout: fixed;
 
   .latest-achievement-icon-cell {
     width: 48px;
     text-align: center;
+    vertical-align: top;
   }
 
   .latest-achievement-earners {
-    min-width: 180px;
+    overflow-wrap: break-word;
+  }
+
+  .latest-achievement-earner {
+    white-space: nowrap;
   }
 }
 
