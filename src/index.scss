@@ -297,12 +297,12 @@ table.week-picks {
   }
 
   th:first-child {
-    z-index: 2;
+    z-index: 3;
     background-color: #333;
   }
 
   td:first-child {
-    z-index: 1;
+    z-index: 2;
     background-color: #222;
   }
 
@@ -397,6 +397,10 @@ table.week-picks {
     width: 48px;
     text-align: center;
     vertical-align: top;
+
+    .achievement-icon {
+      margin-right: 0;
+    }
   }
 
   .latest-achievement-earners {
@@ -1190,7 +1194,8 @@ form input:not(:first-of-type) {
   border: 1px solid black;
   margin-bottom: 20px;
   max-width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 
   text {
     fill: #ddd;

@@ -19,6 +19,10 @@ const getNiceStep = (rawStep) => {
 };
 
 const MAX_BUCKET_SIZE = 25;
+const CHART_HEIGHT = 400;
+const CHART_VERTICAL_PADDING = 80;
+const STACKED_MARKER_SPACING = 0.15;
+const STACKED_MARKER_SPACING_INCREASE_PX = 9.5;
 
 export const createHistogramBins = (scores) => {
   if (scores.length === 0) return undefined;
@@ -49,16 +53,29 @@ const axisStyle = {
 };
 
 function ScoreHistogram({ scores, playerScores = [] }) {
+  const bins = createHistogramBins(scores);
+
+  if (!bins || bins.length - 1 < 3) return null;
+
   const data = scores.map((score) => ({ x: score }));
+  const maxBinCount = Math.max(
+    1,
+    ...bins.slice(0, -1).map((lowerBound, index) => {
+      const upperBound = bins[index + 1];
+      const includesUpperBound = index === bins.length - 2;
+      return scores.filter((score) =>
+        score >= lowerBound && (includesUpperBound ? score <= upperBound : score < upperBound)
+      ).length;
+    })
+  );
+  const markerStackSpacing = STACKED_MARKER_SPACING +
+    (STACKED_MARKER_SPACING_INCREASE_PX * maxBinCount) / (CHART_HEIGHT - CHART_VERTICAL_PADDING);
   const scoreDotCounts = new Map();
   const playerPositionData = scores.map((score) => {
     const dotCount = scoreDotCounts.get(score) || 0;
     scoreDotCounts.set(score, dotCount + 1);
-    return { x: score, y: 0.5 + dotCount * 0.15 };
+    return { x: score, y: 0.5 + dotCount * markerStackSpacing };
   });
-  const bins = createHistogramBins(scores);
-
-  if (!bins || bins.length - 1 < 3) return null;
 
   const getBinLabel = ({ datum }) => {
     const lowerBound = datum.x0;
@@ -85,7 +102,7 @@ function ScoreHistogram({ scores, playerScores = [] }) {
   return (
     <VictoryChart
       containerComponent={<VictoryContainer responsive={false} style={{ touchAction: 'auto' }} />}
-      height={400}
+      height={CHART_HEIGHT}
       width={700}
       domainPadding={{ x: 0, y: 8 }}
       padding={{ top: 20, right: 30, bottom: 60, left: 60 }}
