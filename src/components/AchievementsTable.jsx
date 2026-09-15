@@ -145,7 +145,7 @@ function AchievementsTable({ league }) {
         )}
       />
       <h3>THE BADGERBOARD</h3>
-      <p className="badge-board-legend"><span aria-hidden="true">✦</span>: New this week</p>
+      <p className="badge-board-legend"><span aria-hidden="true">✦</span>: New in week {league.revealedWeek}</p>
       <div className="badge-board-scroll">
         <table className="achievement-table badge-board">
           <thead>

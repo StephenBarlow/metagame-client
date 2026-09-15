@@ -4,6 +4,12 @@ import { Tooltip } from 'react-tooltip';
 
 const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
 
+const getAwardedDay = (awardedAt) => {
+  const date = new Date(awardedAt);
+  if (Number.isNaN(date.getTime())) return 0;
+  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+};
+
 function LatestAchievementsTable({ league, expandToContent = false }) {
   const displayedWeek = league.revealedWeek;
   const awards = (league.achievementAwards || []).filter(
@@ -21,10 +27,11 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
 
     return [...awardsByAchievement.values()].map((awards) => ({
       achievement: awards[0].achievement,
-      awards
+      awards,
+      awardedDay: Math.max(...awards.map(({ awardedAt }) => getAwardedDay(awardedAt))),
     })).sort((first, second) =>
+      second.awardedDay - first.awardedDay ||
       first.awards.length - second.awards.length ||
-      new Date(second.awards[0].awardedAt) - new Date(first.awards[0].awardedAt) ||
       first.achievement.name.localeCompare(second.achievement.name)
     );
   }, [awards, displayedWeek]);

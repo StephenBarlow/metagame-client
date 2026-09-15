@@ -370,9 +370,9 @@ function LeagueDetails() {
           <>
             <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
 
-            <AchievementsTable league={leagueData.league} />
-
             <PickArchive league={leagueData.league} teams={leagueData.sportsTeams} currentSeason={leagueData.currentSeason} />
+
+            <AchievementsTable league={leagueData.league} />
           </>
         }
       </main>
