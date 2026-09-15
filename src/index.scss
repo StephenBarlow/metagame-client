@@ -1,3 +1,8 @@
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   font-family: 'Commissioner', sans-serif;
@@ -373,7 +378,7 @@ table.week-picks {
     min-width: 0;
   }
 
-  @media screen and (max-width: 900px) {
+  @media screen and (max-width: 1100px) {
     display: block;
   }
 }
@@ -387,7 +392,7 @@ table.week-picks {
 }
 
 .latest-achievements-table {
-  width: 750px;
+  width: 375px;
   max-width: 100%;
   min-width: 270px;
   margin-bottom: 0;
@@ -405,6 +410,7 @@ table.week-picks {
 
   .latest-achievement-earners {
     overflow-wrap: break-word;
+    line-height: 1.4;
   }
 
   .latest-achievement-earner {
@@ -424,10 +430,8 @@ table.week-picks {
   }
 }
 
-@media screen and (max-width: 1100px) {
-  .latest-achievements {
-    display: none;
-  }
+.latest-achievements-expanded .latest-achievements-scroll {
+  max-height: none;
 }
 
 .resources a {
@@ -751,6 +755,98 @@ input#show-picked {
   color: white;
 }
 
+.league-page-layout.has-feed {
+  display: grid;
+  grid-template-columns: minmax(0, 9fr) minmax(260px, 3fr);
+  align-items: stretch;
+  gap: 20px;
+  margin-right: -20px;
+}
+
+.league-page-main {
+  min-width: 0;
+}
+
+.league-feed-sidebar-shell.is-open,
+.league-feed-sidebar-shell.is-opening,
+.league-feed-sidebar-shell.is-closing {
+  position: sticky;
+  top: 50px;
+  align-self: start;
+  height: calc(100vh - 50px);
+  min-width: 0;
+}
+
+.league-feed-sidebar-shell.is-open,
+.league-feed-sidebar-shell.is-closing {
+  transition: transform 250ms ease-in-out;
+  will-change: transform;
+}
+
+.league-feed-sidebar-shell.is-open {
+  transform: translateX(0);
+}
+
+.league-feed-sidebar-shell.is-opening,
+.league-feed-sidebar-shell.is-closing {
+  transform: translateX(100%);
+}
+
+.league-feed-sidebar-shell.is-opening {
+  transition: none;
+}
+
+.league-feed-sidebar-shell.is-closed {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  z-index: 9;
+}
+
+.league-feed-toggle {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  place-items: center;
+  background: #191923;
+  color: #eee;
+  border: 1px solid #000;
+  border-right: 0;
+  border-radius: 0;
+  cursor: pointer;
+  z-index: 2;
+
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: $highlight;
+  }
+}
+
+.league-feed-sidebar-shell.is-open .league-feed-toggle,
+.league-feed-sidebar-shell.is-opening .league-feed-toggle,
+.league-feed-sidebar-shell.is-closing .league-feed-toggle {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  left: auto;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 0;
+  transform: none;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 td.player-byes {
   font-size: 12px;
 }
@@ -771,6 +867,58 @@ td.player-byes {
 
 .league-messages-read-only .league-messages-layout {
   grid-template-columns: minmax(0, 700px);
+}
+
+.league-messages-sidebar {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  padding: 0 20px;
+  background: #191923;
+  border-left: 1px solid #000;
+
+  h3 {
+    margin-top: 12px;
+  }
+
+  .league-messages-layout {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .message-feed-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .message-feed {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .message-composer {
+    flex: 0 0 auto;
+  }
+
+  .message-feed-panel {
+    margin-top: 12px;
+  }
+
+  .message-composer,
+  .message-feed-panel {
+    border-radius: 0;
+  }
 }
 
 .message-composer,
@@ -1043,6 +1191,37 @@ td.player-byes {
 
   .message-composer {
     margin-top: 12px;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .latest-achievements-scroll {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .league-page-layout.has-feed {
+    display: block;
+    margin-right: 0;
+  }
+
+  .league-messages-sidebar {
+    height: 100%;
+    padding: 0 20px;
+    background: #191923;
+    border-left: 1px solid #000;
+  }
+
+  .league-feed-sidebar-shell.is-open,
+  .league-feed-sidebar-shell.is-opening,
+  .league-feed-sidebar-shell.is-closing {
+    position: fixed;
+    top: 50px;
+    right: 0;
+    width: min(420px, 100vw);
+    height: calc(100vh - 50px);
+    margin-top: 0;
+    z-index: 9;
   }
 }
 

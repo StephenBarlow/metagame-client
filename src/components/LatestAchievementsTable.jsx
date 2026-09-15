@@ -4,7 +4,7 @@ import { Tooltip } from 'react-tooltip';
 
 const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
 
-function LatestAchievementsTable({ league }) {
+function LatestAchievementsTable({ league, expandToContent = false }) {
   const displayedWeek = league.revealedWeek;
   const awards = (league.achievementAwards || []).filter(
     (award) => String(award.user.id) !== EXCLUDED_ACHIEVEMENT_USER_ID
@@ -32,7 +32,7 @@ function LatestAchievementsTable({ league }) {
   if (!rows.length) return null;
 
   return (
-    <section className="latest-achievements">
+    <section className={`latest-achievements${expandToContent ? ' latest-achievements-expanded' : ''}`}>
       <Tooltip
         id="latest-achievement-tooltip"
         classNameArrow="hidden"

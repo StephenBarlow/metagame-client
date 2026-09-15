@@ -3,6 +3,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
+import { Icon } from '@iconify/react';
 import PickGrid from './PickGrid';
 import UserContext from './ActiveUserContext';
 import PickSubmitForm from './PickSubmitForm';
@@ -14,6 +15,9 @@ import AchievementsTable from './AchievementsTable';
 import LatestAchievementsTable from './LatestAchievementsTable';
 import LeagueMessages from './LeagueMessages';
 import { useParams } from 'react-router';
+
+const FEED_SIDEBAR_OPEN_STORAGE_KEY = 'feedSidebarOpen';
+const FEED_SIDEBAR_MIN_WIDTH = 1100;
 
 const GET_LEAGUE_DETAILS = gql`
   query GetLeagueDetails($leagueID: ID!, $userID: ID!) {
@@ -230,6 +234,11 @@ function LeagueDetails() {
   });
   const [submittedPicks, setSubmittedPicks] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(undefined);
+  const [feedSidebarState, setFeedSidebarState] = useState(() => {
+    const supportsSidebar = window.innerWidth > FEED_SIDEBAR_MIN_WIDTH;
+    const storedPreference = localStorage.getItem(FEED_SIDEBAR_OPEN_STORAGE_KEY);
+    return !supportsSidebar || storedPreference === 'false' ? 'closed' : 'open';
+  });
 
   const onPicksSubmitted = (picks) => {
     setSubmittedPicks((currentPicks) => [
@@ -243,6 +252,23 @@ function LeagueDetails() {
       setSelectedWeek(leagueData.league.currentWeek);
     }
   }, [selectedWeek, leagueData]);
+
+  useEffect(() => {
+    if (feedSidebarState === 'closing') {
+      const timeoutID = window.setTimeout(() => setFeedSidebarState('closed'), 250);
+      return () => window.clearTimeout(timeoutID);
+    }
+    if (feedSidebarState === 'opening') {
+      let nextFrameID;
+      const frameID = window.requestAnimationFrame(() => {
+        nextFrameID = window.requestAnimationFrame(() => setFeedSidebarState('open'));
+      });
+      return () => {
+        window.cancelAnimationFrame(frameID);
+        window.cancelAnimationFrame(nextFrameID);
+      };
+    }
+  }, [feedSidebarState]);
 
   const userConfig = JSON.parse(localStorage.getItem('userConfig'));
 
@@ -267,26 +293,38 @@ function LeagueDetails() {
   const currentWeekPicksVisible = leagueData.league.currentWeek <= leagueData.league.revealedWeek ||
     leagueData.league.season < leagueData.currentSeason;
   const pickFormVisible = leagueData.currentSeason === leagueData.league.season && selectedWeek !== undefined;
+  const feedVisible = !currentLeagueUser?.limited &&
+    (leagueData.league.revealedWeek >= 1 || String(activeUser().id) === '1') &&
+    (leagueData.league.season === leagueData.currentSeason || leagueData.league.messages?.length);
 
 
   // User must pick if the current week's picks
   // have been revealed and this user
   // hasn't made a pick yet.
   const userMustPick = !(leagueData.league.picks.find(pick => (pick.user.id === activeUser().id && pick.week === leagueData.league.currentWeek))) && leagueData.league.currentWeek === leagueData.league.revealedWeek;
+  const showPageFeed = !needsFavoriteTeam && !userMustPick && feedVisible;
+  const feedSidebarVisible = feedSidebarState !== 'closed';
+  const showOpenPageFeed = showPageFeed && feedSidebarVisible;
+  const toggleFeedSidebar = () => {
+    const shouldOpen = feedSidebarState === 'closed' || feedSidebarState === 'closing';
+    localStorage.setItem(FEED_SIDEBAR_OPEN_STORAGE_KEY, String(shouldOpen));
+    setFeedSidebarState(shouldOpen ? 'opening' : 'closing');
+  };
 
   return (
-    <>
-      <h2 className="league-name">{leagueData.league.name}</h2>
+    <div className={`league-page-layout${showOpenPageFeed ? ' has-feed' : ''}`}>
+      <main className="league-page-main">
+        <h2 className="league-name">{leagueData.league.name}</h2>
 
-      {needsFavoriteTeam &&
-        <FavoriteTeamForm
-          league={leagueData.league}
-          teams={leagueData.sportsTeams}
-          userID={activeUser().id}
-        />
-      }
+        {needsFavoriteTeam &&
+          <FavoriteTeamForm
+            league={leagueData.league}
+            teams={leagueData.sportsTeams}
+            userID={activeUser().id}
+          />
+        }
 
-      { !needsFavoriteTeam && (currentWeekPicksVisible || pickFormVisible || selectedWeek !== undefined) &&
+        { !needsFavoriteTeam && (currentWeekPicksVisible || pickFormVisible || selectedWeek !== undefined) &&
         <div className="league-current-week-layout">
           <div className="league-current-week-content">
             {currentWeekPicksVisible &&
@@ -313,11 +351,12 @@ function LeagueDetails() {
               />
             }
           </div>
-          {(currentWeekPicksVisible || pickFormVisible) && <LatestAchievementsTable league={leagueData.league} />}
+          {(currentWeekPicksVisible || pickFormVisible) &&
+            <LatestAchievementsTable league={leagueData.league} expandToContent={currentWeekPicksVisible} />}
         </div>
       }
 
-      {!needsFavoriteTeam &&
+        {!needsFavoriteTeam && userMustPick &&
         <LeagueMessages
           league={leagueData.league}
           teams={leagueData.sportsTeams}
@@ -327,16 +366,40 @@ function LeagueDetails() {
         />
       }
 
-      { !needsFavoriteTeam && !userMustPick &&
-        <>
-          <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
+        { !needsFavoriteTeam && !userMustPick &&
+          <>
+            <PickGrid league={leagueData.league} teams={leagueData.sportsTeams} />
 
-          <AchievementsTable league={leagueData.league} />
+            <AchievementsTable league={leagueData.league} />
 
-          <PickArchive league={leagueData.league} teams={leagueData.sportsTeams} currentSeason={leagueData.currentSeason} />
-        </>
+            <PickArchive league={leagueData.league} teams={leagueData.sportsTeams} currentSeason={leagueData.currentSeason} />
+          </>
+        }
+      </main>
+      {showPageFeed &&
+        <aside className={`league-feed-sidebar-shell is-${feedSidebarState}`}>
+          <button
+            className="league-feed-toggle"
+            type="button"
+            onClick={toggleFeedSidebar}
+            aria-label={feedSidebarState !== 'closed' ? 'Close feed' : 'Open feed'}
+            aria-expanded={feedSidebarState !== 'closed'}
+          >
+            <Icon icon={feedSidebarState !== 'closed' ? 'ant-design:close-outlined' : 'bi:chat-right-fill'} aria-hidden="true" />
+          </button>
+          {feedSidebarVisible &&
+            <LeagueMessages
+              league={leagueData.league}
+              teams={leagueData.sportsTeams}
+              userID={activeUser().id}
+              currentSeason={leagueData.currentSeason}
+              currentUserLimited={currentLeagueUser?.limited}
+              sidebar
+            />
+          }
+        </aside>
       }
-    </>
+    </div>
   );
 }
 
