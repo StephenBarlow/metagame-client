@@ -54,6 +54,7 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
         )}
       />
       <h3>Week {displayedWeek} badges</h3>
+      <p className="badge-board-legend"><span aria-hidden="true">✦</span>: Most recently earned</p>
       <div className="latest-achievements-scroll">
         <table className="achievement-table latest-achievements-table">
           <thead>
