@@ -344,7 +344,8 @@ table.week-picks {
   margin-top: 8px;
 }
 
-.achievement-icon-current {
+.achievement-icon-current,
+.achievement-icon-latest-day {
   &::after {
     position: absolute;
     z-index: 1;

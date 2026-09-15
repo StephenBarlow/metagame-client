@@ -37,6 +37,7 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
   }, [awards, displayedWeek]);
 
   if (!rows.length) return null;
+  const latestAwardedDay = rows[0].awardedDay;
 
   return (
     <section className={`latest-achievements${expandToContent ? ' latest-achievements-expanded' : ''}`}>
@@ -62,11 +63,11 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ achievement, awards }) => (
+            {rows.map(({ achievement, awards, awardedDay }) => (
               <tr key={achievement.id}>
                 <td className="latest-achievement-icon-cell">
                   <span
-                    className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}`}
+                    className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${awardedDay === latestAwardedDay ? ' achievement-icon-latest-day' : ''}`}
                     data-tooltip-id="latest-achievement-tooltip"
                     data-achievement-name={achievement.name}
                     data-achievement-description={achievement.description}
