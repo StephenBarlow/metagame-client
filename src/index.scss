@@ -1402,6 +1402,19 @@ form input:not(:first-of-type) {
   overflow: hidden;
   background: url('/field.png') center / cover no-repeat;
   border: 1px solid #111;
+
+  &.has-queue {
+    margin-bottom: 8px;
+  }
+}
+
+.score-field-queue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 700px;
+  max-width: 100%;
+  margin-bottom: 20px;
 }
 
 .score-field-player {
@@ -1430,11 +1443,18 @@ form input:not(:first-of-type) {
 
 .score-field-player-leader {
   background: $highlight;
+  border-color: $highlight;
   color: #252535;
 }
 
 .score-field-player-initials {
   transform: translateY(1px);
+}
+
+.score-field-queued-player {
+  position: relative;
+  flex: 0 0 auto;
+  transform: none;
 }
 
 

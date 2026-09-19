@@ -384,6 +384,7 @@ function PickGrid(props) {
               id: user.id,
               name: user.displayName,
               score: playerScores.get(user.id),
+              favoriteTeam: user.favoriteTeam,
             }))}
           />
         </>}
