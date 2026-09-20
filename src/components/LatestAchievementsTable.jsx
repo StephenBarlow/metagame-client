@@ -4,10 +4,11 @@ import { Tooltip } from 'react-tooltip';
 
 const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
 
-const getAwardedDay = (awardedAt) => {
-  const date = new Date(awardedAt);
-  if (Number.isNaN(date.getTime())) return 0;
-  return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+const RECENT_AWARD_WINDOW_MS = 3 * 60 * 60 * 1000;
+
+const getAwardedTimestamp = (awardedAt) => {
+  const timestamp = new Date(awardedAt).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 };
 
 function LatestAchievementsTable({ league, expandToContent = false }) {
@@ -28,16 +29,16 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
     return [...awardsByAchievement.values()].map((awards) => ({
       achievement: awards[0].achievement,
       awards,
-      awardedDay: Math.max(...awards.map(({ awardedAt }) => getAwardedDay(awardedAt))),
+      awardedAt: Math.max(...awards.map(({ awardedAt }) => getAwardedTimestamp(awardedAt))),
     })).sort((first, second) =>
-      second.awardedDay - first.awardedDay ||
+      second.awardedAt - first.awardedAt ||
       first.awards.length - second.awards.length ||
       first.achievement.name.localeCompare(second.achievement.name)
     );
   }, [awards, displayedWeek]);
 
   if (!rows.length) return null;
-  const latestAwardedDay = rows[0].awardedDay;
+  const latestAwardedAt = rows[0].awardedAt;
 
   return (
     <section className={`latest-achievements${expandToContent ? ' latest-achievements-expanded' : ''}`}>
@@ -64,11 +65,11 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ achievement, awards, awardedDay }) => (
+            {rows.map(({ achievement, awards, awardedAt }) => (
               <tr key={achievement.id}>
                 <td className="latest-achievement-icon-cell">
                   <span
-                    className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${awardedDay === latestAwardedDay ? ' achievement-icon-latest-day' : ''}`}
+                    className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${latestAwardedAt - awardedAt <= RECENT_AWARD_WINDOW_MS ? ' achievement-icon-latest-day' : ''}`}
                     data-tooltip-id="latest-achievement-tooltip"
                     data-achievement-name={achievement.name}
                     data-achievement-description={achievement.description}
