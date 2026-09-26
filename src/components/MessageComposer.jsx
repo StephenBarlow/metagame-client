@@ -40,6 +40,14 @@ const SUBMIT_MESSAGE = gql`
         id
         week
         createdAt
+        reactions {
+          id
+          reactionType
+          user {
+            id
+            displayName(leagueID: $leagueID)
+          }
+        }
         author {
           id
           displayName(leagueID: $leagueID)

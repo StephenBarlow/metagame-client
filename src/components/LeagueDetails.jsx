@@ -74,6 +74,14 @@ const GET_LEAGUE_DETAILS = gql`
         id
         week
         createdAt
+        reactions {
+          id
+          reactionType
+          user {
+            id
+            displayName(leagueID: $leagueID)
+          }
+        }
         author {
           id
           displayName(leagueID: $leagueID)

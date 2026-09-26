@@ -1094,6 +1094,53 @@ td.player-byes {
   line-height: 1.45;
 }
 
+.message-reactions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.message-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+  padding: 3px 6px;
+  background: transparent;
+  color: #ddd;
+  border: 1px solid #666;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  &:hover:not(:disabled) {
+    background: #444;
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+}
+
+.message-reaction-empty {
+  color: #777;
+  border-color: #444;
+}
+
+.message-reaction-active {
+  background: $highlight;
+  color: #181818;
+  border-color: $highlight;
+}
+
 .message-selection {
   color: $highlight;
 }
