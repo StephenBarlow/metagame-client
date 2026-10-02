@@ -2,8 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
 import UserContext from './ActiveUserContext';
-
-const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
+import { filterSoloSpecialUserAwards, SPECIAL_ACHIEVEMENT_USER_ID } from './achievementUtils';
 
 const getBadgeIDs = (player) => new Set(player.awards.map((award) => String(award.achievement.id)));
 
@@ -104,14 +103,13 @@ export function AchievementIcon({ award, isCurrent = false, tooltipId = 'achieve
 function AchievementsTable({ league }) {
   const activeUser = useContext(UserContext);
   const players = useMemo(() => {
+    const visibleAwards = filterSoloSpecialUserAwards(league.achievementAwards);
     const awardsByUser = new Map(league.users.map((user) => [String(user.id), []]));
-    for (const award of league.achievementAwards || []) {
-      if (String(award.user.id) === EXCLUDED_ACHIEVEMENT_USER_ID) continue;
+    for (const award of visibleAwards) {
       awardsByUser.get(String(award.user.id))?.push(award);
     }
 
     const players = league.users
-      .filter((user) => String(user.id) !== EXCLUDED_ACHIEVEMENT_USER_ID)
       .map((user, index) => ({
         user,
         index,
@@ -144,6 +142,11 @@ function AchievementsTable({ league }) {
           </>
         )}
       />
+      <Tooltip
+        id="achievement-special-user-tooltip"
+        classNameArrow="hidden"
+        style={{ backgroundColor: '#000000', zIndex: 10, maxWidth: '300px' }}
+      />
       <h3>THE BADGERBOARD</h3>
       <p className="badge-board-legend"><span aria-hidden="true">✦</span>: New in week {league.revealedWeek}</p>
       <div className="badge-board-scroll">
@@ -157,8 +160,14 @@ function AchievementsTable({ league }) {
           </thead>
           <tbody>
             {players.map(({ user, awards }) => (
-              <tr key={user.id}>
-                <td className={`achievement-player-name${String(user.id) === String(activeUser()?.id) ? ' is-active-user' : ''}`}>{user.displayName}</td>
+              <tr key={user.id} className={String(user.id) === SPECIAL_ACHIEVEMENT_USER_ID ? 'achievement-special-user-row' : undefined}>
+                <td
+                  className={`achievement-player-name${String(user.id) === String(activeUser()?.id) ? ' is-active-user' : ''}${String(user.id) === SPECIAL_ACHIEVEMENT_USER_ID ? ' achievement-special-user-name' : ''}`}
+                  data-tooltip-id={String(user.id) === SPECIAL_ACHIEVEMENT_USER_ID ? 'achievement-special-user-tooltip' : undefined}
+                  data-tooltip-content={String(user.id) === SPECIAL_ACHIEVEMENT_USER_ID ? 'Ineligible for the BIG BADGER award because he knows all the badges' : undefined}
+                >
+                  {user.displayName}{String(user.id) === SPECIAL_ACHIEVEMENT_USER_ID && '*'}
+                </td>
               <td className="achievement-total">{awards.length}</td>
               <td className="achievement-icons">
                   {awards.map((award) => (

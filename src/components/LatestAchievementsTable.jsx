@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
-
-const EXCLUDED_ACHIEVEMENT_USER_ID = '1';
+import { filterSoloSpecialUserAwards } from './achievementUtils';
 
 const RECENT_AWARD_WINDOW_MS = 3 * 60 * 60 * 1000;
 
@@ -13,9 +12,7 @@ const getAwardedTimestamp = (awardedAt) => {
 
 function LatestAchievementsTable({ league, expandToContent = false }) {
   const displayedWeek = league.revealedWeek;
-  const awards = (league.achievementAwards || []).filter(
-    (award) => String(award.user.id) !== EXCLUDED_ACHIEVEMENT_USER_ID
-  );
+  const awards = filterSoloSpecialUserAwards(league.achievementAwards);
   const rows = useMemo(() => {
     if (!displayedWeek) return [];
     const awardsByAchievement = new Map();
