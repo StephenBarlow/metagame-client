@@ -4,7 +4,7 @@ import { Tooltip } from 'react-tooltip';
 export const TOTAL_WEEKS = 18;
 const MAX_FIELD_PLAYERS = 9;
 
-const FIELD_LEFT_EDGE = 12;
+const FIELD_LEFT_EDGE = 15;
 const FIELD_RIGHT_EDGE = 88;
 
 const comparePlayersByScore = (firstPlayer, secondPlayer) =>
@@ -69,6 +69,7 @@ export const getFieldPlayers = (playerScores, currentWeek, totalWeeks = TOTAL_WE
 
   if (!leaders.length) return [];
 
+  const lowestScore = Math.min(...leaders.map(({ score }) => score));
   const highestScore = Math.max(...leaders.map(({ score }) => score));
   const weekProgress = Math.min(Math.max(currentWeek / totalWeeks, 0), 1);
   const furthestPosition = FIELD_LEFT_EDGE + (FIELD_RIGHT_EDGE - FIELD_LEFT_EDGE) * weekProgress;
@@ -81,7 +82,9 @@ export const getFieldPlayers = (playerScores, currentWeek, totalWeeks = TOTAL_WE
   );
 
   return leaders.map((player) => {
-    const scorePosition = highestScore === 0 ? 0 : player.score / highestScore;
+    const scorePosition = highestScore === lowestScore
+      ? 0
+      : (player.score - lowestScore) / (highestScore - lowestScore);
 
     return {
       ...player,

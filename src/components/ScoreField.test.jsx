@@ -71,14 +71,14 @@ describe('getFieldPlayers', () => {
     const halfwayThroughSeason = getFieldPlayers(scores, 9).find(({ id }) => id === 'a');
     const finalWeek = getFieldPlayers(scores, 18).find(({ id }) => id === 'a');
 
-    expect(halfwayThroughSeason.x).toBe(50);
+    expect(halfwayThroughSeason.x).toBe(51.5);
     expect(finalWeek.x).toBe(88);
   });
 
-  test('uses zero rather than tenth place as the left end of the score scale', () => {
+  test('uses the lowest displayed score as the left end of the score scale', () => {
     const trailingPlayer = getFieldPlayers(scores, 9).find(({ id }) => id === 'c');
 
-    expect(trailingPlayer.x).toBe(21.5);
+    expect(trailingPlayer.x).toBe(15);
   });
 
   test('queues players outside the top nine in score order', () => {
