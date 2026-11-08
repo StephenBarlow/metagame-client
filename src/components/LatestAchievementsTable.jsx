@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
-import { filterSoloSpecialUserAwards } from './achievementUtils';
+import { filterSoloSpecialUserAwards, getAchievementIconStyleClass } from './achievementUtils';
 
 const RECENT_AWARD_WINDOW_MS = 3 * 60 * 60 * 1000;
 
@@ -66,7 +66,7 @@ function LatestAchievementsTable({ league, expandToContent = false }) {
               <tr key={achievement.id}>
                 <td className="latest-achievement-icon-cell">
                   <span
-                    className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${latestAwardedAt - awardedAt <= RECENT_AWARD_WINDOW_MS ? ' achievement-icon-latest-day' : ''}`}
+                    className={`achievement-icon${achievement.iconId ? getAchievementIconStyleClass(achievement.iconId) : ' achievement-icon-missing'}${latestAwardedAt - awardedAt <= RECENT_AWARD_WINDOW_MS ? ' achievement-icon-latest-day' : ''}`}
                     data-tooltip-id="latest-achievement-tooltip"
                     data-achievement-name={achievement.name}
                     data-achievement-description={achievement.description}

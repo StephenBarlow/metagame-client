@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import { Icon } from '@iconify/react';
 import { Tooltip } from 'react-tooltip';
 import UserContext from './ActiveUserContext';
-import { filterSoloSpecialUserAwards, SPECIAL_ACHIEVEMENT_USER_ID } from './achievementUtils';
+import { filterSoloSpecialUserAwards, getAchievementIconStyleClass, SPECIAL_ACHIEVEMENT_USER_ID } from './achievementUtils';
 
 const getBadgeIDs = (player) => new Set(player.awards.map((award) => String(award.achievement.id)));
 
@@ -85,7 +85,7 @@ export function AchievementIcon({ award, isCurrent = false, tooltipId = 'achieve
   const { achievement } = award;
   return (
     <span
-      className={`achievement-icon${achievement.iconId ? '' : ' achievement-icon-missing'}${isCurrent && achievement.iconId ? ' achievement-icon-current' : ''}`}
+      className={`achievement-icon${achievement.iconId ? getAchievementIconStyleClass(achievement.iconId) : ' achievement-icon-missing'}${isCurrent && achievement.iconId ? ' achievement-icon-current' : ''}`}
       data-tooltip-id={tooltipId}
       data-achievement-name={achievement.name}
       data-achievement-description={achievement.description}

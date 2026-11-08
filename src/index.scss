@@ -342,6 +342,21 @@ table.week-picks {
   }
 }
 
+// Noto's family icon includes a gray square backdrop rather than using
+// currentColor. Keep only its family glyph, then color it like our other badges.
+.achievement-icon-noto-family {
+  svg path[fill='#bdbdbd'],
+  svg path[fill='#e0e0e0'],
+  svg path[fill='#fff'] {
+    display: none;
+  }
+
+  svg path:not([fill]),
+  svg circle {
+    fill: currentColor;
+  }
+}
+
 .achievement-tooltip-week {
   display: block;
   margin-top: 8px;
